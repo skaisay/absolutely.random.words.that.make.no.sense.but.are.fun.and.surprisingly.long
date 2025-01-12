@@ -3,524 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Современный адаптивный дизайн</title>
+    <title>Изучение норвежского языка</title>
     <style>
-        :root {
-            --primary: #05161A;
-            --secondary: #072E33;
-            --accent: #0C7075;
-            --highlight: #0F969C;
-            --light: #6DA5C0;
-            --dark: #294D61;
-        }
-
-        * {
+        body, html {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
             overflow-x: hidden;
         }
-
-        /* Header Styles */
-        header {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 2rem;
-            position: relative;
-            animation: fadeIn 1.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: var(--light);
-            background: rgba(255, 255, 255, 0.1);
-            padding: 1rem 2rem;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            color: var(--highlight);
-        }
-
-        .cta-button {
-            padding: 1rem 2rem;
-            background: var(--accent);
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: transform 0.3s ease, background-color 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            animation: pulse 2s infinite;
-        }
-
-        .cta-button:hover {
-            transform: scale(1.1);
-            background: var(--highlight);
-            animation: none;
-        }
-
-        /* Navigation Menu */
-        .menu-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            background: var(--accent);
-            border: none;
-            border-radius: 8px;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .menu-toggle span {
-            width: 25px;
-            height: 3px;
-            background: white;
-            border-radius: 3px;
-            transition: transform 0.3s ease;
-        }
-
-        .menu-toggle.active span:nth-child(1) {
-            transform: translateY(9px) rotate(45deg);
-        }
-
-        .menu-toggle.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .menu-toggle.active span:nth-child(3) {
-            transform: translateY(-9px) rotate(-45deg);
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            right: -300px;
-            width: 300px;
-            height: 100vh;
-            background: rgba(7, 46, 51, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 80px 20px;
-            transition: right 0.3s ease;
-            z-index: 999;
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .sidebar.active {
-            right: 0;
-        }
-
-        .sidebar a {
-            display: block;
-            color: white;
-            text-decoration: none;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar a:hover {
-            background: var(--accent);
-            transform: translateX(10px);
-        }
-
-        /* News Section */
-        .news {
-            padding: 4rem 2rem;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-        }
-
-        .news-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+        .container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 20px;
         }
-
-        .news-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .news-card:hover {
-            transform: translateY(-10px);
-        }
-
-        .news-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .news-content {
-            padding: 1.5rem;
-        }
-
-        .news-content h3 {
-            color: var(--light);
-            margin-bottom: 1rem;
-        }
-
-        /* About Section */
-        .about {
-            padding: 4rem 2rem;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .about a {
-            color: var(--light);
-            text-decoration: none;
-            transition: color 0.3s ease;
-            padding: 0.5rem 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 1rem;
-        }
-
-        .about a:hover {
-            color: var(--highlight);
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Mini-Game */
-        .game-container {
-            padding: 2rem;
-            text-align: center;
-            min-height: 400px;
-            position: relative;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-        }
-
-        .target {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: var(--highlight);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .target:hover {
-            transform: scale(1.1);
-        }
-
-        .score {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent);
-            padding: 10px 20px;
-            border-radius: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Settings Panel */
-        .settings {
-            padding: 4rem 2rem;
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            text-align: center;
-        }
-
-        .theme-selector {
+        .header {
             display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-
-        .theme-option {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .theme-option:hover {
-            transform: scale(1.2);
-        }
-
-        /* Footer */
-        .footer {
-            padding: 2rem;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-        }
-
-        .scroll-top {
-            padding: 1rem 2rem;
-            background: var(--accent);
-            border: none;
-            border-radius: 25px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #05161A;
             color: white;
+        }
+        .main {
+            padding: 20px;
+        }
+        .welcome {
+            text-align: center;
+            padding: 50px;
+            border: 2px solid #0F969C;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .welcome button {
+            padding: 10px 20px;
+            font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: none;
+            border-radius: 5px;
+            background-color: #0F969C;
+            color: white;
+            animation: pulse 1.5s infinite;
         }
-
-        .scroll-top:hover {
-            background: var(--highlight);
-            transform: translateY(-5px);
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-
-            .subtitle {
-                font-size: 1rem;
-            }
-
-            .sidebar {
-                width: 100%;
-                right: -100%;
-            }
-
-            .news-container {
-                grid-template-columns: 1fr;
-            }
+        .section {
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .word-card {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 5px;
+            display: inline-block;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .word-card:hover {
+            background-color: #e0e0e0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #05161A;
+            color: white;
+        }
+        .footer button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #0F969C;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <button class="menu-toggle" aria-label="Toggle Menu">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
-
-    <nav class="sidebar">
-        <a href="#home">Главная страница</a>
-        <a href="#news">Новости</a>
-        <a href="#about">О нас</a>
-        <a href="#settings">Настройки</a>
-        <a href="#game">Мини-игра</a>
-    </nav>
-
-    <header id="home">
-        <h1>Добро пожаловать!</h1>
-        <p class="subtitle">Современный адаптивный дизайн для любых устройств</p>
-        <button class="cta-button">Продолжить</button>
-    </header>
-
-    <section id="news" class="news">
-        <h2>Новости</h2>
-        <div class="news-container">
-            <div class="news-card">
-                <img src="https://picsum.photos/seed/1/400/200" alt="Новость 1">
-                <div class="news-content">
-                    <h3>Заголовок новости 1</h3>
-                    <p>Краткое описание первой новости. Здесь может быть ваш текст.</p>
-                </div>
-            </div>
-            <div class="news-card">
-                <img src="https://picsum.photos/seed/2/400/200" alt="Новость 2">
-                <div class="news-content">
-                    <h3>Заголовок новости 2</h3>
-                    <p>Краткое описание второй новости. Здесь может быть ваш текст.</p>
-                </div>
-            </div>
-            <div class="news-card">
-                <img src="https://picsum.photos/seed/3/400/200" alt="Новость 3">
-                <div class="news-content">
-                    <h3>Заголовок новости 3</h3>
-                    <p>Краткое описание третьей новости. Здесь может быть ваш текст.</p>
-                </div>
-            </div>
+    <div class="header">
+        <h1>Изучение норвежского языка</h1>
+    </div>
+    <div class="main container">
+        <div class="welcome">
+            <h2>Добро пожаловать на платформу изучения норвежского языка!</h2>
+            <p>Легко и весело учите норвежский язык!</p>
+            <button onclick="scrollToSection('lessons')">Начать обучение</button>
         </div>
-    </section>
-
-    <section id="about" class="about">
-        <h2>О проекте</h2>
-        <p>Создатель проекта: Serhii Stafiichuk</p>
-        <a href="https://www.instagram.com/serhii_stafiichuk?igsh=MXRsd2t2Z2I3Mzg2NA==" target="_blank" rel="noopener noreferrer">Мой Instagram</a>
-    </section>
-
-    <section id="game" class="game-container">
-        <div class="score">Счет: <span id="score">0</span></div>
-    </section>
-
-    <section id="settings" class="settings">
-        <h2>Настройки</h2>
-        <div class="theme-selector">
-            <div class="theme-option" style="background: #05161A;" data-theme="default"></div>
-            <div class="theme-option" style="background: #072E33;" data-theme="secondary"></div>
-            <div class="theme-option" style="background: #0C7075;" data-theme="accent"></div>
-            <div class="theme-option" style="background: #0F969C;" data-theme="highlight"></div>
-            <div class="theme-option" style="background: #6DA5C0;" data-theme="light"></div>
-            <div class="theme-option" style="background: #294D61;" data-theme="dark"></div>
+        <div class="section" id="lessons">
+            <h2>Уроки</h2>
+            <div id="word-list"></div>
         </div>
-    </section>
-
-    <footer class="footer">
-        <button class="scroll-top">Вернуться на главную</button>
-    </footer>
-
+        <div class="section" id="practice">
+            <h2>Практика и игры</h2>
+            <button onclick="startGame()">Поймай слово</button>
+            <button onclick="startQuiz()">Угадай правильный перевод</button>
+        </div>
+        <div class="section" id="about">
+            <h2>О нас</h2>
+            <p>Описание проекта и ссылка на Instagram:</p>
+            <a href="https://www.instagram.com/serhii_stafiichuk?igsh=MXRsd2t2Z2I3Mzg2NA==" target="_blank">Мой Instagram</a>
+        </div>
+        <div class="section" id="settings">
+            <h2>Настройки</h2>
+            <p>Выберите цветовую тему:</p>
+            <button style="background-color: #05161A;" onclick="changeTheme('#05161A')">Тема 1</button>
+            <button style="background-color: #072E33;" onclick="changeTheme('#072E33')">Тема 2</button>
+            <button style="background-color: #0C7075;" onclick="changeTheme('#0C7075')">Тема 3</button>
+            <button style="background-color: #0F969C;" onclick="changeTheme('#0F969C')">Тема 4</button>
+            <button style="background-color: #6DA5C0;" onclick="changeTheme('#6DA5C0')">Тема 5</button>
+            <button style="background-color: #294D61;" onclick="changeTheme('#294D61')">Тема 6</button>
+        </div>
+    </div>
+    <div class="footer">
+        <button onclick="scrollToSection('main')">Вернуться на главную</button>
+    </div>
     <script>
-        // Menu Toggle
-        const menuToggle = document.querySelector('.menu-toggle');
-        const sidebar = document.querySelector('.sidebar');
-        
-        menuToggle.addEventListener('click', () => {
-            menuToggle.classList.toggle('active');
-            sidebar.classList.toggle('active');
-        });
+        const norwegianWords = [
+            { norwegian: "Hei", translation: "Привет", category: "Приветствия" },
+            { norwegian: "God morgen", translation: "Доброе утро", category: "Приветствия" },
+            { norwegian: "Bok", translation: "Книга", category: "Существительные" },
+            { norwegian: "Spise", translation: "Есть (приём пищи)", category: "Глаголы" },
+        ];
 
-        // Smooth Scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                sidebar.classList.remove('active');
-                menuToggle.classList.remove('active');
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-        // Continue Button Scroll
-        document.querySelector('.cta-button').addEventListener('click', () => {
-            document.querySelector('#news').scrollIntoView({
-                behavior: 'smooth'
-            });
-        });
-
-        // Mini-Game
-        const gameContainer = document.querySelector('.game-container');
-        const scoreElement = document.querySelector('#score');
-        let score = 0;
-
-        function createTarget() {
-            const target = document.createElement('div');
-            target.className = 'target';
-            
-            const maxX = gameContainer.clientWidth - 50;
-            const maxY = gameContainer.clientHeight - 50;
-            
-            target.style.left = Math.random() * maxX + 'px';
-            target.style.top = Math.random() * maxY + 'px';
-            
-            target.addEventListener('click', () => {
-                score++;
-                scoreElement.textContent = score;
-                target.remove();
-                createTarget();
-            });
-            
-            gameContainer.appendChild(target);
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
         }
 
-        createTarget();
-
-        // Theme Selector with localStorage
-        const themeOptions = document.querySelectorAll('.theme-option');
-        
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            document.body.className = savedTheme;
+        function changeTheme(color) {
+            document.body.style.backgroundColor = color;
+            localStorage.setItem('theme', color);
         }
-        
-        themeOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                const theme = option.dataset.theme;
-                document.body.className = theme;
-                localStorage.setItem('theme', theme);
-            });
-        });
 
-        // Scroll to Top
-        document.querySelector('.scroll-top').addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
+        function loadTheme() {
+            const theme = localStorage.getItem('theme');
+            if (theme) {
+                document.body.style.backgroundColor = theme;
+            }
+        }
 
-        // Intersection Observer for Animations
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        });
+        function startLesson() {
+            document.getElementById("word-list").innerHTML = norwegianWords
+                .map(word => `<div class="word-card" onclick="showTranslation('${word.translation}')">${word.norwegian}</div>`)
+                .join('');
+        }
 
-        document.querySelectorAll('section').forEach(section => {
-            section.style.opacity = '0';
-            section.style.transform = 'translateY(20px)';
-            section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            observer.observe(section);
-        });
+        function showTranslation(translation) {
+            alert(`Перевод: ${translation}`);
+        }
 
-        // News Cards Animation
-        document.querySelectorAll('.news-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            observer.observe(card);
-        });
+        function startGame() {
+            alert("Игра началась!");
+        }
+
+        function startQuiz() {
+            alert("Викторина началась!");
+        }
+
+        document.addEventListener('DOMContentLoaded', loadTheme);
+        startLesson();
     </script>
 </body>
 </html>
