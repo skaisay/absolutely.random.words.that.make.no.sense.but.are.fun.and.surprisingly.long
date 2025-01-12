@@ -1,257 +1,525 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Responsive Website</title>
+    <title>Современный адаптивный дизайн</title>
     <style>
         :root {
-            --primary-dark: #05161A;
-            --secondary-dark: #072E33;
-            --primary-accent: #0C7075;
-            --secondary-accent: #0F969C;
-            --light-accent: #6DA5C0;
-            --neutral: #294D61;
-            --transition: all 0.3s ease-in-out;
-        }
-
-        :root[data-theme="light"] {
-            --bg-color: #ffffff;
-            --text-color: var(--primary-dark);
-            --card-bg: rgba(255, 255, 255, 0.7);
-        }
-
-        :root[data-theme="dark"] {
-            --bg-color: var(--primary-dark);
-            --text-color: #ffffff;
-            --card-bg: rgba(7, 46, 51, 0.7);
+            --primary: #05161A;
+            --secondary: #072E33;
+            --accent: #0C7075;
+            --highlight: #0F969C;
+            --light: #6DA5C0;
+            --dark: #294D61;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            transition: var(--transition);
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
-            color: var(--text-color);
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+        /* Header Styles */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            animation: fadeIn 1.5s ease-out;
         }
 
-        /* Navigation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--light);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: var(--highlight);
+        }
+
+        .cta-button {
+            padding: 1rem 2rem;
+            background: var(--accent);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.1);
+            background: var(--highlight);
+            animation: none;
+        }
+
+        /* Navigation Menu */
         .menu-toggle {
             position: fixed;
             top: 20px;
             right: 20px;
             z-index: 1000;
-            cursor: pointer;
-            background: var(--primary-accent);
-            border-radius: 50%;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
             width: 50px;
             height: 50px;
+            cursor: pointer;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            border: none;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
         .menu-toggle span {
             width: 25px;
             height: 3px;
             background: white;
-            position: relative;
+            border-radius: 3px;
+            transition: transform 0.3s ease;
         }
 
-        .menu-toggle span::before,
-        .menu-toggle span::after {
-            content: '';
-            position: absolute;
-            width: 25px;
-            height: 3px;
-            background: white;
-            transition: var(--transition);
+        .menu-toggle.active span:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
         }
 
-        .menu-toggle span::before { top: -8px; }
-        .menu-toggle span::after { top: 8px; }
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
 
         .sidebar {
             position: fixed;
-            right: -300px;
             top: 0;
+            right: -300px;
             width: 300px;
             height: 100vh;
-            background: var(--card-bg);
+            background: rgba(7, 46, 51, 0.95);
             backdrop-filter: blur(10px);
             padding: 80px 20px;
-            transition: var(--transition);
+            transition: right 0.3s ease;
             z-index: 999;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
         }
 
         .sidebar.active {
             right: 0;
         }
 
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            position: relative;
-            padding: 20px;
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .hero h1 {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            opacity: 0;
-            animation: fadeIn 1s ease-in forwards;
+        .sidebar a:hover {
+            background: var(--accent);
+            transform: translateX(10px);
         }
 
-        .card {
-            background: var(--card-bg);
+        /* News Section */
+        .news {
+            padding: 4rem 2rem;
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 100%;
         }
 
-        /* Game Section */
+        .news-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .news-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .news-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .news-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .news-content {
+            padding: 1.5rem;
+        }
+
+        .news-content h3 {
+            color: var(--light);
+            margin-bottom: 1rem;
+        }
+
+        /* About Section */
+        .about {
+            padding: 4rem 2rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .about a {
+            color: var(--light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .about a:hover {
+            color: var(--highlight);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Mini-Game */
         .game-container {
+            padding: 2rem;
+            text-align: center;
+            min-height: 400px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .target {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: var(--highlight);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .target:hover {
+            transform: scale(1.1);
+        }
+
+        .score {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
+            background: var(--accent);
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Settings Panel */
+        .settings {
+            padding: 4rem 2rem;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
             text-align: center;
         }
 
-        .game-circle {
-            width: 50px;
-            height: 50px;
-            background: var(--secondary-accent);
-            border-radius: 50%;
-            cursor: pointer;
-            position: absolute;
-            transition: var(--transition);
+        .theme-selector {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .theme-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-option:hover {
+            transform: scale(1.2);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 2rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .scroll-top {
+            padding: 1rem 2rem;
+            background: var(--accent);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .scroll-top:hover {
+            background: var(--highlight);
+            transform: translateY(-5px);
         }
 
         /* Responsive Design */
-        @media (max-width: 767px) {
-            .hero h1 { font-size: 2.5rem; }
-            .card { margin: 20px; }
-        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
 
-        @media (min-width: 768px) and (max-width: 1023px) {
-            .hero h1 { font-size: 3rem; }
-        }
+            .subtitle {
+                font-size: 1rem;
+            }
 
-        /* Theme Switcher */
-        .theme-switch {
-            background: var(--primary-accent);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            margin-top: 20px;
+            .sidebar {
+                width: 100%;
+                right: -100%;
+            }
+
+            .news-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <button class="menu-toggle" aria-label="Toggle Menu">
         <span></span>
+        <span></span>
+        <span></span>
     </button>
 
     <nav class="sidebar">
-        <h2>My Account</h2>
-        <button class="theme-switch">Switch Theme</button>
+        <a href="#home">Главная страница</a>
+        <a href="#news">Новости</a>
+        <a href="#about">О нас</a>
+        <a href="#settings">Настройки</a>
+        <a href="#game">Мини-игра</a>
     </nav>
 
-    <main class="hero">
-        <div class="card">
-            <h1>Welcome!</h1>
-            <p>Experience a modern, responsive design that adapts to any device.</p>
-        </div>
-    </main>
+    <header id="home">
+        <h1>Добро пожаловать!</h1>
+        <p class="subtitle">Современный адаптивный дизайн для любых устройств</p>
+        <button class="cta-button">Продолжить</button>
+    </header>
 
-    <div class="game-container">
-        <div id="score">Score: 0</div>
-        <div class="game-circle"></div>
-    </div>
+    <section id="news" class="news">
+        <h2>Новости</h2>
+        <div class="news-container">
+            <div class="news-card">
+                <img src="https://picsum.photos/seed/1/400/200" alt="Новость 1">
+                <div class="news-content">
+                    <h3>Заголовок новости 1</h3>
+                    <p>Краткое описание первой новости. Здесь может быть ваш текст.</p>
+                </div>
+            </div>
+            <div class="news-card">
+                <img src="https://picsum.photos/seed/2/400/200" alt="Новость 2">
+                <div class="news-content">
+                    <h3>Заголовок новости 2</h3>
+                    <p>Краткое описание второй новости. Здесь может быть ваш текст.</p>
+                </div>
+            </div>
+            <div class="news-card">
+                <img src="https://picsum.photos/seed/3/400/200" alt="Новость 3">
+                <div class="news-content">
+                    <h3>Заголовок новости 3</h3>
+                    <p>Краткое описание третьей новости. Здесь может быть ваш текст.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <h2>О проекте</h2>
+        <p>Создатель проекта: Serhii Stafiichuk</p>
+        <a href="https://www.instagram.com/serhii_stafiichuk?igsh=MXRsd2t2Z2I3Mzg2NA==" target="_blank" rel="noopener noreferrer">Мой Instagram</a>
+    </section>
+
+    <section id="game" class="game-container">
+        <div class="score">Счет: <span id="score">0</span></div>
+    </section>
+
+    <section id="settings" class="settings">
+        <h2>Настройки</h2>
+        <div class="theme-selector">
+            <div class="theme-option" style="background: #05161A;" data-theme="default"></div>
+            <div class="theme-option" style="background: #072E33;" data-theme="secondary"></div>
+            <div class="theme-option" style="background: #0C7075;" data-theme="accent"></div>
+            <div class="theme-option" style="background: #0F969C;" data-theme="highlight"></div>
+            <div class="theme-option" style="background: #6DA5C0;" data-theme="light"></div>
+            <div class="theme-option" style="background: #294D61;" data-theme="dark"></div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <button class="scroll-top">Вернуться на главную</button>
+    </footer>
 
     <script>
-        // Theme Management
-        const themeSwitch = document.querySelector('.theme-switch');
-        const root = document.documentElement;
-
-        const currentTheme = localStorage.getItem('theme') || 'dark';
-        root.setAttribute('data-theme', currentTheme);
-
-        themeSwitch.addEventListener('click', () => {
-            const newTheme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            root.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
-
         // Menu Toggle
         const menuToggle = document.querySelector('.menu-toggle');
         const sidebar = document.querySelector('.sidebar');
-
+        
         menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
             sidebar.classList.toggle('active');
         });
 
-        // Click Game
-        const gameCircle = document.querySelector('.game-circle');
-        const scoreDisplay = document.getElementById('score');
-        let score = 0;
-
-        function moveCircle() {
-            const maxX = window.innerWidth - 50;
-            const maxY = window.innerHeight - 150;
-            const randomX = Math.random() * maxX;
-            const randomY = Math.max(Math.random() * maxY, 100);
-            
-            gameCircle.style.left = `${randomX}px`;
-            gameCircle.style.top = `${randomY}px`;
-        }
-
-        gameCircle.addEventListener('click', () => {
-            score++;
-            scoreDisplay.textContent = `Score: ${score}`;
-            moveCircle();
-            
-            gameCircle.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 50%)`;
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                sidebar.classList.remove('active');
+                menuToggle.classList.remove('active');
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
         });
 
-        // Initial circle position
-        moveCircle();
+        // Continue Button Scroll
+        document.querySelector('.cta-button').addEventListener('click', () => {
+            document.querySelector('#news').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
 
-        // Close sidebar when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
-                sidebar.classList.remove('active');
-            }
+        // Mini-Game
+        const gameContainer = document.querySelector('.game-container');
+        const scoreElement = document.querySelector('#score');
+        let score = 0;
+
+        function createTarget() {
+            const target = document.createElement('div');
+            target.className = 'target';
+            
+            const maxX = gameContainer.clientWidth - 50;
+            const maxY = gameContainer.clientHeight - 50;
+            
+            target.style.left = Math.random() * maxX + 'px';
+            target.style.top = Math.random() * maxY + 'px';
+            
+            target.addEventListener('click', () => {
+                score++;
+                scoreElement.textContent = score;
+                target.remove();
+                createTarget();
+            });
+            
+            gameContainer.appendChild(target);
+        }
+
+        createTarget();
+
+        // Theme Selector with localStorage
+        const themeOptions = document.querySelectorAll('.theme-option');
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.body.className = savedTheme;
+        }
+        
+        themeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const theme = option.dataset.theme;
+                document.body.className = theme;
+                localStorage.setItem('theme', theme);
+            });
+        });
+
+        // Scroll to Top
+        document.querySelector('.scroll-top').addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Intersection Observer for Animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(section);
+        });
+
+        // News Cards Animation
+        document.querySelectorAll('.news-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(card);
         });
     </script>
 </body>
