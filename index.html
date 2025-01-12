@@ -3,87 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Современный адаптивный сайт</title>
+    <title>Coffee House</title>
     <style>
-        body {
+        /* Reset and base styles */
+        * {
             margin: 0;
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f9;
+            padding: 0;
+            box-sizing: border-box;
         }
-        header {
-            background: linear-gradient(135deg, #2b5876, #4e4376);
-            color: white;
-            padding: 50px 20px;
-            text-align: center;
+
+        html {
+            scroll-behavior: smooth;
         }
-        header h1 {
-            font-size: 2.5rem;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #fdf2e9 0%, #ffecd1 100%);
+            color: #4a3428;
         }
-        header p {
-            font-size: 1.2rem;
-            margin: 20px 0;
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        section {
-            padding: 50px 20px;
-            max-width: 800px;
-            margin: auto;
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            color: white;
-            background-color: #4e4376;
+
+        .nav-logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #6b4423;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: #6b4423;
             text-decoration: none;
-            border-radius: 5px;
-            transition: 0.3s;
+            transition: color 0.3s;
         }
-        .btn:hover {
-            background-color: #2b5876;
+
+        .nav-link:hover {
+            color: #9c6644;
         }
-        footer {
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6b4423;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            padding: 20px;
-            background-color: #2b5876;
+            position: relative;
+            background: url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&q=80') center/cover;
             color: white;
         }
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 2rem;
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: fadeDown 1s ease-out forwards;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #6b4423;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #9c6644;
+            transform: translateY(-2px);
+        }
+
+        /* Menu Section */
+        .menu {
+            padding: 5rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #4a3428;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+
+        .menu-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .menu-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .menu-item-content {
+            padding: 1.5rem;
+        }
+
+        .menu-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #4a3428;
+        }
+
+        .price-btn {
+            background: #6b4423;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .price-btn:hover {
+            background: #9c6644;
+        }
+
+        /* Footer */
+        .footer {
+            background: #4a3428;
+            color: white;
+            padding: 4rem 1rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: #9c6644;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: #ffecd1;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animations */
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
             }
-            header p {
-                font-size: 1rem;
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Добро пожаловать на мой сайт!</h1>
-        <p>Современный и адаптивный дизайн для всех устройств</p>
-        <a href="#about" class="btn">Подробнее</a>
-    </header>
-    
-    <section id="about">
-        <h2>О проекте</h2>
-        <p>Этот сайт создан для демонстрации адаптивного дизайна и современных интерфейсов.</p>
-        <a href="#contact" class="btn">Связаться</a>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="nav-logo">Coffee House</div>
+            <button class="menu-toggle">☰</button>
+            <div class="nav-menu">
+                <a href="#menu" class="nav-link">Меню</a>
+                <a href="#about" class="nav-link">О нас</a>
+                <a href="#contact" class="nav-link">Контакты</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Добро пожаловать</h1>
+            <p>в мир изысканного кофе</p>
+            <a href="#menu" class="btn">Продолжить ↓</a>
+        </div>
     </section>
-    
-    <section id="contact">
-        <h2>Форма обратной связи</h2>
-        <form>
-            <label>Имя:</label>
-            <input type="text" placeholder="Введите ваше имя" required><br><br>
-            <label>Email:</label>
-            <input type="email" placeholder="Введите ваш email" required><br><br>
-            <label>Сообщение:</label>
-            <textarea placeholder="Введите сообщение"></textarea><br><br>
-            <button type="submit" class="btn">Отправить</button>
-        </form>
+
+    <!-- Menu Section -->
+    <section id="menu" class="menu">
+        <h2 class="section-title">Наше меню</h2>
+        <div class="menu-grid">
+            <div class="menu-item">
+                <img src="https://images.unsplash.com/photo-1509785307050-d4066910ec1e?auto=format&fit=crop&q=80&w=400" alt="Американо">
+                <div class="menu-item-content">
+                    <h3>Американо</h3>
+                    <button class="price-btn">$2.50</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&q=80&w=400" alt="Капучино">
+                <div class="menu-item-content">
+                    <h3>Капучино</h3>
+                    <button class="price-btn">$3.50</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=400" alt="Латте">
+                <div class="menu-item-content">
+                    <h3>Латте</h3>
+                    <button class="price-btn">$3.75</button>
+                </div>
+            </div>
+        </div>
     </section>
-    
-    <footer>
-        <p>© 2025 Ваш Сайт | Контакты: Telegram @ВашЛогин</p>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>Наши услуги</h3>
+                <ul>
+                    <li><a href="#">Кофе с собой</a></li>
+                    <li><a href="#">Доставка</a></li>
+                    <li><a href="#">Кейтеринг</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>О компании</h3>
+                <ul>
+                    <li><a href="#">История</a></li>
+                    <li><a href="#">Команда</a></li>
+                    <li><a href="#">Карьера</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Контакты</h3>
+                <ul>
+                    <li>Тел: +7 (999) 123-45-67</li>
+                    <li>Email: info@coffeehouse.ru</li>
+                    <li>Адрес: ул. Кофейная, 1</li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2024 Coffee House. Все права защищены.</p>
+        </div>
     </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navMenu = document.querySelector('.nav-menu');
+
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Intersection Observer for scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        document.querySelectorAll('.menu-item').forEach(item => {
+            observer.observe(item);
+        });
+    </script>
 </body>
 </html>
