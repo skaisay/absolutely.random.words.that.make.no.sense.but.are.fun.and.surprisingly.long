@@ -8,8 +8,9 @@
         body {
             margin: 0;
             font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+            background: linear-gradient(135deg, #05161A, #6DA5C0);
             color: #fff;
+            overflow: hidden;
         }
         header {
             display: flex;
@@ -35,31 +36,29 @@
             height: 80vh;
             position: relative;
         }
-        .scroll-container {
-            overflow-x: auto;
-            white-space: nowrap;
+        .carousel {
             width: 100%;
-            text-align: center;
+            height: 100%;
+            perspective: 1000px;
+            position: relative;
         }
-        .scroll-content {
-            display: inline-block;
-        }
-        .ai-link {
-            display: inline-block;
-            margin: 0 20px;
-            padding: 15px 30px;
-            background: #444;
+        .carousel-item {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            transition: transform 0.3s, background 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+            transition: transform 0.5s, opacity 0.5s;
         }
-        .ai-link:hover {
-            transform: scale(1.1);
-            background: #555;
-        }
-        .ai-link a {
+        .carousel-item a {
             color: #fff;
             text-decoration: none;
             font-size: 18px;
+            text-align: center;
         }
         .tooltip {
             position: absolute;
@@ -92,19 +91,17 @@
         <div class="logo">Логотип</div>
         <input type="text" id="search" placeholder="Поиск ИИ-инструментов...">
     </header><main>
-        <div class="scroll-container">
-            <div class="scroll-content">
-                <div class="ai-link" data-tooltip="Создание текстов и ответов на вопросы">
-                    <a href="chatgpt.html">ChatGPT</a>
-                </div>
-                <div class="ai-link" data-tooltip="Генерация изображений">
-                    <a href="dalle.html">DALL·E</a>
-                </div>
-                <div class="ai-link" data-tooltip="Автоматизация задач">
-                    <a href="automate.html">Automate</a>
-                </div>
-                <!-- Добавь больше ссылок по аналогии -->
+        <div class="carousel">
+            <div class="carousel-item" data-tooltip="ChatGPT — отвечает на вопросы">
+                <a href="https://chat.openai.com/" target="_blank">ChatGPT</a>
             </div>
+            <div class="carousel-item" data-tooltip="DALL·E — генерация изображений">
+                <a href="https://openai.com/dall-e" target="_blank">DALL·E</a>
+            </div>
+            <div class="carousel-item" data-tooltip="MidJourney — создание изображений">
+                <a href="https://midjourney.com/" target="_blank">MidJourney</a>
+            </div>
+            <!-- Добавь остальные ссылки по аналогии -->
         </div>
         <div id="tooltip" class="tooltip"></div>
     </main>
@@ -116,17 +113,42 @@
             <a href="#">Instagram</a>
         </div>
         <div class="license">© 2023 Каталог ИИ. Все права защищены.</div>
-    </footer><script>
-        const aiLinks = document.querySelectorAll('.ai-link');
-        const tooltip = document.getElementById('tooltip');
+    </footer><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Настройка сцены Three.js
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.querySelector('.carousel').appendChild(renderer.domElement);
 
-        aiLinks.forEach(link => {
-            link.addEventListener('mouseover', () => {
-                tooltip.textContent = link.getAttribute('data-tooltip');
+        // Создание 3D-объектов
+        const items = document.querySelectorAll('.carousel-item');
+        items.forEach((item, index) => {
+            const geometry = new THREE.BoxGeometry(2, 2, 2);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+            const cube = new THREE.Mesh(geometry, material);
+            cube.position.x = (index - items.length / 2) * 3;
+            scene.add(cube);
+        });
+
+        camera.position.z = 10;
+
+        // Анимация
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Подсказки
+        const tooltip = document.getElementById('tooltip');
+        items.forEach(item => {
+            item.addEventListener('mouseover', () => {
+                tooltip.textContent = item.getAttribute('data-tooltip');
                 tooltip.style.opacity = '1';
             });
-
-            link.addEventListener('mouseout', () => {
+            item.addEventListener('mouseout', () => {
                 tooltip.style.opacity = '0';
             });
         });
