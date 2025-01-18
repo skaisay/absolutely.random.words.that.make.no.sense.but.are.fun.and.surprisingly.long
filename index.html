@@ -3,526 +3,411 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Universe</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Telegram WebApp -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- GSAP для анимаций -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
-    <!-- Three.js для 3D -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
+    <title>2048 Game</title>
     <style>
-        :root {
-            --primary-color: #6DA5C0;
-            --accent-color: #FFD700;
-            --dark-bg: #05161A;
-            --light-bg: #0A2E38;
-            --text-light: #ffffff;
-            --text-dark: #333333;
-        }
-
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--dark-bg), var(--light-bg));
-            color: var(--text-light);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .navbar {
-            background: rgba(5, 22, 26, 0.95) !important;
-            backdrop-filter: blur(10px);
-            padding: 1rem 0;
-        }
-
-        .navbar-brand {
-            color: var(--primary-color) !important;
-            font-weight: 600;
-            font-size: 1.5rem;
-        }
-
-        .nav-link {
-            color: var(--text-light) !important;
-            transition: color 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: var(--accent-color) !important;
-        }
-
-        .hero {
-            min-height: 100vh;
+            background-color: #faf8ef;
+            font-family: Arial, sans-serif;
             display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 500px;
+            padding: 15px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            position: relative;
-            overflow: hidden;
+            margin-bottom: 20px;
         }
 
-        .hero-content {
-            position: relative;
-            z-index: 2;
+        h1 {
+            font-size: 48px;
+            font-weight: bold;
+            color: #776e65;
         }
 
-        .hero-title {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-            opacity: 0;
-            transform: translateY(30px);
+        .scores {
+            display: flex;
+            gap: 10px;
         }
 
-        .hero-text {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0;
-            transform: translateY(30px);
+        .score-box {
+            background: #bbada0;
+            padding: 10px 20px;
+            border-radius: 3px;
+            color: white;
+            min-width: 100px;
+            text-align: center;
         }
 
-        .cta-button {
-            display: inline-block;
-            padding: 1rem 2rem;
-            background: var(--primary-color);
-            color: var(--text-light);
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: 500;
-            transition: transform 0.3s ease, background 0.3s ease;
-            opacity: 0;
-            transform: translateY(30px);
+        .score-label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 4px;
         }
 
-        .cta-button:hover {
-            background: var(--accent-color);
-            transform: translateY(-3px);
-            color: var(--text-dark);
-            text-decoration: none;
+        #score, #best-score {
+            font-size: 20px;
+            font-weight: bold;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+        #new-game {
+            background: #8f7a66;
+            color: white;
             border: none;
-            transition: transform 0.3s ease;
-            margin-bottom: 2rem;
-            opacity: 0;
-            transform: translateY(30px);
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
         }
 
-        .card:hover {
-            transform: translateY(-10px) rotateY(5deg);
+        #new-game:hover {
+            background: #9f8a76;
         }
 
-        .card-body {
-            padding: 2rem;
-        }
-
-        .card-title {
-            color: var(--accent-color);
-            margin-bottom: 1rem;
-        }
-
-        .search-container {
+        .game-container {
             position: relative;
-            max-width: 500px;
-            margin: 0 auto;
+            background: #bbada0;
+            padding: 15px;
+            border-radius: 6px;
+            width: 470px;
+            height: 470px;
         }
 
-        .search-input {
-            width: 100%;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 5px;
-            color: var(--text-light);
-            backdrop-filter: blur(5px);
+        .grid-background, .grid-container {
+            position: absolute;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 15px;
+            width: calc(100% - 30px);
+            height: calc(100% - 30px);
         }
 
-        .search-input:focus {
-            outline: none;
-            background: rgba(255, 255, 255, 0.15);
+        .grid-cell {
+            background: rgba(238, 228, 218, 0.35);
+            border-radius: 3px;
         }
 
-        .modal-content {
-            background: linear-gradient(135deg, var(--dark-bg), var(--light-bg));
-            color: var(--text-light);
-        }
-
-        .modal-header {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .modal-footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .footer {
-            background: rgba(5, 22, 26, 0.95);
-            padding: 3rem 0;
-            margin-top: 5rem;
-        }
-
-        .social-links a {
-            color: var(--text-light);
-            margin: 0 1rem;
-            font-size: 1.5rem;
-            transition: color 0.3s ease;
-        }
-
-        .social-links a:hover {
-            color: var(--accent-color);
-        }
-
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .rotate-on-hover {
-            transition: transform 0.3s ease;
-            transform-style: preserve-3d;
-        }
-
-        .rotate-on-hover:hover {
-            transform: rotateY(10deg) rotateX(5deg);
-        }
-
-        .preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--dark-bg);
+        .tile {
+            position: absolute;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
+            width: 100px;
+            height: 100px;
+            font-size: 45px;
+            font-weight: bold;
+            border-radius: 3px;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+            animation: appear 0.2s ease;
         }
 
-        .preloader-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid var(--primary-color);
-            border-top: 3px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        @keyframes appear {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes merge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
-        #canvas-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
+        .tile.merged {
+            animation: merge 0.2s ease;
         }
 
-        @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2.5rem;
-            }
-
-            .navbar-collapse {
-                background: rgba(5, 22, 26, 0.95);
-                padding: 1rem;
-                border-radius: 5px;
-            }
+        .tile-2 { background: #eee4da; color: #776e65; }
+        .tile-4 { background: #ede0c8; color: #776e65; }
+        .tile-8 { background: #f2b179; color: #f9f6f2; }
+        .tile-16 { background: #f59563; color: #f9f6f2; }
+        .tile-32 { background: #f67c5f; color: #f9f6f2; }
+        .tile-64 { background: #f65e3b; color: #f9f6f2; }
+        .tile-128 { 
+            background: #edcf72; 
+            color: #f9f6f2;
+            font-size: 40px;
         }
-
-        @media (max-width: 576px) {
-            .card {
-                margin: 1rem 0;
-            }
-            
-            .hero-content {
-                padding: 0 1rem;
-            }
-            
-            .search-container {
-                width: 100%;
-                margin-top: 1rem;
-            }
+        .tile-256 { 
+            background: #edcc61; 
+            color: #f9f6f2;
+            font-size: 40px;
+        }
+        .tile-512 { 
+            background: #edc850; 
+            color: #f9f6f2;
+            font-size: 40px;
+        }
+        .tile-1024 { 
+            background: #edc53f; 
+            color: #f9f6f2;
+            font-size: 35px;
+        }
+        .tile-2048 { 
+            background: #edc22e; 
+            color: #f9f6f2;
+            font-size: 35px;
         }
     </style>
 </head>
 <body>
-    <!-- Прелоадер -->
-    <div class="preloader">
-        <div class="preloader-spinner"></div>
-    </div>
-
-    <!-- Навигация -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">AI Universe</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#home">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#about">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#catalog">Catalog</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#blog">Blog</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
-                    </li>
-                </ul>
-                <div class="search-container ms-3">
-                    <input type="text" class="search-input" placeholder="Search...">
+    <div class="container">
+        <div class="header">
+            <h1>2048</h1>
+            <div class="scores">
+                <div class="score-box">
+                    <span class="score-label">SCORE</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="score-box">
+                    <span class="score-label">BEST</span>
+                    <span id="best-score">0</span>
                 </div>
             </div>
+            <button id="new-game">New Game</button>
         </div>
-    </nav>
-
-    <!-- Герой секция -->
-    <section class="hero" id="home">
-        <div id="canvas-container"></div>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 hero-content">
-                    <h1 class="hero-title">Welcome to AI Universe</h1>
-                    <p class="hero-text">Discover the future of artificial intelligence and explore cutting-edge AI tools that are reshaping our world</p>
-                    <a href="#catalog" class="cta-button">Explore AI Tools</a>
-                </div>
+        <div class="game-container">
+            <div class="grid-background">
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
             </div>
-        </div>
-    </section>
-
-    <!-- Каталог -->
-    <section class="py-5" id="catalog">
-        <div class="container">
-            <h2 class="text-center mb-5">Popular AI Tools</h2>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card rotate-on-hover">
-                        <div class="card-body">
-                            <h3 class="card-title">ChatGPT</h3>
-                            <p class="card-text">Advanced language model for natural conversations and content generation</p>
-                            <button class="cta-button" onclick="showDetails('ChatGPT')">Learn More</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card rotate-on-hover">
-                        <div class="card-body">
-                            <h3 class="card-title">DALL·E</h3>
-                            <p class="card-text">AI system that creates realistic images and art from text descriptions</p>
-                            <button class="cta-button" onclick="showDetails('DALL·E')">Learn More</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card rotate-on-hover">
-                        <div class="card-body">
-                            <h3 class="card-title">Midjourney</h3>
-                            <p class="card-text">Create stunning artwork using advanced AI image generation</p>
-                            <button class="cta-button" onclick="showDetails('Midjourney')">Learn More</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Модальное окно -->
-    <div class="modal fade" id="toolModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="modalBody">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="cta-button" data-bs-dismiss="modal">Close</button>
-                </div>
+            <div class="grid-container">
+                <!-- Tiles will be added here dynamically -->
             </div>
         </div>
     </div>
-
-    <!-- Футер -->
-    <footer class="footer">
-        <div class="container text-center">
-            <div class="social-links mb-4">
-                <a href="#"><i class="fab fa-telegram"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="#"><i class="fab fa-github"></i></a>
-            </div>
-            <p>&copy; 2025 AI Universe. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Font Awesome -->
-    <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
 
     <script>
-        // Инициализация Telegram WebApp
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-
-        // Настройка темы
-        function setTheme() {
-            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
-        }
-
-        setTheme();
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setTheme);
-
-        // Анимации с GSAP
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-
-        // Анимация заголовка и текста при загрузке
-        gsap.from('.hero-title', {
-            duration: 1,
-            y: 30,
-            opacity: 0,
-            delay: 0.2
-        });
-
-        gsap.from('.hero-text', {
-            duration: 1,
-            y: 30,
-            opacity: 0,
-            delay: 0.4
-        });
-
-        gsap.from('.cta-button', {
-            duration: 1,
-            y: 30,
-            opacity: 0,
-            delay: 0.6
-        });
-
-        // Анимация карточек при скролле
-        gsap.utils.toArray('.card').forEach(card => {
-            gsap.from(card, {
-                scrollTrigger: {
-                    trigger: card,
-                    start: 'top bottom-=100',
-                    toggleActions: 'play none none reverse'
-                },
-                y: 50,
-                opacity: 0,
-                duration: 1
-            });
-        });
-
-        // Three.js анимация фона
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-        // Создание сферы
-        const geometry = new THREE.SphereGeometry(1, 32, 32);
-        const material = new THREE.MeshBasicMaterial({
-            color: 0x6DA5C0,
-            wireframe: true
-        });
-        const sphere = new THREE.Mesh(geometry, material);
-        scene.add(sphere);
-
-        camera.position.z = 5;
-
-        // Анимация сферы
-        function animate() {
-            requestAnimationFrame(animate);
-            sphere.rotation.x += 0.001;
-            sphere.rotation.y += 0.001;
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        // Обработка изменения размера окна
-        window.addEventListener('resize', onWindowResize, false);
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        // Функция для показа деталей инструмента
-        function showDetails(tool) {
-            if (tg.initDataUnsafe?.user) {
-                tg.sendData(`Show details for: ${tool}`);
+        class Game {
+            constructor() {
+                this.gridSize = 4;
+                this.gridContainer = document.querySelector('.grid-container');
+                this.scoreElement = document.getElementById('score');
+                this.bestScoreElement = document.getElementById('best-score');
+                this.score = 0;
+                this.bestScore = parseInt(localStorage.getItem('bestScore')) || 0;
+                this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(null));
+                this.setupNewGame();
+                this.setupEventListeners();
             }
-            
-            // Создание и показ модального окна
-            const modal = new bootstrap.Modal(document.getElementById('toolModal'));
-            document.getElementById('modalTitle').textContent = tool;
-            document.getElementById('modalBody').textContent = `Detailed information about ${tool} will be displayed here.`;
-            modal.show();
-        }
 
-        // Прелоадер
-        window.addEventListener('load', () => {
-            const preloader = document.querySelector('.preloader');
-            if (preloader) {
-                preloader.style.opacity = '0';
-                setTimeout(() => {
-                    preloader.style.display = 'none';
-                }, 500);
+            setupNewGame() {
+                this.clearGrid();
+                this.score = 0;
+                this.updateScore();
+                this.addRandomTile();
+                this.addRandomTile();
             }
-        });
 
-        // Плавная прокрутка для навигации
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    gsap.to(window, {
-                        duration: 1,
-                        scrollTo: {
-                            y: target,
-                            offsetY: 70
-                        },
-                        ease: "power2.inOut"
-                    });
+            clearGrid() {
+                this.gridContainer.innerHTML = '';
+                this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(null));
+            }
+
+            updateScore() {
+                this.scoreElement.textContent = this.score;
+                if (this.score > this.bestScore) {
+                    this.bestScore = this.score;
+                    this.bestScoreElement.textContent = this.bestScore;
+                    localStorage.setItem('bestScore', this.bestScore);
                 }
-            });
-        });
+            }
+
+            addRandomTile() {
+                const emptyCells = [];
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        if (!this.grid[row][col]) {
+                            emptyCells.push({ row, col });
+                        }
+                    }
+                }
+
+                if (emptyCells.length) {
+                    const { row, col } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                    const value = Math.random() < 0.9 ? 2 : 4;
+                    this.grid[row][col] = value;
+                    this.createTile(row, col, value);
+                }
+            }
+
+            createTile(row, col, value) {
+                const tile = document.createElement('div');
+                tile.className = `tile tile-${value}`;
+                tile.textContent = value;
+                tile.style.setProperty('--x', col);
+                tile.style.setProperty('--y', row);
+                this.positionTile(tile, row, col);
+                this.gridContainer.appendChild(tile);
+                return tile;
+            }
+
+            positionTile(tile, row, col) {
+                tile.style.transform = `translate(${col * 115}px, ${row * 115}px)`;
+            }
+
+            setupEventListeners() {
+                document.addEventListener('keydown', this.handleKeyPress.bind(this));
+                document.getElementById('new-game').addEventListener('click', () => this.setupNewGame());
+                
+                // Touch events for mobile
+                let touchStartX, touchStartY;
+                document.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                });
+
+                document.addEventListener('touchend', (e) => {
+                    if (!touchStartX || !touchStartY) return;
+
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const touchEndY = e.changedTouches[0].clientY;
+
+                    const deltaX = touchEndX - touchStartX;
+                    const deltaY = touchEndY - touchStartY;
+
+                    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                        if (deltaX > 0) this.move('right');
+                        else this.move('left');
+                    } else {
+                        if (deltaY > 0) this.move('down');
+                        else this.move('up');
+                    }
+                });
+            }
+
+            handleKeyPress(event) {
+                if (event.key.startsWith('Arrow')) {
+                    event.preventDefault();
+                    const direction = event.key.replace('Arrow', '').toLowerCase();
+                    this.move(direction);
+                }
+            }
+
+            move(direction) {
+                const previousGrid = this.grid.map(row => [...row]);
+                let moved = false;
+                
+                // Determine movement parameters based on direction
+                const movements = {
+                    'up': { start: 1, end: this.gridSize, step: 1, isRow: true },
+                    'down': { start: this.gridSize - 2, end: -1, step: -1, isRow: true },
+                    'left': { start: 1, end: this.gridSize, step: 1, isRow: false },
+                    'right': { start: this.gridSize - 2, end: -1, step: -1, isRow: false }
+                };
+
+                const movement = movements[direction];
+                
+                // Process movement
+                for (let i = 0; i < this.gridSize; i++) {
+                    for (let j = movement.start; j != movement.end; j += movement.step) {
+                        const current = movement.isRow ? [j, i] : [i, j];
+                        const next = movement.isRow ? [j - movement.step, i] : [i, j - movement.step];
+                        
+                        if (this.grid[current[0]][current[1]]) {
+                            let [newRow, newCol] = next;
+                            let value = this.grid[current[0]][current[1]];
+                            
+                            while (
+                                newRow >= 0 && newRow < this.gridSize &&
+                                newCol >= 0 && newCol < this.gridSize
+                            ) {
+                                if (!this.grid[newRow][newCol]) {
+                                    this.grid[newRow][newCol] = value;
+                                    this.grid[current[0]][current[1]] = null;
+                                    [current[0], current[1]] = [newRow, newCol];
+                                    moved = true;
+                                } else if (this.grid[newRow][newCol] === value) {
+                                    this.grid[newRow][newCol] *= 2;
+                                    this.grid[current[0]][current[1]] = null;
+                                    this.score += this.grid[newRow][newCol];
+                                    moved = true;
+                                    break;
+                                } else {
+                                    break;
+                                }
+                                
+                                newRow = movement.isRow ? newRow - movement.step : newRow;
+                                newCol = movement.isRow ? newCol : newCol - movement.step;
+                            }
+                        }
+                    }
+                }
+
+                if (moved) {
+                    this.updateGrid();
+                    this.addRandomTile();
+                    this.updateScore();
+                    
+                    if (this.isGameOver()) {
+                        setTimeout(() => alert('Game Over!'), 300);
+                    }
+                }
+            }
+
+            updateGrid() {
+                this.gridContainer.innerHTML = '';
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        if (this.grid[row][col]) {
+                            this.createTile(row, col, this.grid[row][col]);
+                        }
+                    }
+                }
+            }
+
+            isGameOver() {
+                // Check for empty cells
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        if (!this.grid[row][col]) return false;
+                    }
+                }
+
+                // Check for possible merges
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        const current = this.grid[row][col];
+                        // Check right neighbor
+                        if (col < this.gridSize - 1 && this.grid[row][col + 1] === current) return false;
+                        // Check bottom neighbor
+                        if (row < this.gridSize - 1 && this.grid[row + 1][col] === current) return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        // Start the game
+        new Game();
     </script>
 </body>
 </html>
