@@ -1,38 +1,216 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Современный Сайт</title>
-  <style>
-    /* Стили и анимации */
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sands of Time</title>
+    <style>
+        /* Общие стили */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, white, lightgray);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo img {
+            height: 50px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 15px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: black;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 150px 20px 50px 20px;
+            background: linear-gradient(to bottom, white, lightgray);
+        }
+
+        .hero h1 {
+            font-size: 3em;
+            animation: fadeIn 2s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .learn-more {
+            padding: 10px 20px;
+            font-size: 1em;
+            margin-top: 20px;
+            cursor: pointer;
+            border: none;
+            background-color: #333;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        .learn-more:hover {
+            background-color: #555;
+        }
+
+        .vertical-icons {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Карточки */
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background-color: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            width: 250px;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        /* Подвал */
+        footer {
+            background: linear-gradient(to bottom, lightgray, white);
+            margin-top: auto;
+            padding: 20px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .social-links a {
+            margin: 0 5px;
+            text-decoration: none;
+            color: black;
+        }
+
+        @media (max-width: 600px) {
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header class="header">
-    <div class="parallax-bg"></div>
-    <nav class="navbar">
-      <div class="logo">МойСайт</div>
-      <ul class="nav-links">
-        <li><a href="#about">О себе</a></li>
-        <li><a href="#portfolio">Портфолио</a></li>
-        <li><a href="#contact">Контакты</a></li>
-      </ul>
-    </nav>
-    <div class="hero">
-      <h1 class="hero-title">Добро пожаловать в будущее!</h1>
-      <p class="hero-subtitle">Здесь ты найдешь что-то крутое.</p>
-      <button class="cta-button">Узнать больше</button>
-    </div>
-  </header>
 
-  <script>
-    // Параллакс-эффект
-    const parallaxBg = document.querySelector('.parallax-bg');
-    window.addEventListener('scroll', () => {
-      const offset = window.pageYOffset;
-      parallaxBg.style.transform = translateY(${offset * 0.5}px);
-    });
-  </script>
+    <!-- Главная страница -->
+    <header>
+        <div class="logo">
+            <!-- Комментарий: Замените src на путь к вашему логотипу -->
+            <img src="images/logo.png" alt="Логотип">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Главная</a></li>
+                <li><a href="#about">О проекте</a></li>
+                <li><a href="#contacts">Контакты</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1 class="fade-in">Sands of time</h1>
+            <button class="learn-more">Подробнее</button>
+            <div class="vertical-icons">
+                <!-- Комментарий: Добавьте иконки для навигации по секциям -->
+                <a href="#section1"><img src="images/icon1.png" alt="Иконка 1"></a>
+                <a href="#section2"><img src="images/icon2.png" alt="Иконка 2"></a>
+                <a href="#section3"><img src="images/icon3.png" alt="Иконка 3"></a>
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="card-container">
+                <div class="card">
+                    <h2>Заголовок карточки 1</h2>
+                    <p>Текст карточки 1</p>
+                    <button>Кнопка</button>
+                </div>
+                <!-- Добавьте больше карточек по аналогии -->
+            </div>
+        </section>
+
+        <!-- Другие разделы -->
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="social-links">
+                <!-- Комментарий: Замените href на ссылки на ваши соцсети -->
+                <a href="#">Twitter</a>
+                <a href="#">Facebook</a>
+                <a href="#">Instagram</a>
+            </div>
+            <div class="contact-info">
+                <p>Контактная информация</p>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 Sands of Time. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Анимации и интерактивность
+
+        document.querySelector('.learn-more').addEventListener('click', function() {
+            // Добавьте здесь функциональность кнопки "Подробнее"
+            alert('Вы нажали кнопку "Подробнее"');
+        });
+
+        // Пример анимации при наведении на карточку
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'scale(1.05)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+    </script>
 </body>
 </html>
