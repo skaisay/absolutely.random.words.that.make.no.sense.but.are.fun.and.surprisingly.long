@@ -3,411 +3,421 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2048 Game</title>
+    <title>Game Hub</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Phaser.js -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+
     <style>
+        :root {
+            --primary-color: #6DA5C0;
+            --accent-color: #FFD700;
+            --dark-bg: #05161A;
+            --light-bg: #0A2E38;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+        }
+
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            background-color: #faf8ef;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg), var(--light-bg));
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
         }
 
-        .container {
-            width: 500px;
-            padding: 15px;
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
         }
 
-        .header {
+        .navbar {
+            background: rgba(5, 22, 26, 0.95) !important;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-light) !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-color) !important;
+        }
+
+        .hero {
+            min-height: 60vh;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 48px;
-            font-weight: bold;
-            color: #776e65;
-        }
-
-        .scores {
-            display: flex;
-            gap: 10px;
-        }
-
-        .score-box {
-            background: #bbada0;
-            padding: 10px 20px;
-            border-radius: 3px;
-            color: white;
-            min-width: 100px;
             text-align: center;
+            padding: 4rem 0;
         }
 
-        .score-label {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 4px;
+        .hero-title {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
         }
 
-        #score, #best-score {
-            font-size: 20px;
-            font-weight: bold;
+        .hero-text {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
         }
 
-        #new-game {
-            background: #8f7a66;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 3px;
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease, background 0.3s ease;
             cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
+            backdrop-filter: blur(10px);
         }
 
-        #new-game:hover {
-            background: #9f8a76;
+        .game-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .game-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .game-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .game-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--dark-bg), var(--light-bg));
+            color: var(--text-light);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .game-container {
-            position: relative;
-            background: #bbada0;
-            padding: 15px;
-            border-radius: 6px;
-            width: 470px;
-            height: 470px;
+            width: 100%;
+            height: 600px;
+            background: #000;
+            margin: 1rem 0;
+            display: none;
         }
 
-        .grid-background, .grid-container {
-            position: absolute;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-gap: 15px;
-            width: calc(100% - 30px);
-            height: calc(100% - 30px);
+        .cta-button {
+            background: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: background 0.3s ease, transform 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .grid-cell {
-            background: rgba(238, 228, 218, 0.35);
-            border-radius: 3px;
+        .cta-button:hover {
+            background: var(--accent-color);
+            transform: translateY(-3px);
+            color: var(--text-dark);
         }
 
-        .tile {
-            position: absolute;
+        .footer {
+            background: rgba(5, 22, 26, 0.95);
+            padding: 3rem 0;
+            margin-top: 5rem;
+        }
+
+        .social-links a {
+            color: var(--text-light);
+            margin: 0 1rem;
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .game-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                padding: 1rem;
+            }
+        }
+
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-bg);
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100px;
-            height: 100px;
-            font-size: 45px;
-            font-weight: bold;
-            border-radius: 3px;
-            transition: transform 0.15s ease, opacity 0.15s ease;
-            animation: appear 0.2s ease;
+            z-index: 9999;
         }
 
-        @keyframes appear {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .preloader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--primary-color);
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
 
-        @keyframes merge {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .tile.merged {
-            animation: merge 0.2s ease;
+        .search-container {
+            position: relative;
+            max-width: 300px;
         }
 
-        .tile-2 { background: #eee4da; color: #776e65; }
-        .tile-4 { background: #ede0c8; color: #776e65; }
-        .tile-8 { background: #f2b179; color: #f9f6f2; }
-        .tile-16 { background: #f59563; color: #f9f6f2; }
-        .tile-32 { background: #f67c5f; color: #f9f6f2; }
-        .tile-64 { background: #f65e3b; color: #f9f6f2; }
-        .tile-128 { 
-            background: #edcf72; 
-            color: #f9f6f2;
-            font-size: 40px;
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 5px;
+            color: var(--text-light);
         }
-        .tile-256 { 
-            background: #edcc61; 
-            color: #f9f6f2;
-            font-size: 40px;
-        }
-        .tile-512 { 
-            background: #edc850; 
-            color: #f9f6f2;
-            font-size: 40px;
-        }
-        .tile-1024 { 
-            background: #edc53f; 
-            color: #f9f6f2;
-            font-size: 35px;
-        }
-        .tile-2048 { 
-            background: #edc22e; 
-            color: #f9f6f2;
-            font-size: 35px;
+
+        .search-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>2048</h1>
-            <div class="scores">
-                <div class="score-box">
-                    <span class="score-label">SCORE</span>
-                    <span id="score">0</span>
-                </div>
-                <div class="score-box">
-                    <span class="score-label">BEST</span>
-                    <span id="best-score">0</span>
+    <!-- Прелоадер -->
+    <div class="preloader">
+        <div class="preloader-spinner"></div>
+    </div>
+
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Game Hub</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#games">Games</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                </ul>
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search games...">
                 </div>
             </div>
-            <button id="new-game">New Game</button>
         </div>
-        <div class="game-container">
-            <div class="grid-background">
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
+    </nav>
+
+    <!-- Герой секция -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1 class="hero-title">Welcome to Game Hub</h1>
+            <p class="hero-text">Discover and play 20 amazing games directly in your browser or Telegram!</p>
+            <a href="#games" class="cta-button">Start Playing</a>
+        </div>
+    </section>
+
+    <!-- Секция с играми -->
+    <section id="games" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Our Games</h2>
+            <div class="game-grid">
+                <!-- Игры будут добавлены динамически -->
             </div>
-            <div class="grid-container">
-                <!-- Tiles will be added here dynamically -->
+        </div>
+    </section>
+
+    <!-- Модальное окно для игр -->
+    <div class="modal fade" id="gameModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="gameContainer" class="game-container"></div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="container text-center">
+            <div class="social-links mb-4">
+                <a href="#"><i class="fab fa-telegram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+            </div>
+            <p>&copy; 2025 Game Hub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
+
     <script>
-        class Game {
-            constructor() {
-                this.gridSize = 4;
-                this.gridContainer = document.querySelector('.grid-container');
-                this.scoreElement = document.getElementById('score');
-                this.bestScoreElement = document.getElementById('best-score');
-                this.score = 0;
-                this.bestScore = parseInt(localStorage.getItem('bestScore')) || 0;
-                this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(null));
-                this.setupNewGame();
-                this.setupEventListeners();
-            }
+        // Инициализация Telegram WebApp
+        let tg = window.Telegram.WebApp;
+        tg.expand();
 
-            setupNewGame() {
-                this.clearGrid();
-                this.score = 0;
-                this.updateScore();
-                this.addRandomTile();
-                this.addRandomTile();
-            }
+        // Список игр
+        const games = [
+            { id: 'snake', title: 'Snake', description: 'Classic snake game', icon: '🐍' },
+            { id: 'tetris', title: 'Tetris', description: 'The original block puzzle', icon: '🟦' },
+            { id: 'flappy', title: 'Flappy Bird', description: 'Guide the bird through pipes', icon: '🐦' },
+            { id: '2048', title: '2048', description: 'Merge numbers to reach 2048', icon: '🔢' },
+            { id: 'platformer', title: 'Platformer', description: 'Jump and run adventure', icon: '🏃' },
+            { id: 'tictactoe', title: 'Tic-Tac-Toe', description: 'Classic X and O game', icon: '⭕' },
+            { id: 'arkanoid', title: 'Arkanoid', description: 'Break all the blocks', icon: '🧱' },
+            { id: 'hangman', title: 'Hangman', description: 'Guess the word', icon: '📝' },
+            { id: 'puzzle', title: 'Puzzle', description: 'Solve image puzzles', icon: '🧩' },
+            { id: 'racing', title: 'Racing', description: 'Fast-paced car racing', icon: '🏎️' },
+            { id: 'battleship', title: 'Battleship', description: 'Sink enemy ships', icon: '⚓' },
+            { id: 'pong', title: 'Pong', description: 'Classic table tennis', icon: '🏓' },
+            { id: 'minesweeper', title: 'Minesweeper', description: 'Find all mines', icon: '💣' },
+            { id: 'bounce', title: 'Bouncing Ball', description: 'Keep the ball bouncing', icon: '⚽' },
+            { id: 'quest', title: 'Text Quest', description: 'Text-based adventure', icon: '📖' },
+            { id: 'memory', title: 'Memory Game', description: 'Match the cards', icon: '🃏' },
+            { id: 'shooter', title: 'Space Shooter', description: 'Defend against aliens', icon: '👾' },
+            { id: 'cube', title: 'Cube Puzzle', description: 'Solve 3D puzzles', icon: '🎲' },
+            { id: 'football', title: 'Football', description: 'Score goals', icon: '⚽' },
+            { id: 'idle', title: 'Idle Game', description: 'Build your empire', icon: '🏰' }
+        ];
 
-            clearGrid() {
-                this.gridContainer.innerHTML = '';
-                this.grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(null));
-            }
-
-            updateScore() {
-                this.scoreElement.textContent = this.score;
-                if (this.score > this.bestScore) {
-                    this.bestScore = this.score;
-                    this.bestScoreElement.textContent = this.bestScore;
-                    localStorage.setItem('bestScore', this.bestScore);
-                }
-            }
-
-            addRandomTile() {
-                const emptyCells = [];
-                for (let row = 0; row < this.gridSize; row++) {
-                    for (let col = 0; col < this.gridSize; col++) {
-                        if (!this.grid[row][col]) {
-                            emptyCells.push({ row, col });
-                        }
-                    }
-                }
-
-                if (emptyCells.length) {
-                    const { row, col } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                    const value = Math.random() < 0.9 ? 2 : 4;
-                    this.grid[row][col] = value;
-                    this.createTile(row, col, value);
-                }
-            }
-
-            createTile(row, col, value) {
-                const tile = document.createElement('div');
-                tile.className = `tile tile-${value}`;
-                tile.textContent = value;
-                tile.style.setProperty('--x', col);
-                tile.style.setProperty('--y', row);
-                this.positionTile(tile, row, col);
-                this.gridContainer.appendChild(tile);
-                return tile;
-            }
-
-            positionTile(tile, row, col) {
-                tile.style.transform = `translate(${col * 115}px, ${row * 115}px)`;
-            }
-
-            setupEventListeners() {
-                document.addEventListener('keydown', this.handleKeyPress.bind(this));
-                document.getElementById('new-game').addEventListener('click', () => this.setupNewGame());
-                
-                // Touch events for mobile
-                let touchStartX, touchStartY;
-                document.addEventListener('touchstart', (e) => {
-                    touchStartX = e.touches[0].clientX;
-                    touchStartY = e.touches[0].clientY;
-                });
-
-                document.addEventListener('touchend', (e) => {
-                    if (!touchStartX || !touchStartY) return;
-
-                    const touchEndX = e.changedTouches[0].clientX;
-                    const touchEndY = e.changedTouches[0].clientY;
-
-                    const deltaX = touchEndX - touchStartX;
-                    const deltaY = touchEndY - touchStartY;
-
-                    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                        if (deltaX > 0) this.move('right');
-                        else this.move('left');
-                    } else {
-                        if (deltaY > 0) this.move('down');
-                        else this.move('up');
-                    }
-                });
-            }
-
-            handleKeyPress(event) {
-                if (event.key.startsWith('Arrow')) {
-                    event.preventDefault();
-                    const direction = event.key.replace('Arrow', '').toLowerCase();
-                    this.move(direction);
-                }
-            }
-
-            move(direction) {
-                const previousGrid = this.grid.map(row => [...row]);
-                let moved = false;
-                
-                // Determine movement parameters based on direction
-                const movements = {
-                    'up': { start: 1, end: this.gridSize, step: 1, isRow: true },
-                    'down': { start: this.gridSize - 2, end: -1, step: -1, isRow: true },
-                    'left': { start: 1, end: this.gridSize, step: 1, isRow: false },
-                    'right': { start: this.gridSize - 2, end: -1, step: -1, isRow: false }
-                };
-
-                const movement = movements[direction];
-                
-                // Process movement
-                for (let i = 0; i < this.gridSize; i++) {
-                    for (let j = movement.start; j != movement.end; j += movement.step) {
-                        const current = movement.isRow ? [j, i] : [i, j];
-                        const next = movement.isRow ? [j - movement.step, i] : [i, j - movement.step];
-                        
-                        if (this.grid[current[0]][current[1]]) {
-                            let [newRow, newCol] = next;
-                            let value = this.grid[current[0]][current[1]];
-                            
-                            while (
-                                newRow >= 0 && newRow < this.gridSize &&
-                                newCol >= 0 && newCol < this.gridSize
-                            ) {
-                                if (!this.grid[newRow][newCol]) {
-                                    this.grid[newRow][newCol] = value;
-                                    this.grid[current[0]][current[1]] = null;
-                                    [current[0], current[1]] = [newRow, newCol];
-                                    moved = true;
-                                } else if (this.grid[newRow][newCol] === value) {
-                                    this.grid[newRow][newCol] *= 2;
-                                    this.grid[current[0]][current[1]] = null;
-                                    this.score += this.grid[newRow][newCol];
-                                    moved = true;
-                                    break;
-                                } else {
-                                    break;
-                                }
-                                
-                                newRow = movement.isRow ? newRow - movement.step : newRow;
-                                newCol = movement.isRow ? newCol : newCol - movement.step;
-                            }
-                        }
-                    }
-                }
-
-                if (moved) {
-                    this.updateGrid();
-                    this.addRandomTile();
-                    this.updateScore();
-                    
-                    if (this.isGameOver()) {
-                        setTimeout(() => alert('Game Over!'), 300);
-                    }
-                }
-            }
-
-            updateGrid() {
-                this.gridContainer.innerHTML = '';
-                for (let row = 0; row < this.gridSize; row++) {
-                    for (let col = 0; col < this.gridSize; col++) {
-                        if (this.grid[row][col]) {
-                            this.createTile(row, col, this.grid[row][col]);
-                        }
-                    }
-                }
-            }
-
-            isGameOver() {
-                // Check for empty cells
-                for (let row = 0; row < this.gridSize; row++) {
-                    for (let col = 0; col < this.gridSize; col++) {
-                        if (!this.grid[row][col]) return false;
-                    }
-                }
-
-                // Check for possible merges
-                for (let row = 0; row < this.gridSize; row++) {
-                    for (let col = 0; col < this.gridSize; col++) {
-                        const current = this.grid[row][col];
-                        // Check right neighbor
-                        if (col < this.gridSize - 1 && this.grid[row][col + 1] === current) return false;
-                        // Check bottom neighbor
-                        if (row < this.gridSize - 1 && this.grid[row + 1][col] === current) return false;
-                    }
-                }
-
-                return true;
-            }
+        // Создание карточек игр
+        function createGameCards() {
+            const gameGrid = document.querySelector('.game-grid');
+            games.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.innerHTML = `
+                    <div class="game-icon">${game.icon}</div>
+                    <h3 class="game-title">${game.title}</h3>
+                    <p class="game-description">${game.description}</p>
+                `;
+                card.onclick = () => openGame(game);
+                gameGrid.appendChild(card);
+            });
         }
 
-        // Start the game
-        new Game();
+        // Открытие игры
+        function openGame(game) {
+            const modal = new bootstrap.Modal(document.getElementById('gameModal'));
+            document.querySelector('.modal-title').textContent = game.title;
+            const gameContainer = document.getElementById('gameContainer');
+            gameContainer.style.display = 'block';
+
+            // Здесь будет инициализация конкретной игры
+            // В данном примере просто показываем заглушку
+            if (tg.initDataUnsafe?.user) {
+                tg.sendData(`Opening game: ${game.title}`);
+            }
+
+            modal.show();
+        }
+
+        // Поиск игр
+        document.querySelector('.search-input').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            document.querySelectorAll('.game-card').forEach(card => {
+                const title = card.querySelector('.game-title').textContent.toLowerCase();
+                const description = card.querySelector('.game-description').textContent.toLowerCase();
+                const visible = title.includes(searchTerm) || description.includes(searchTerm);
+                card.style.display = visible ? 'block' : 'none';
+            });
+        });
+
+        // Прелоадер
+        window.addEventListener('load', () => {
+            createGameCards();
+            const preloader = document.querySelector('.preloader');
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                setTimeout(() => preloader.style.display = 'none', 300);
+            }, 500);
+        });
+
+        // Плавная прокрутка
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
     </script>
 </body>
 </html>
