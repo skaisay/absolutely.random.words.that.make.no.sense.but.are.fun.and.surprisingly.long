@@ -3,245 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quotes App</title>
+    <title>Каталог ИИ</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-
-        :root {
-            --primary-color: #5B9BD5;
-            --background-start: #2B5797;
-            --background-end: #5B9BD5;
-            --transition-time: 0.3s;
-        }
-
         body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--background-start), var(--background-end));
-            color: white;
-            overflow: hidden;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+            color: #fff;
         }
-
-        .container {
-            height: 100vh;
-            backdrop-filter: blur(10px);
+        header {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
         }
-
-        /* Header */
-        .header {
-            padding: 1rem;
-            display: flex;
-            justify-content: flex-end;
-            position: relative;
-            z-index: 100;
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
         }
-
-        .menu-btn {
-            background: none;
+        #search {
+            padding: 10px;
             border: none;
-            color: white;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
+            border-radius: 5px;
+            width: 300px;
+        }
+        main {
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            height: 80vh;
             position: relative;
-            transition: transform 0.3s;
         }
-
-        .menu-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .menu-btn .dot {
-            width: 6px;
-            height: 6px;
-            background: white;
-            border-radius: 50%;
-            margin: 0 2px;
-            transition: transform 0.3s;
-        }
-
-        .menu-btn:hover .dot {
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
-
-        .quote-container {
+        .scroll-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            width: 100%;
             text-align: center;
-            max-width: 600px;
-            opacity: 1;
-            transition: opacity 0.5s;
         }
-
-        .quote-container.fade {
-            opacity: 0;
+        .scroll-content {
+            display: inline-block;
         }
-
-        .quote {
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-            line-height: 1.4;
+        .ai-link {
+            display: inline-block;
+            margin: 0 20px;
+            padding: 15px 30px;
+            background: #444;
+            border-radius: 10px;
+            transition: transform 0.3s, background 0.3s;
         }
-
-        .emoji {
-            font-size: 3rem;
-            margin-top: 1rem;
-            display: block;
+        .ai-link:hover {
+            transform: scale(1.1);
+            background: #555;
         }
-
-        /* Menu Dropdown */
-        .menu-dropdown {
+        .ai-link a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .tooltip {
             position: absolute;
-            top: 100%;
-            right: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 8px;
-            padding: 0.5rem;
-            display: none;
-            transform-origin: top right;
-            animation: slideIn 0.3s ease;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-
-        .menu-dropdown.active {
-            display: block;
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
         }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .menu-item {
-            padding: 0.8rem 1.2rem;
-            color: white;
-            cursor: pointer;
-            transition: background 0.2s;
-            border-radius: 4px;
-        }
-
-        .menu-item:hover {
-            background: rgba(255, 255, 255, 0.1);
+        .social-links a {
+            margin: 0 10px;
+            color: #fff;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <button class="menu-btn">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-            </button>
-            <div class="menu-dropdown">
-                <div class="menu-item">Настройки</div>
-                <div class="menu-item">О приложении</div>
+    <header>
+        <div class="logo">Логотип</div>
+        <input type="text" id="search" placeholder="Поиск ИИ-инструментов...">
+    </header><main>
+        <div class="scroll-container">
+            <div class="scroll-content">
+                <div class="ai-link" data-tooltip="Создание текстов и ответов на вопросы">
+                    <a href="chatgpt.html">ChatGPT</a>
+                </div>
+                <div class="ai-link" data-tooltip="Генерация изображений">
+                    <a href="dalle.html">DALL·E</a>
+                </div>
+                <div class="ai-link" data-tooltip="Автоматизация задач">
+                    <a href="automate.html">Automate</a>
+                </div>
+                <!-- Добавь больше ссылок по аналогии -->
             </div>
-        </header>
+        </div>
+        <div id="tooltip" class="tooltip"></div>
+    </main>
 
-        <main class="main-content">
-            <div class="quote-container">
-                <div class="quote"></div>
-                <div class="emoji"></div>
-            </div>
-        </main>
-    </div>
+    <footer>
+        <div class="social-links">
+            <a href="#">Twitter</a>
+            <a href="#">Facebook</a>
+            <a href="#">Instagram</a>
+        </div>
+        <div class="license">© 2023 Каталог ИИ. Все права защищены.</div>
+    </footer><script>
+        const aiLinks = document.querySelectorAll('.ai-link');
+        const tooltip = document.getElementById('tooltip');
 
-    <script>
-        const quotes = [
-            { text: "Жизнь — это не ожидание, когда пройдет гроза, а умение танцевать под дождем", emoji: "🌧️" },
-            { text: "Самый важный день в твоей жизни — сегодня", emoji: "✨" },
-            { text: "Каждое утро — это новая возможность", emoji: "🌅" },
-            { text: "Мечты не работают, пока не работаешь ты", emoji: "💫" },
-            { text: "Действуй сейчас. Завтра может быть слишком поздно", emoji: "⏳" },
-            { text: "Верь в себя, и весь мир поверит в тебя", emoji: "🌟" }
-        ];
+        aiLinks.forEach(link => {
+            link.addEventListener('mouseover', () => {
+                tooltip.textContent = link.getAttribute('data-tooltip');
+                tooltip.style.opacity = '1';
+            });
 
-        const menuBtn = document.querySelector('.menu-btn');
-        const menuDropdown = document.querySelector('.menu-dropdown');
-        const quoteContainer = document.querySelector('.quote-container');
-        const quoteElement = document.querySelector('.quote');
-        const emojiElement = document.querySelector('.emoji');
-
-        let currentQuoteIndex = 0;
-
-        function updateQuote() {
-            quoteContainer.classList.add('fade');
-            
-            setTimeout(() => {
-                const quote = quotes[currentQuoteIndex];
-                quoteElement.textContent = quote.text;
-                emojiElement.textContent = quote.emoji;
-                
-                currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
-                quoteContainer.classList.remove('fade');
-            }, 500);
-        }
-
-        // Initial quote
-        updateQuote();
-
-        // Change quote every 4 seconds
-        setInterval(updateQuote, 4000);
-
-        // Menu toggle
-        menuBtn.addEventListener('click', () => {
-            menuDropdown.classList.toggle('active');
+            link.addEventListener('mouseout', () => {
+                tooltip.style.opacity = '0';
+            });
         });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!menuBtn.contains(e.target) && !menuDropdown.contains(e.target)) {
-                menuDropdown.classList.remove('active');
-            }
-        });
-
-        // Background color transition
-        const colors = [
-            { start: '#2B5797', end: '#5B9BD5' },
-            { start: '#8E44AD', end: '#9B59B6' },
-            { start: '#2ECC71', end: '#27AE60' }
-        ];
-
-        let colorIndex = 0;
-
-        function changeBackground() {
-            const color = colors[colorIndex];
-            document.documentElement.style.setProperty('--background-start', color.start);
-            document.documentElement.style.setProperty('--background-end', color.end);
-            colorIndex = (colorIndex + 1) % colors.length;
-        }
-
-        // Change background color every 10 seconds
-        setInterval(changeBackground, 10000);
     </script>
 </body>
 </html>
