@@ -580,26 +580,401 @@
         // Список игр
         const games = [
             { id: 'snake', title: 'Snake', description: 'Classic snake game', icon: '🐍' },
-            { id: 'tetris', title: 'Tetris', description: 'The original block puzzle', icon: '🟦' },
-            { id: 'flappy', title: 'Flappy Bird', description: 'Guide the bird through pipes', icon: '🐦' },
+            { id: 'tetris', title: 'Tetris', description: 'The iconic falling blocks game', icon: '🟦' },
             { id: '2048', title: '2048', description: 'Merge numbers to reach 2048', icon: '🔢' },
-            { id: 'platformer', title: 'Platformer', description: 'Jump and run adventure', icon: '🏃' },
-            { id: 'tictactoe', title: 'Tic-Tac-Toe', description: 'Classic X and O game', icon: '⭕' },
-            { id: 'arkanoid', title: 'Arkanoid', description: 'Break all the blocks', icon: '🧱' },
-            { id: 'hangman', title: 'Hangman', description: 'Guess the word', icon: '📝' },
-            { id: 'puzzle', title: 'Puzzle', description: 'Solve image puzzles', icon: '🧩' },
-            { id: 'racing', title: 'Racing', description: 'Fast-paced car racing', icon: '🏎️' },
-            { id: 'battleship', title: 'Battleship', description: 'Sink enemy ships', icon: '⚓' },
-            { id: 'pong', title: 'Pong', description: 'Classic table tennis', icon: '🏓' },
-            { id: 'minesweeper', title: 'Minesweeper', description: 'Find all mines', icon: '💣' },
-            { id: 'bounce', title: 'Bouncing Ball', description: 'Keep the ball bouncing', icon: '⚽' },
-            { id: 'quest', title: 'Text Quest', description: 'Text-based adventure', icon: '📖' },
-            { id: 'memory', title: 'Memory Game', description: 'Match the cards', icon: '🃏' },
-            { id: 'shooter', title: 'Space Shooter', description: 'Defend against aliens', icon: '👾' },
-            { id: 'cube', title: 'Cube Puzzle', description: 'Solve 3D puzzles', icon: '🎲' },
-            { id: 'football', title: 'Football', description: 'Score goals', icon: '⚽' },
-            { id: 'idle', title: 'Idle Game', description: 'Build your empire', icon: '🏰' }
+            { id: 'pong', title: 'Pong', description: 'Classic table tennis game', icon: '🏓' },
+            { id: 'breakout', title: 'Breakout', description: 'Break all the blocks', icon: '🧱' },
+            { id: 'memory', title: 'Memory', description: 'Test your memory', icon: '🎴' }
         ];
+
+        // Game implementations
+        class Tetris {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.grid = Array(20).fill().map(() => Array(10).fill(0));
+                this.piece = this.newPiece();
+                this.gameLoop = null;
+                this.score = 0;
+                
+                this.pieces = [
+                    [[1,1,1,1]], // I
+                    [[1,1,1],[0,1,0]], // T
+                    [[1,1,1],[1,0,0]], // L
+                    [[1,1,1],[0,0,1]], // J
+                    [[1,1],[1,1]], // O
+                    [[0,1,1],[1,1,0]], // S
+                    [[1,1,0],[0,1,1]] // Z
+                ];
+                
+                this.bindControls();
+                this.start();
+            }
+
+            newPiece() {
+                const piece = this.pieces[Math.floor(Math.random() * this.pieces.length)];
+                return {
+                    shape: piece,
+                    x: Math.floor((10 - piece[0].length) / 2),
+                    y: 0
+                };
+            }
+
+            bindControls() {
+                document.addEventListener('keydown', (e) => {
+                    switch(e.key) {
+                        case 'ArrowLeft':
+                            if (this.isValidMove(this.piece.x - 1, this.piece.y)) {
+                                this.piece.x--;
+                            }
+                            break;
+                        case 'ArrowRight':
+                            if (this.isValidMove(this.piece.x + 1, this.piece.y)) {
+                                this.piece.x++;
+                            }
+                            break;
+                        case 'ArrowDown':
+                            if (this.isValidMove(this.piece.x, this.piece.y + 1)) {
+                                this.piece.y++;
+                            }
+                            break;
+                        case 'ArrowUp':
+                            this.rotatePiece();
+                            break;
+                    }
+                });
+            }
+
+            isValidMove(x, y) {
+                return this.piece.shape.every((row, dy) =>
+                    row.every((value, dx) =>
+                        value === 0 ||
+                        (x + dx >= 0 &&
+                         x + dx < 10 &&
+                         y + dy < 20 &&
+                         (y + dy < 0 || this.grid[y + dy][x + dx] === 0))
+                    )
+                );
+            }
+
+            rotatePiece() {
+                const rotated = this.piece.shape[0].map((_, i) =>
+                    this.piece.shape.map(row => row[i]).reverse()
+                );
+                const oldShape = this.piece.shape;
+                this.piece.shape = rotated;
+                if (!this.isValidMove(this.piece.x, this.piece.y)) {
+                    this.piece.shape = oldShape;
+                }
+            }
+
+            mergePiece() {
+                this.piece.shape.forEach((row, dy) => {
+                    row.forEach((value, dx) => {
+                        if (value && this.piece.y + dy >= 0) {
+                            this.grid[this.piece.y + dy][this.piece.x + dx] = value;
+                        }
+                    });
+                });
+            }
+
+            clearLines() {
+                let linesCleared = 0;
+                for (let y = this.grid.length - 1; y >= 0; y--) {
+                    if (this.grid[y].every(cell => cell)) {
+                        this.grid.splice(y, 1);
+                        this.grid.unshift(Array(10).fill(0));
+                        linesCleared++;
+                        y++;
+                    }
+                }
+                if (linesCleared > 0) {
+                    this.score += linesCleared * 100;
+                }
+            }
+
+            update() {
+                if (this.isValidMove(this.piece.x, this.piece.y + 1)) {
+                    this.piece.y++;
+                } else {
+                    this.mergePiece();
+                    this.clearLines();
+                    this.piece = this.newPiece();
+                    if (!this.isValidMove(this.piece.x, this.piece.y)) {
+                        this.destroy();
+                        alert(`Game Over! Score: ${this.score}`);
+                    }
+                }
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw grid
+                this.grid.forEach((row, y) => {
+                    row.forEach((value, x) => {
+                        if (value) {
+                            this.ctx.fillStyle = '#FF5722';
+                            this.ctx.fillRect(x * 30, y * 30, 29, 29);
+                        }
+                    });
+                });
+                
+                // Draw current piece
+                this.piece.shape.forEach((row, y) => {
+                    row.forEach((value, x) => {
+                        if (value) {
+                            this.ctx.fillStyle = '#4CAF50';
+                            this.ctx.fillRect(
+                                (this.piece.x + x) * 30,
+                                (this.piece.y + y) * 30,
+                                29,
+                                29
+                            );
+                        }
+                    });
+                });
+
+                // Draw score
+                this.ctx.fillStyle = '#fff';
+                this.ctx.font = '20px Arial';
+                this.ctx.fillText(`Score: ${this.score}`, 10, 30);
+            }
+
+            start() {
+                if (this.gameLoop) return;
+                this.gameLoop = setInterval(() => {
+                    this.update();
+                    this.draw();
+                }, 500);
+            }
+
+            destroy() {
+                if (this.gameLoop) {
+                    clearInterval(this.gameLoop);
+                    this.gameLoop = null;
+                }
+            }
+        }
+
+        class Game2048 {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.grid = Array(4).fill().map(() => Array(4).fill(0));
+                this.score = 0;
+                this.gameLoop = null;
+                this.cellSize = Math.min(canvas.width, canvas.height) / 4;
+                
+                this.colors = {
+                    '2': '#eee4da',
+                    '4': '#ede0c8',
+                    '8': '#f2b179',
+                    '16': '#f59563',
+                    '32': '#f67c5f',
+                    '64': '#f65e3b',
+                    '128': '#edcf72',
+                    '256': '#edcc61',
+                    '512': '#edc850',
+                    '1024': '#edc53f',
+                    '2048': '#edc22e'
+                };
+
+                this.initialize();
+                this.bindControls();
+                this.draw();
+            }
+
+            initialize() {
+                this.addNumber();
+                this.addNumber();
+            }
+
+            addNumber() {
+                const emptyCells = [];
+                this.grid.forEach((row, y) => {
+                    row.forEach((cell, x) => {
+                        if (cell === 0) emptyCells.push({x, y});
+                    });
+                });
+                
+                if (emptyCells.length) {
+                    const {x, y} = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                    this.grid[y][x] = Math.random() < 0.9 ? 2 : 4;
+                }
+            }
+
+            bindControls() {
+                document.addEventListener('keydown', (e) => {
+                    let moved = false;
+                    switch(e.key) {
+                        case 'ArrowLeft':
+                            moved = this.moveLeft();
+                            break;
+                        case 'ArrowRight':
+                            moved = this.moveRight();
+                            break;
+                        case 'ArrowUp':
+                            moved = this.moveUp();
+                            break;
+                        case 'ArrowDown':
+                            moved = this.moveDown();
+                            break;
+                    }
+                    if (moved) {
+                        this.addNumber();
+                        this.draw();
+                        if (this.isGameOver()) {
+                            alert(`Game Over! Score: ${this.score}`);
+                            this.destroy();
+                        }
+                    }
+                });
+            }
+
+            moveRow(row) {
+                let newRow = row.filter(cell => cell !== 0);
+                for (let i = 0; i < newRow.length - 1; i++) {
+                    if (newRow[i] === newRow[i + 1]) {
+                        newRow[i] *= 2;
+                        this.score += newRow[i];
+                        newRow.splice(i + 1, 1);
+                    }
+                }
+                while (newRow.length < 4) newRow.push(0);
+                return newRow;
+            }
+
+            moveLeft() {
+                let moved = false;
+                for (let i = 0; i < 4; i++) {
+                    const oldRow = [...this.grid[i]];
+                    const newRow = this.moveRow(oldRow);
+                    this.grid[i] = newRow;
+                    if (oldRow.join(',') !== newRow.join(',')) moved = true;
+                }
+                return moved;
+            }
+
+            moveRight() {
+                let moved = false;
+                for (let i = 0; i < 4; i++) {
+                    const oldRow = [...this.grid[i]].reverse();
+                    const newRow = this.moveRow(oldRow).reverse();
+                    this.grid[i] = newRow;
+                    if (oldRow.join(',') !== newRow.reverse().join(',')) moved = true;
+                }
+                return moved;
+            }
+
+            moveUp() {
+                let moved = false;
+                for (let j = 0; j < 4; j++) {
+                    const oldCol = this.grid.map(row => row[j]);
+                    const newCol = this.moveRow(oldCol);
+                    for (let i = 0; i < 4; i++) {
+                        if (this.grid[i][j] !== newCol[i]) moved = true;
+                        this.grid[i][j] = newCol[i];
+                    }
+                }
+                return moved;
+            }
+
+            moveDown() {
+                let moved = false;
+                for (let j = 0; j < 4; j++) {
+                    const oldCol = this.grid.map(row => row[j]).reverse();
+                    const newCol = this.moveRow(oldCol).reverse();
+                    for (let i = 0; i < 4; i++) {
+                        if (this.grid[i][j] !== newCol[i]) moved = true;
+                        this.grid[i][j] = newCol[i];
+                    }
+                }
+                return moved;
+            }
+
+            isGameOver() {
+                // Check for empty cells
+                for (let y = 0; y < 4; y++) {
+                    for (let x = 0; x < 4; x++) {
+                        if (this.grid[y][x] === 0) return false;
+                    }
+                }
+                
+                // Check for possible merges
+                for (let y = 0; y < 4; y++) {
+                    for (let x = 0; x < 4; x++) {
+                        const current = this.grid[y][x];
+                        if ((y < 3 && current === this.grid[y + 1][x]) ||
+                            (x < 3 && current === this.grid[y][x + 1])) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                for (let y = 0; y < 4; y++) {
+                    for (let x = 0; x < 4; x++) {
+                        const value = this.grid[y][x];
+                        const cellX = x * this.cellSize;
+                        const cellY = y * this.cellSize;
+                        
+                        // Draw cell background
+                        this.ctx.fillStyle = value ? this.colors[value] : '#cdc1b4';
+                        this.ctx.fillRect(cellX, cellY, this.cellSize - 2, this.cellSize - 2);
+                        
+                        if (value) {
+                            // Draw number
+                            this.ctx.fillStyle = value <= 4 ? '#776e65' : '#f9f6f2';
+                            this.ctx.font = `${this.cellSize/3}px Arial`;
+                            this.ctx.textAlign = 'center';
+                            this.ctx.textBaseline = 'middle';
+                            this.ctx.fillText(
+                                value,
+                                cellX + this.cellSize/2,
+                                cellY + this.cellSize/2
+                            );
+                        }
+                    }
+                }
+
+                // Draw score
+                this.ctx.fillStyle = '#776e65';
+                this.ctx.font = '20px Arial';
+                this.ctx.textAlign = 'left';
+                this.ctx.fillText(`Score: ${this.score}`, 10, 30);
+            }
+
+            destroy() {
+                // Cleanup any intervals or event listeners if needed
+            }
+        }
+
+        function openGame(game) {
+            gameScreen.style.display = 'flex';
+            resizeCanvas();
+            
+            if (currentGame) {
+                currentGame.destroy();
+            }
+
+            switch(game.id) {
+                case 'snake':
+                    currentGame = new Snake(gameCanvas);
+                    break;
+                case 'tetris':
+                    currentGame = new Tetris(gameCanvas);
+                    break;
+                case '2048':
+                    currentGame = new Game2048(gameCanvas);
+                    break;
+                // Additional games will be added here
+            }
+        }
 
         // Создание карточек игр
         function createGameCards() {
