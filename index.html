@@ -1,233 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Portal</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            background-image: url('https://i.postimg.cc/tRSqnCfJ/IMG-5144.jpg');
-            background-size: cover;
-            background-position: center;
-            color: white;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 70px;
-            height: 100%;
-            background-color: #1c2b2d;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 20px;
-        }
-
-        .sidebar .nav-icon {
-            width: 50px;
-            height: 50px;
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #2f4f4f;
-            border-radius: 15px;
-            cursor: pointer;
-        }
-
-        .sidebar .nav-icon i {
-            color: #fff;
-            font-size: 24px;
-        }
-
-        .game-list {
-            margin-left: 100px;
-            padding-top: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .game-item {
-            width: 150px;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.3s, background-color 0.3s;
-        }
-
-        .game-item:hover {
-            transform: scale(1.1);
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .game-item span {
-            font-size: 18px;
-            color: white;
-            text-align: center;
-        }
-
-        .game-container {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .game-container canvas {
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            color: white;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <div class="sidebar">
-        <div class="nav-icon" onclick="showGameList()">
-            <i class="fa-solid fa-gamepad"></i>
+<html lang="ru" class="notranslate windows chrome translated-ltr" translate="no" style="scroll-behavior: auto;">
+  <head>
+    <script id="fsc-api" src="https://sbl.onfastspring.com/sbl/1.0.1/fastspring-builder.min.js" type="text/javascript" 
+      data-storefront="wegic.onfastspring.com/popup-wegic" data-popup-closed="onFSPopupClosed" 
+      data-error-callback="onFSPopupError" async></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-1668280517"></script>
+    <script src="https://cdn.wegic.ai/static/js/gtag.js"></script>
+    <script src="https://cdn.wegic.ai/static/js/ttq.js"></script>
+    <script src="https://cdn.wegic.ai/static/js/fbq.js"></script>
+  </head>
+  <body style="right: unset;">
+    <div id="root">
+      <div class="app-wrap_1yjjx_60">
+        <div class="app_1yjjx_60 light-scrollbar vault-drawer-wrapper style">
+          <div class="header_619e9_60 hidden_619e9_74" id="chat-header" style="transform: none;"></div>
+          <div style="height: calc(100% - 38px); width: 100%; overflow: unset;">
+            <div class="arco-resizebox-split-group arco-resizebox-split-group-horizontal" style="height: 100%; width: 100%;">
+              <div class="arco-resizebox-split-group-pane" style="width: calc(71.3542% - 4px); min-width: 490px;">
+                <div class="left-panel-container_1dyz2_60" style="margin: 20px 0px 20px;">
+                  <div class="site-editor_1mzc3_60 _mobile_1mzc3_212">
+                    <div class="toolbar_1kzqa_60" style="border-color: transparent;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="_focus-selection_9o44i_60" style="height: 621px; width: 428.4px; top: 0px; left: 0px; opacity: 1;"></div>
+      <div class="_hover-selection_1lmri_60" style="z-index: 900; width: 365.4px; height: 208.2px; transform: translate(31px, 275.8px); border-radius: 8px;"></div>
+      <div class="_selection_kgag1_60" style="opacity: 0; z-index: 900;"></div>
+      <div class="_left-panel-mount-point_1dyz2_78"></div>
+      <div class="arco-resizebox-trigger arco-resizebox-trigger-vertical arco-resizebox-split-group-trigger"></div>
+      <div class="arco-resizebox-split-group-pane" style="min-width: 440px; width: calc(28.6458% - 4px);"></div>
+      <div id="bottom-panel" class="_bottom-panel_1fpeq_60" style="transform: none; overflow: hidden;"></div>
+      <noscript>
+        <iframe height="0" width="0" style="display: none; visibility: hidden;"></iframe>
+      </noscript>
+      <div id="rbd-announcement-0" aria-live="assertive" aria-atomic="true" 
+        style="position: absolute; width: 1px; height: 1px; margin: -1px; border: 0; padding: 0; overflow: hidden; 
+        clip: rect(0px, 0px, 0px, 0px); clip-path: inset(100%);"></div>
+      <div id="rbd-hidden-text-0-hidden-text-0" style="display: none;"></div>
+      <div id="rbd-hidden-text-1-hidden-text-8" style="display: none;"></div>
+      <div id="pre-render-mount" style="display: none;"></div>
     </div>
-
-    <div class="game-list" id="game-list"></div>
-
-    <!-- Game Container -->
-    <div class="game-container" id="game-container">
-        <div class="close-btn" onclick="closeGame()">&times;</div>
-        <canvas id="game-canvas"></canvas>
-    </div>
-
-    <script>
-        // List of games available in the portal
-        const games = [
-            'Snake', 'Tetris', 'Flappy Bird', '2048', 'Platformer',
-            'Tic Tac Toe', 'Arkanoid', 'Hangman', 'Puzzle', 'Racing',
-            'Chess', 'Battleship', 'Minesweeper', 'Conveyor',
-            'Asteroids', 'Bomberman', 'Pacman', 'Space Invaders', 'Breakout', 'Memory'
-        ];
-
-        // Reference to the game list container and game canvas
-        const gameListElement = document.getElementById('game-list');
-        const gameContainer = document.getElementById('game-container');
-        const gameCanvas = document.getElementById('game-canvas');
-        const ctx = gameCanvas.getContext('2d');
-
-        // Display the list of games in the sidebar
-        function showGameList() {
-            gameListElement.innerHTML = '';
-            games.forEach((game, index) => {
-                const gameItem = document.createElement('div');
-                gameItem.classList.add('game-item');
-                gameItem.innerHTML = `<span>${game}</span>`;
-                gameItem.onclick = () => openGame(index);
-                gameListElement.appendChild(gameItem);
-            });
-        }
-
-        let currentGame = null; // Reference to the current game instance
-
-        // Open a selected game
-        function openGame(index) {
-            const selectedGame = games[index];
-            console.log(`Opening game: ${selectedGame}`);
-            gameContainer.style.display = 'flex';
-            gameCanvas.width = 800;
-            gameCanvas.height = 600;
-            ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-            loadGame(selectedGame);
-        }
-
-        // Close the currently open game
-        function closeGame() {
-            console.log('Closing game.');
-            gameContainer.style.display = 'none';
-            ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-            if (currentGame && typeof currentGame.stop === 'function') {
-                currentGame.stop();
-            }
-            currentGame = null;
-        }
-
-        // Load and initialize the selected game
-        function loadGame(gameName) {
-            switch (gameName) {
-                case 'Snake':
-                    currentGame = new SnakeGame(ctx);
-                    break;
-                case 'Tetris':
-                    currentGame = new TetrisGame(ctx);
-                    break;
-                // Add other games similarly
-                default:
-                    console.error('Game not implemented:', gameName);
-            }
-            if (currentGame && typeof currentGame.start === 'function') {
-                currentGame.start();
-            }
-        }
-
-        // Class to handle the Snake game logic
-        class SnakeGame {
-            constructor(ctx) {
-                this.ctx = ctx;
-                this.running = false;
-            }
-
-            start() {
-                console.log('Starting Snake Game');
-                this.running = true;
-                // Add snake game logic here
-            }
-
-            stop() {
-                console.log('Stopping Snake Game');
-                this.running = false;
-            }
-        }
-
-        // Class to handle the Tetris game logic
-        class TetrisGame {
-            constructor(ctx) {
-                this.ctx = ctx;
-                this.running = false;
-            }
-
-            start() {
-                console.log('Starting Tetris Game');
-                this.running = true;
-                // Add tetris game logic here
-            }
-
-            stop() {
-                console.log('Stopping Tetris Game');
-                this.running = false;
-            }
-        }
-
-        // Additional game classes (e.g., Flappy Bird, 2048, etc.) should follow a similar structure
-
-        showGameList(); // Initialize the game list on page load
-    </script>
-</body>
+  </body>
 </html>
