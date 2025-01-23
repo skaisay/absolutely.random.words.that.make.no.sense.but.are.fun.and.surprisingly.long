@@ -321,6 +321,172 @@
       color: var(--text-secondary);
       font-style: italic;
     }
+
+    /* Chatbot Styles */
+    .chatbot-container {
+      display: none;
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 400px;
+      background: rgba(0, 0, 0, 0.9);
+      border-radius: 20px;
+      padding: 20px;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .chatbot-container.active {
+      display: block;
+      animation: slideUp 0.3s ease forwards;
+    }
+
+    .chatbot-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .chatbot-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      border-radius: 50%;
+      position: relative;
+      margin-right: 15px;
+    }
+
+    .chatbot-eye {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #00ff00;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: blink 3s infinite;
+    }
+
+    .chatbot-title {
+      color: var(--text);
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .chatbot-messages {
+      height: 300px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+      padding-right: 10px;
+    }
+
+    .message {
+      margin-bottom: 15px;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .message.show {
+      animation: messageSlideUp 0.3s ease forwards;
+    }
+
+    .message-bot {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px 15px;
+      border-radius: 15px 15px 15px 0;
+      max-width: 80%;
+      margin-right: auto;
+    }
+
+    .message-user {
+      background: var(--primary);
+      padding: 12px 15px;
+      border-radius: 15px 15px 0 15px;
+      max-width: 80%;
+      margin-left: auto;
+    }
+
+    .chatbot-input {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chatbot-input input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      padding: 12px 15px;
+      border-radius: 25px;
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .chatbot-input input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .chatbot-input button {
+      background: var(--primary);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+
+    .chatbot-input button:hover {
+      transform: scale(1.1);
+    }
+
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .suggestion {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .suggestion.show {
+      animation: suggestionFadeIn 0.3s ease forwards;
+    }
+
+    .suggestion:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    @keyframes messageSlideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes suggestionFadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 <body>
@@ -330,7 +496,7 @@
     <p class="subtitle">Добро пожаловать в блог о приложении Klyo и многом другом</p>
     <div class="button-container">
       <a href="#blog" class="button primary">Читать блог</a>
-      <a href="#about" class="button secondary">Узнать больше</a>
+      <button onclick="toggleChatbot()" class="button secondary">Задать вопрос</button>
     </div>
   </section>
 
@@ -366,6 +532,26 @@
     </div>
   </div>
 
+  <!-- Chatbot Container -->
+  <div class="chatbot-container" id="chatbot">
+    <div class="chatbot-header">
+      <div class="chatbot-avatar">
+        <div class="chatbot-eye"></div>
+      </div>
+      <div class="chatbot-title">AI Помощник</div>
+    </div>
+    <div class="chatbot-messages" id="chatMessages"></div>
+    <div class="chatbot-input">
+      <input type="text" id="userInput" placeholder="Задайте вопрос..." onkeypress="handleKeyPress(event)">
+      <button onclick="sendMessage()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z"/>
+        </svg>
+      </button>
+    </div>
+    <div class="suggestions" id="suggestions"></div>
+  </div>
+
   <!-- Blog Section -->
   <section id="blog" class="blog">
     <div class="blog-vertical">
@@ -381,6 +567,9 @@
     <h3>Политика конфиденциальности</h3>
     <p>
       Мы уважаем вашу приватность и не собираем персональные данные. Регистрация на сайте не требуется.
+      Мы не используем файлы cookie и не отслеживаем ваши действия. Вся информация, представленная на сайте,
+      предназначена исключительно для ознакомления. Используя наш сайт, вы можете быть уверены в
+      безопасности ваших данных.
     </p>
   </footer>
 
@@ -538,6 +727,138 @@
 
     updateQuote();
     setInterval(updateQuote, 10000);
+
+    // Chatbot Knowledge Base
+    const knowledgeBase = {
+      'что такое программирование': 'Программирование - это процесс создания компьютерных программ с помощью языков программирования. Это способ говорить с компьютером и указывать ему, что делать.',
+      'javascript': 'JavaScript - это мультипарадигменный язык программирования, который позволяет создавать интерактивные веб-страницы. Это один из трех столпов веб-разработки наряду с HTML и CSS.',
+      'что такое веб-приложение': 'Веб-приложение - это программа, которая работает в браузере. В отличие от обычных сайтов, веб-приложения более интерактивны и могут работать как полноценные программы.',
+      'telegram': 'Telegram - это мессенджер с открытым API, который позволяет создавать ботов и мини-приложения. Он известен своей безопасностью и широкими возможностями для разработчиков.',
+      'python': 'Python - это высокоуровневый язык программирования с простым синтаксисом. Он отлично подходит для начинающих и используется в веб-разработке, науке о данных и машинном обучении.',
+      'искусственный интеллект': 'Искусственный интеллект (ИИ) - это способность компьютерных систем выполнять задачи, которые обычно требуют человеческого интеллекта. Например, распознавание речи или принятие решений.',
+    };
+
+    const suggestions = [
+      'Что такое программирование',
+      'JavaScript',
+      'Что такое веб-приложение',
+      'Telegram',
+      'Python',
+      'Искусственный интеллект'
+    ];
+
+    let isTyping = false;
+
+    function toggleChatbot() {
+      const chatbot = document.getElementById('chatbot');
+      chatbot.classList.toggle('active');
+      if (chatbot.classList.contains('active')) {
+        showSuggestions();
+        addBotMessage('Привет! Я AI помощник. Задайте мне вопрос о программировании или выберите одну из подсказок ниже.');
+      }
+    }
+
+    function showSuggestions() {
+      const suggestionsContainer = document.getElementById('suggestions');
+      suggestionsContainer.innerHTML = '';
+      
+      suggestions.forEach((text, index) => {
+        const suggestion = document.createElement('div');
+        suggestion.className = 'suggestion';
+        suggestion.textContent = text;
+        suggestion.style.animationDelay = `${index * 0.1}s`;
+        suggestion.onclick = () => handleSuggestion(text);
+        suggestionsContainer.appendChild(suggestion);
+        
+        // Force reflow to trigger animation
+        suggestion.offsetHeight;
+        suggestion.classList.add('show');
+      });
+    }
+
+    function handleSuggestion(text) {
+      document.getElementById('userInput').value = text;
+      sendMessage();
+    }
+
+    function addMessage(text, isBot = false) {
+      const messages = document.getElementById('chatMessages');
+      const message = document.createElement('div');
+      message.className = `message ${isBot ? 'message-bot' : 'message-user'}`;
+      message.textContent = text;
+      messages.appendChild(message);
+      
+      // Force reflow to trigger animation
+      message.offsetHeight;
+      message.classList.add('show');
+      
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function simulateTyping(text) {
+      return new Promise(resolve => {
+        isTyping = true;
+        const words = text.split(' ');
+        let currentText = '';
+        let wordIndex = 0;
+        
+        function typeWord() {
+          if (wordIndex < words.length) {
+            currentText += (wordIndex > 0 ? ' ' : '') + words[wordIndex];
+            addBotMessage(currentText + '|');
+            wordIndex++;
+            setTimeout(typeWord, 100);
+          } else {
+            addBotMessage(currentText);
+            isTyping = false;
+            resolve();
+          }
+        }
+        
+        typeWord();
+      });
+    }
+
+    function addBotMessage(text) {
+      const messages = document.getElementById('chatMessages');
+      const lastMessage = messages.lastElementChild;
+      
+      if (lastMessage && lastMessage.classList.contains('message-bot')) {
+        lastMessage.textContent = text;
+      } else {
+        addMessage(text, true);
+      }
+    }
+
+    async function sendMessage() {
+      if (isTyping) return;
+      
+      const input = document.getElementById('userInput');
+      const text = input.value.trim().toLowerCase();
+      
+      if (text) {
+        addMessage(input.value);
+        input.value = '';
+        
+        let response = 'Извините, я не знаю ответа на этот вопрос. Попробуйте выбрать один из предложенных вариантов.';
+        
+        for (const [key, value] of Object.entries(knowledgeBase)) {
+          if (text.includes(key)) {
+            response = value;
+            break;
+          }
+        }
+        
+        await simulateTyping(response);
+        showSuggestions();
+      }
+    }
+
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    }
   </script>
 </body>
 </html>
