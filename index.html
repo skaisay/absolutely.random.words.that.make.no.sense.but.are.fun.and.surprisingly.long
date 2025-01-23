@@ -326,22 +326,62 @@
     .chatbot-container {
       display: none;
       position: fixed;
-      bottom: 100px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
       width: 90%;
       max-width: 400px;
-      background: rgba(0, 0, 0, 0.9);
+      max-height: 80vh;
+      background: rgba(0, 0, 0, 0.95);
       border-radius: 20px;
       padding: 20px;
       z-index: 1000;
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
 
     .chatbot-container.active {
       display: block;
-      animation: slideUp 0.3s ease forwards;
+      animation: chatbotFadeIn 0.3s ease forwards;
+    }
+
+    .chatbot-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 30px;
+      height: 30px;
+      border: none;
+      background: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .chatbot-close:hover {
+      color: var(--text);
+      transform: scale(1.1);
+    }
+
+    .chatbot-close svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    @keyframes chatbotFadeIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+      }
     }
 
     .chatbot-header {
@@ -534,6 +574,11 @@
 
   <!-- Chatbot Container -->
   <div class="chatbot-container" id="chatbot">
+    <button class="chatbot-close" onclick="toggleChatbot()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
     <div class="chatbot-header">
       <div class="chatbot-avatar">
         <div class="chatbot-eye"></div>
@@ -736,15 +781,33 @@
       'telegram': 'Telegram - это мессенджер с открытым API, который позволяет создавать ботов и мини-приложения. Он известен своей безопасностью и широкими возможностями для разработчиков.',
       'python': 'Python - это высокоуровневый язык программирования с простым синтаксисом. Он отлично подходит для начинающих и используется в веб-разработке, науке о данных и машинном обучении.',
       'искусственный интеллект': 'Искусственный интеллект (ИИ) - это способность компьютерных систем выполнять задачи, которые обычно требуют человеческого интеллекта. Например, распознавание речи или принятие решений.',
+      'html': 'HTML (HyperText Markup Language) - это стандартный язык разметки для создания веб-страниц. Он определяет структуру и содержание веб-страницы.',
+      'css': 'CSS (Cascading Style Sheets) - это язык стилей, который определяет внешний вид HTML-документов. С его помощью можно управлять цветами, шрифтами, отступами и другими визуальными аспектами.',
+      'react': 'React - это библиотека JavaScript для создания пользовательских интерфейсов. Разработана Facebook, позволяет создавать сложные интерактивные приложения.',
+      'база данных': 'База данных - это организованная коллекция данных, которая позволяет хранить, управлять и получать информацию. Существуют различные типы баз данных: реляционные, NoSQL и другие.',
+      'api': 'API (Application Programming Interface) - это набор правил и протоколов, которые позволяют различным программам взаимодействовать друг с другом.',
+      'фронтенд': 'Frontend (фронтенд) - это клиентская часть веб-приложения, с которой взаимодействует пользователь. Включает HTML, CSS и JavaScript.',
+      'бэкенд': 'Backend (бэкенд) - это серверная часть приложения, которая обрабатывает данные, работает с базами данных и обеспечивает безопасность.',
+      'git': 'Git - это система контроля версий, которая позволяет отслеживать изменения в коде и работать над проектом совместно с другими разработчиками.',
+      'docker': 'Docker - это платформа для разработки, доставки и запуска приложений в контейнерах. Контейнеры позволяют упаковать приложение со всеми его зависимостями.',
+      'облачные технологии': 'Облачные технологии позволяют получить доступ к вычислительным ресурсам через интернет. Примеры: AWS, Google Cloud, Microsoft Azure.',
+      'кибербезопасность': 'Кибербезопасность - это защита компьютерных систем от кражи или повреждения оборудования, программного обеспечения или данных.',
+      'машинное обучение': 'Машинное обучение - это подраздел искусственного интеллекта, который позволяет компьютерам учиться на основе данных без явного программирования.',
+      'blockchain': 'Blockchain (блокчейн) - это распределенная база данных, которая хранит информацию о всех транзакциях участников системы в виде цепочки блоков.',
+      'devops': 'DevOps - это набор практик, направленных на автоматизацию процессов между разработкой ПО и ИТ-специалистами для создания, тестирования и выпуска ПО.'
     };
 
     const suggestions = [
       'Что такое программирование',
       'JavaScript',
-      'Что такое веб-приложение',
-      'Telegram',
       'Python',
-      'Искусственный интеллект'
+      'HTML',
+      'CSS',
+      'React',
+      'База данных',
+      'Frontend',
+      'Backend',
+      'DevOps'
     ];
 
     let isTyping = false;
@@ -754,7 +817,7 @@
       chatbot.classList.toggle('active');
       if (chatbot.classList.contains('active')) {
         showSuggestions();
-        addBotMessage('Привет! Я AI помощник. Задайте мне вопрос о программировании или выберите одну из подсказок ниже.');
+        addBotMessage('Привет!addBotMessage('Привет! Я AI помощник. Задайте мне вопрос о программировании или выберите одну из подсказок ниже.');
       }
     }
 
@@ -768,11 +831,9 @@
         suggestion.textContent = text;
         suggestion.style.animationDelay = `${index * 0.1}s`;
         suggestion.onclick = () => handleSuggestion(text);
-        suggestionsContainer.appendChild(suggestion);
         
-        // Force reflow to trigger animation
-        suggestion.offsetHeight;
-        suggestion.classList.add('show');
+        setTimeout(() => suggestion.classList.add('show'), 50);
+        suggestionsContainer.appendChild(suggestion);
       });
     }
 
@@ -782,76 +843,77 @@
     }
 
     function addMessage(text, isBot = false) {
-      const messages = document.getElementById('chatMessages');
+      const messagesContainer = document.getElementById('chatMessages');
       const message = document.createElement('div');
       message.className = `message ${isBot ? 'message-bot' : 'message-user'}`;
       message.textContent = text;
-      messages.appendChild(message);
       
-      // Force reflow to trigger animation
-      message.offsetHeight;
-      message.classList.add('show');
-      
-      messages.scrollTop = messages.scrollHeight;
-    }
-
-    function simulateTyping(text) {
-      return new Promise(resolve => {
-        isTyping = true;
-        const words = text.split(' ');
-        let currentText = '';
-        let wordIndex = 0;
-        
-        function typeWord() {
-          if (wordIndex < words.length) {
-            currentText += (wordIndex > 0 ? ' ' : '') + words[wordIndex];
-            addBotMessage(currentText + '|');
-            wordIndex++;
-            setTimeout(typeWord, 100);
-          } else {
-            addBotMessage(currentText);
-            isTyping = false;
-            resolve();
-          }
-        }
-        
-        typeWord();
-      });
+      messagesContainer.appendChild(message);
+      setTimeout(() => message.classList.add('show'), 50);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
     function addBotMessage(text) {
-      const messages = document.getElementById('chatMessages');
-      const lastMessage = messages.lastElementChild;
-      
-      if (lastMessage && lastMessage.classList.contains('message-bot')) {
-        lastMessage.textContent = text;
-      } else {
-        addMessage(text, true);
-      }
-    }
-
-    async function sendMessage() {
       if (isTyping) return;
+      isTyping = true;
       
-      const input = document.getElementById('userInput');
-      const text = input.value.trim().toLowerCase();
+      const words = text.split(' ');
+      let currentText = '';
+      let wordIndex = 0;
       
-      if (text) {
-        addMessage(input.value);
-        input.value = '';
-        
-        let response = 'Извините, я не знаю ответа на этот вопрос. Попробуйте выбрать один из предложенных вариантов.';
-        
-        for (const [key, value] of Object.entries(knowledgeBase)) {
-          if (text.includes(key)) {
-            response = value;
-            break;
-          }
+      const interval = setInterval(() => {
+        if (wordIndex >= words.length) {
+          clearInterval(interval);
+          isTyping = false;
+          return;
         }
         
-        await simulateTyping(response);
-        showSuggestions();
+        currentText += (wordIndex > 0 ? ' ' : '') + words[wordIndex];
+        const messagesContainer = document.getElementById('chatMessages');
+        const lastMessage = messagesContainer.lastElementChild;
+        
+        if (!lastMessage || !lastMessage.classList.contains('message-bot')) {
+          addMessage(currentText, true);
+        } else {
+          lastMessage.textContent = currentText;
+        }
+        
+        wordIndex++;
+      }, 100);
+    }
+
+    function findAnswer(question) {
+      question = question.toLowerCase().trim();
+      
+      // Прямое совпадение
+      if (knowledgeBase[question]) {
+        return knowledgeBase[question];
       }
+      
+      // Поиск по ключевым словам
+      for (let key in knowledgeBase) {
+        if (question.includes(key)) {
+          return knowledgeBase[key];
+        }
+      }
+      
+      return 'Извините, я не знаю ответа на этот вопрос. Попробуйте спросить что-то другое или выберите тему из подсказок ниже.';
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('userInput');
+      const question = input.value.trim();
+      
+      if (!question) return;
+      
+      addMessage(question);
+      input.value = '';
+      
+      setTimeout(() => {
+        const answer = findAnswer(question);
+        addBotMessage(answer);
+        showSuggestions();
+      }, 500);
     }
 
     function handleKeyPress(event) {
