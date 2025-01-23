@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Telegram Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
   <link href="https://unpkg.com/lucide-react@latest/dist/umd/lucide.min.js" rel="stylesheet">
   <style>
     /* Reset and base styles */
@@ -15,6 +16,7 @@
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
       user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     :root {
@@ -28,21 +30,27 @@
       --success: #4CAF50;
       --warning: #FFC107;
       --danger: #FF5252;
+      --usdt: #26A17B;
     }
 
+    /* Enhanced Animations */
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-10px); }
     }
 
     @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, var(--background), #1a1a1a);
       color: var(--text);
       min-height: 100vh;
@@ -50,7 +58,7 @@
       position: relative;
     }
 
-    /* Enhanced Snowfall Animation */
+    /* Enhanced Snowfall */
     .snowfall {
       position: fixed;
       top: 0;
@@ -59,6 +67,7 @@
       height: 100%;
       pointer-events: none;
       z-index: 1;
+      perspective: 1000px;
     }
 
     .snowflake {
@@ -68,15 +77,16 @@
       pointer-events: none;
       opacity: 0;
       filter: blur(1px);
+      transform-style: preserve-3d;
     }
 
     @keyframes snowfall {
       0% {
-        transform: translateY(-10vh) translateX(0) rotate(0deg);
+        transform: translateY(-10vh) translateX(0) translateZ(0) rotate(0deg);
         opacity: 1;
       }
       100% {
-        transform: translateY(100vh) translateX(20px) rotate(360deg);
+        transform: translateY(100vh) translateX(20px) translateZ(100px) rotate(360deg);
         opacity: 0;
       }
     }
@@ -91,7 +101,196 @@
       z-index: 2;
     }
 
-    /* Enhanced Navigation */
+    /* Enhanced Cards */
+    .card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+      );
+      animation: shimmer 2s infinite;
+    }
+
+    .card:active {
+      transform: scale(0.98);
+    }
+
+    /* USDT Balance Display */
+    .usdt-balance {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 48px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--usdt), #2ecc71);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: pulse 2s infinite;
+    }
+
+    .usdt-symbol {
+      font-size: 24px;
+      color: var(--usdt);
+      margin-left: 4px;
+    }
+
+    /* Enhanced Transactions */
+    .transaction {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      margin-bottom: 8px;
+      transition: transform 0.2s ease;
+    }
+
+    .transaction:hover {
+      transform: translateX(4px);
+    }
+
+    .transaction-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .transaction-date {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .transaction-amount {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .transaction-amount.plus {
+      color: var(--success);
+    }
+
+    .transaction-amount.minus {
+      color: var(--danger);
+    }
+
+    /* Enhanced Tasks */
+    .task-item {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .task-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .task-title {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .task-reward {
+      color: var(--usdt);
+      font-weight: 600;
+    }
+
+    .task-progress {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .task-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--usdt));
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    /* Enhanced Buttons */
+    .button {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+      );
+      transition: 0.5s;
+    }
+
+    .button:hover::before {
+      left: 100%;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 136, 204, 0.3);
+    }
+
+    .button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    /* Navigation */
     .nav {
       position: fixed;
       bottom: 0;
@@ -134,247 +333,123 @@
       transform: scale(0.9);
     }
 
-    /* Enhanced Pages */
-    .page {
-      display: none;
-      animation: fadein 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      opacity: 0;
-      transform: translateY(10px);
-    }
-
-    .page.active {
-      display: block;
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @keyframes fadein {
-      from { 
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to { 
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Enhanced Components */
-    .card {
-      background: var(--card-bg);
-      border-radius: 24px;
-      padding: 24px;
-      margin-bottom: 20px;
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card:active {
-      transform: scale(0.98);
-    }
-
-    .profile-header {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      margin-bottom: 24px;
-    }
-
-    .avatar {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid var(--primary);
-      box-shadow: 0 0 20px rgba(0, 136, 204, 0.3);
-    }
-
-    .profile-info h2 {
-      font-size: 28px;
-      margin-bottom: 8px;
-      font-weight: 700;
-    }
-
-    .profile-info p {
-      color: var(--text-secondary);
-      font-size: 16px;
-    }
-
-    .button {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 14px 28px;
-      border-radius: 16px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .button:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 136, 204, 0.3);
-    }
-
-    .button:active {
-      transform: translateY(0);
-      box-shadow: none;
-    }
-
-    /* Enhanced Task List */
-    .task-list {
-      list-style: none;
-    }
-
-    .task-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px;
-      border-bottom: 1px solid var(--border);
-      transition: background-color 0.3s ease;
-    }
-
-    .task-item:last-child {
-      border-bottom: none;
-    }
-
-    .task-item .button {
-      padding: 10px 20px;
-      font-size: 14px;
-    }
-
-    /* Enhanced Leaderboard */
-    .leaderboard-item {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
-      transition: transform 0.3s ease;
-    }
-
-    .leaderboard-item:hover {
-      transform: translateX(5px);
-    }
-
-    .leaderboard-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      border: 2px solid var(--primary);
-    }
-
-    /* Enhanced Wallet */
-    .balance {
-      font-size: 48px;
-      font-weight: 700;
-      text-align: center;
-      margin: 24px 0;
-      background: linear-gradient(135deg, var(--primary), #00bcd4);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: pulse 2s infinite;
-    }
-
-    .transaction {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .transaction:last-child {
-      border-bottom: none;
-    }
-
-    .transaction span:last-child {
-      font-weight: 600;
-    }
-
-    .transaction span[class*="plus"] {
-      color: var(--success);
-    }
-
-    .transaction span[class*="minus"] {
-      color: var(--danger);
-    }
-
-    /* Progress Bar */
-    .progress-bar {
-      width: 100%;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 3px;
-      margin: 8px 0;
+    /* Loading States */
+    .loading {
+      position: relative;
       overflow: hidden;
     }
 
-    .progress-bar-fill {
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 200%;
       height: 100%;
-      background: var(--primary);
-      border-radius: 3px;
-      transition: width 0.3s ease;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+      );
+      animation: shimmer 1.5s infinite;
     }
 
-    /* Badges */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 12px;
+    /* Toast Notifications */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 12px 24px;
       border-radius: 12px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-right: 8px;
+      font-size: 14px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
-    .badge-success {
-      background: rgba(76, 175, 80, 0.2);
-      color: var(--success);
+    .toast.show {
+      opacity: 1;
     }
 
-    .badge-warning {
-      background: rgba(255, 193, 7, 0.2);
-      color: var(--warning);
+    /* Modals */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
     }
 
-    /* Animations */
-    .float {
-      animation: float 3s ease-in-out infinite;
+    .modal.show {
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    .pulse {
-      animation: pulse 2s ease-in-out infinite;
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 24px;
+      width: 90%;
+      max-width: 400px;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal.show .modal-content {
+      transform: translateY(0);
     }
   </style>
 </head>
 <body>
   <div class="snowfall" id="snowfall"></div>
 
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Withdrawal Modal -->
+  <div class="modal" id="withdrawModal">
+    <div class="modal-content">
+      <h2>Вывод USDT</h2>
+      <div class="usdt-balance">250.00 <span class="usdt-symbol">USDT</span></div>
+      <p>Выберите способ вывода:</p>
+      <button class="button" onclick="connectWallet('tonkeeper')">
+        <span class="lucide-wallet"></span>
+        Tonkeeper
+      </button>
+      <button class="button" onclick="connectWallet('telegram')">
+        <span class="lucide-send"></span>
+        Telegram Wallet
+      </button>
+    </div>
+  </div>
+
   <div class="container">
     <!-- Home Page -->
     <div class="page active" id="home">
       <div class="card float">
         <h1>Добро пожаловать!</h1>
-        <div class="balance pulse">1,234 ₽</div>
+        <div class="usdt-balance">250.00 <span class="usdt-symbol">USDT</span></div>
         <div class="badge badge-success">Активный пользователь</div>
       </div>
       <div class="card">
         <h2>Ежедневные достижения</h2>
-        <div class="progress-bar">
-          <div class="progress-bar-fill" style="width: 60%"></div>
+        <div class="task-progress">
+          <div class="task-progress-fill" style="width: 60%"></div>
         </div>
         <p>Выполнено задач: 3/5</p>
-        <p>Заработано сегодня: 100 ₽</p>
+        <p>Заработано сегодня: 25.00 USDT</p>
       </div>
     </div>
 
@@ -382,21 +457,22 @@
     <div class="page" id="profile">
       <div class="card">
         <div class="profile-header">
-          <img src="https://via.placeholder.com/90" alt="Avatar" class="avatar">
+          <img src="https://via.placeholder.com/90" alt="Avatar" class="avatar" id="userAvatar">
           <div class="profile-info">
-            <h2>Имя пользователя</h2>
-            <p>@username</p>
+            <h2 id="userName">Загрузка...</h2>
+            <p id="userUsername">@loading</p>
           </div>
         </div>
-        <button class="button">
+        <button class="button" onclick="editProfile()">
           <span class="lucide-edit"></span>
           Редактировать профиль
         </button>
       </div>
       <div class="card">
         <h3>Реферальная программа</h3>
-        <p>Ваша ссылка: https://t.me/app/...</p>
-        <div class="badge badge-success">Приглашено: 5 пользователей</div>
+        <p>Ваша ссылка: <span id="referralLink">loading...</span></p>
+        <div class="badge badge-success">Приглашено: <span id="referralCount">0</span> пользователей</div>
+        <p>Бонус за реферала: 5.00 USDT</p>
       </div>
     </div>
 
@@ -404,31 +480,9 @@
     <div class="page" id="tasks">
       <div class="card">
         <h2>Ежедневные задания</h2>
-        <ul class="task-list">
-          <li class="task-item">
-            <div>
-              <span>Выполнить 5 заданий</span>
-              <div class="progress-bar">
-                <div class="progress-bar-fill" style="width: 40%"></div>
-              </div>
-            </div>
-            <button class="button">Начать</button>
-          </li>
-          <li class="task-item">
-            <div>
-              <span>Пригласить друга</span>
-              <div class="badge badge-warning">+50 ₽</div>
-            </div>
-            <button class="button">Начать</button>
-          </li>
-          <li class="task-item">
-            <div>
-              <span>Заработать 100 ₽</span>
-              <div class="badge badge-success">+100 ₽</div>
-            </div>
-            <button class="button">Начать</button>
-          </li>
-        </ul>
+        <div id="taskList">
+          <!-- Tasks will be loaded dynamically -->
+        </div>
       </div>
     </div>
 
@@ -436,26 +490,8 @@
     <div class="page" id="leaderboard">
       <div class="card">
         <h2>Топ пользователей</h2>
-        <div class="leaderboard-item">
-          <img src="https://via.placeholder.com/48" alt="User" class="leaderboard-avatar">
-          <div>
-            <h3>Пользователь 1</h3>
-            <div class="badge badge-success">1,234 ₽</div>
-          </div>
-        </div>
-        <div class="leaderboard-item">
-          <img src="https://via.placeholder.com/48" alt="User" class="leaderboard-avatar">
-          <div>
-            <h3>Пользователь 2</h3>
-            <div class="badge badge-success">987 ₽</div>
-          </div>
-        </div>
-        <div class="leaderboard-item">
-          <img src="https://via.placeholder.com/48" alt="User" class="leaderboard-avatar">
-          <div>
-            <h3>Пользователь 3</h3>
-            <div class="badge badge-success">654 ₽</div>
-          </div>
+        <div id="leaderboardList">
+          <!-- Leaderboard will be loaded dynamically -->
         </div>
       </div>
     </div>
@@ -464,25 +500,16 @@
     <div class="page" id="wallet">
       <div class="card">
         <h2>Баланс</h2>
-        <div class="balance">1,234 ₽</div>
-        <button class="button">
+        <div class="usdt-balance">250.00 <span class="usdt-symbol">USDT</span></div>
+        <button class="button" onclick="showWithdrawModal()">
           <span class="lucide-wallet"></span>
-          Вывести средства
+          Вывести USDT
         </button>
       </div>
       <div class="card">
         <h2>История транзакций</h2>
-        <div class="transaction">
-          <span>Выполнено задание</span>
-          <span class="plus">+100 ₽</span>
-        </div>
-        <div class="transaction">
-          <span>Реферальный бонус</span>
-          <span class="plus">+50 ₽</span>
-        </div>
-        <div class="transaction">
-          <span>Вывод средств</span>
-          <span class="minus">-500 ₽</span>
+        <div id="transactionList">
+          <!-- Transactions will be loaded dynamically -->
         </div>
       </div>
     </div>
@@ -516,6 +543,76 @@
 
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
+    // Mock data for testing
+    const mockData = {
+      tasks: [
+        {
+          id: 1,
+          title: 'Выполнить 5 заданий',
+          reward: 10.00,
+          progress: 40,
+          completed: false
+        },
+        {
+          id: 2,
+          title: 'Пригласить друга',
+          reward: 5.00,
+          progress: 0,
+          completed: false
+        },
+        {
+          id: 3,
+          title: 'Заработать 100 USDT',
+          reward: 20.00,
+          progress: 25,
+          completed: false
+        }
+      ],
+      transactions: [
+        {
+          id: 1,
+          type: 'plus',
+          amount: 10.00,
+          description: 'Выполнено задание',
+          date: '2024-03-10T12:00:00Z'
+        },
+        {
+          id: 2,
+          type: 'plus',
+          amount: 5.00,
+          description: 'Реферальный бонус',
+          date: '2024-03-09T15:30:00Z'
+        },
+        {
+          id: 3,
+          type: 'minus',
+          amount: 50.00,
+          description: 'Вывод средств',
+          date: '2024-03-08T18:45:00Z'
+        }
+      ],
+      leaderboard: [
+        {
+          id: 1,
+          name: 'Пользователь 1',
+          avatar: 'https://via.placeholder.com/48',
+          earnings: 1234.00
+        },
+        {
+          id: 2,
+          name: 'Пользователь 2',
+          avatar: 'https://via.placeholder.com/48',
+          earnings: 987.00
+        },
+        {
+          id: 3,
+          name: 'Пользователь 3',
+          avatar: 'https://via.placeholder.com/48',
+          earnings: 654.00
+        }
+      ]
+    };
+
     // Initialize Telegram WebApp
     window.Telegram?.WebApp?.ready();
 
@@ -530,7 +627,7 @@
       item.addEventListener('click', () => {
         const pageId = item.dataset.page;
         
-        // Update navigation with animation
+        // Update navigation
         navItems.forEach(nav => nav.classList.remove('active'));
         item.classList.add('active');
         
@@ -556,31 +653,30 @@
       const snowflake = document.createElement('div');
       snowflake.classList.add('snowflake');
       
-      // Random size between 2px and 4px
       const size = Math.random() * 2 + 2;
       snowflake.style.width = `${size}px`;
       snowflake.style.height = `${size}px`;
       
-      // Random starting position
       snowflake.style.left = `${Math.random() * 100}vw`;
       
-      // Random animation duration and delay
       const duration = Math.random() * 3 + 3;
       const delay = Math.random() * 2;
+      const xMove = (Math.random() - 0.5) * 100;
+      const zMove = Math.random() * 100;
+      
       snowflake.style.animation = `snowfall ${duration}s linear ${delay}s`;
+      snowflake.style.transform = `translate3d(${xMove}px, 0, ${zMove}px)`;
       
       document.getElementById('snowfall').appendChild(snowflake);
       
-      // Remove snowflake after animation
       setTimeout(() => {
         snowflake.remove();
       }, (duration + delay) * 1000);
     }
 
-    // Create new snowflakes periodically
     setInterval(createSnowflake, 200);
 
-    // User data handling with enhanced error handling
+    // User data handling
     const user = (() => {
       try {
         return window.Telegram?.WebApp?.initDataUnsafe?.user || {
@@ -598,39 +694,139 @@
       }
     })();
 
-    // Update profile information with animation
-    if (user) {
-      const updateProfileElement = (selector, value) => {
-        const element = document.querySelector(selector);
-        if (element) {
-          element.style.opacity = '0';
-          setTimeout(() => {
-            element.textContent = value;
-            element.style.opacity = '1';
-          }, 300);
+    // Update profile information
+    function updateProfile() {
+      const userName = document.getElementById('userName');
+      const userUsername = document.getElementById('userUsername');
+      const userAvatar = document.getElementById('userAvatar');
+      const referralLink = document.getElementById('referralLink');
+
+      userName.textContent = user.first_name;
+      userUsername.textContent = `@${user.username}`;
+      if (user.photo_url) {
+        userAvatar.src = user.photo_url;
+      }
+      referralLink.textContent = `https://t.me/app/...?ref=${user.username}`;
+    }
+
+    // Load tasks
+    function loadTasks() {
+      const taskList = document.getElementById('taskList');
+      taskList.innerHTML = mockData.tasks.map(task => `
+        <div class="task-item">
+          <div class="task-header">
+            <span class="task-title">${task.title}</span>
+            <span class="task-reward">+${task.reward.toFixed(2)} USDT</span>
+          </div>
+          <div class="task-progress">
+            <div class="task-progress-fill" style="width: ${task.progress}%"></div>
+          </div>
+          <button class="button" onclick="startTask(${task.id})">
+            <span class="lucide-play"></span>
+            Начать
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // Load leaderboard
+    function loadLeaderboard() {
+      const leaderboardList = document.getElementById('leaderboardList');
+      leaderboardList.innerHTML = mockData.leaderboard.map(user => `
+        <div class="leaderboard-item">
+          <img src="${user.avatar}" alt="${user.name}" class="leaderboard-avatar">
+          <div>
+            <h3>${user.name}</h3>
+            <div class="badge badge-success">${user.earnings.toFixed(2)} USDT</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Load transactions
+    function loadTransactions() {
+      const transactionList = document.getElementById('transactionList');
+      transactionList.innerHTML = mockData.transactions.map(tx => `
+        <div class="transaction">
+          <div class="transaction-info">
+            <span>${tx.description}</span>
+            <span class="transaction-date">${new Date(tx.date).toLocaleDateString()}</span>
+          </div>
+          <span class="transaction-amount ${tx.type}">
+            ${tx.type === 'plus' ? '+' : '-'}${tx.amount.toFixed(2)} USDT
+          </span>
+        </div>
+      `).join('');
+    }
+
+    // Toast notification
+    function showToast(message, duration = 3000) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, duration);
+    }
+
+    // Wallet functions
+    function showWithdrawModal() {
+      const modal = document.getElementById('withdrawModal');
+      modal.classList.add('show');
+    }
+
+    function hideWithdrawModal() {
+      const modal = document.getElementById('withdrawModal');
+      modal.classList.remove('show');
+    }
+
+    async function connectWallet(type) {
+      showToast(`Подключение к ${type}...`);
+      // Simulate wallet connection
+      setTimeout(() => {
+        hideWithdrawModal();
+        showToast('Средства успешно выведены!');
+      }, 2000);
+    }
+
+    // Task functions
+    function startTask(taskId) {
+      showToast(`Задание #${taskId} начато!`);
+      // Simulate task progress
+      const task = mockData.tasks.find(t => t.id === taskId);
+      if (task) {
+        task.progress += 20;
+        if (task.progress >= 100) {
+          task.completed = true;
+          showToast(`Получено +${task.reward.toFixed(2)} USDT!`);
         }
-      };
-
-      updateProfileElement('.profile-info h2', user.first_name);
-      updateProfileElement('.profile-info p', `@${user.username}`);
-
-      const profileAvatar = document.querySelector('.avatar');
-      if (profileAvatar && user.photo_url) {
-        profileAvatar.style.opacity = '0';
-        profileAvatar.src = user.photo_url;
-        profileAvatar.onload = () => {
-          profileAvatar.style.opacity = '1';
-        };
+        loadTasks();
       }
     }
 
-    // Initialize progress bars with animation
-    document.querySelectorAll('.progress-bar-fill').forEach(bar => {
-      const width = bar.style.width;
-      bar.style.width = '0';
+    // Add the missing editProfile function
+    function editProfile() {
+      showToast('Редактирование профиля...');
+      // Here you would typically show a modal or form for editing
+      // For now, we'll just show a toast message
       setTimeout(() => {
-        bar.style.width = width;
-      }, 300);
+        showToast('Профиль обновлен!');
+      }, 1000);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      updateProfile();
+      loadTasks();
+      loadLeaderboard();
+      loadTransactions();
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('withdrawModal').addEventListener('click', (e) => {
+      if (e.target.id === 'withdrawModal') {
+        hideWithdrawModal();
+      }
     });
   </script>
 </body>
