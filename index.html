@@ -2,35 +2,138 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome | Блог Сергея</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Telegram Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    /* Reset and base styles */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
     }
 
     :root {
-      --primary: #2563eb;
-      --secondary: #10b981;
-      --text: #1f2937;
-      --background: #ffffff;
-      --card-bg: #f8fafc;
-      --border: #e2e8f0;
-    }
-
-    html {
-      scroll-behavior: smooth;
+      --primary: #0088cc;
+      --primary-dark: #0077b3;
+      --background: #000000;
+      --card-bg: rgba(255, 255, 255, 0.1);
+      --text: #ffffff;
+      --text-secondary: #999999;
+      --border: rgba(255, 255, 255, 0.1);
+      --success: #4CAF50;
+      --warning: #FFC107;
+      --danger: #FF5252;
+      --robot-eye: #00ff00;
     }
 
     body {
-      font-family: 'Inter', sans-serif;
-      line-height: 1.6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--background), #1a1a1a);
       color: var(--text);
-      background: var(--background);
+      min-height: 100vh;
       overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Enhanced Hero Section */
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+    }
+
+    .welcome-text {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #fff, #a0a0a0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      animation: fadeInUp 1s ease-out 0.3s backwards;
+    }
+
+    /* Robot Animation */
+    .robot {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      width: 60px;
+      height: 60px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .robot-head {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      border: 2px solid var(--primary);
+      overflow: hidden;
+    }
+
+    .robot-eye {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: var(--robot-eye);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: blink 3s infinite;
+    }
+
+    .robot-antenna {
+      position: absolute;
+      width: 4px;
+      height: 15px;
+      background: var(--primary);
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    @keyframes blink {
+      0%, 45%, 55%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(0.1);
+        opacity: 0.5;
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-10px) rotate(5deg);
+      }
     }
 
     /* Enhanced Snowfall */
@@ -46,585 +149,142 @@
 
     .snowflake {
       position: absolute;
-      background: white;
+      background: rgba(255, 255, 255, 0.8);
       border-radius: 50%;
-      opacity: 0.6;
       pointer-events: none;
+      opacity: 0;
       filter: blur(1px);
     }
 
     /* Enhanced Navigation */
-    .nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      z-index: 1000;
-      padding: 1rem;
-      border-bottom: 1px solid var(--border);
-      transform: translateY(0);
-      transition: transform 0.3s ease;
-    }
-
-    .nav.hidden {
-      transform: translateY(-100%);
-    }
-
-    .nav-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .nav-brand {
-      font-weight: 800;
-      color: var(--text);
-      text-decoration: none;
-      font-size: 1.5rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      transition: transform 0.3s ease;
-    }
-
-    .nav-brand:hover {
-      transform: scale(1.05);
-    }
-
-    /* Enhanced Hamburger */
     .hamburger {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      width: 24px;
-      height: 20px;
-      background: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      width: 40px;
+      height: 40px;
+      background: transparent;
       border: none;
       cursor: pointer;
       padding: 0;
-      transition: transform 0.3s ease;
     }
 
-    .hamburger:hover {
-      transform: scale(1.1);
-    }
-
-    .hamburger span {
-      width: 100%;
-      height: 2px;
-      background-color: var(--text);
-      transition: all 0.3s ease;
-    }
-
-    .hamburger.active span:nth-child(1) {
-      transform: translateY(9px) rotate(45deg);
-    }
-
-    .hamburger.active span:nth-child(2) {
-      opacity: 0;
-    }
-
-    .hamburger.active span:nth-child(3) {
-      transform: translateY(-9px) rotate(-45deg);
-    }
-
-    /* Enhanced Hero Section */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      padding: 6rem 1rem 4rem;
-      position: relative;
-      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-      overflow: hidden;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.1) 0%, transparent 50%);
-      animation: pulse 4s ease-in-out infinite;
-    }
-
-    .hero-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-      position: relative;
-      z-index: 2;
-    }
-
-    .hero-text {
-      animation: fadeInUp 1s ease;
-    }
-
-    .hero-image {
-      width: 100%;
-      max-width: 500px;
-      height: auto;
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      animation: fadeInUp 1s ease 0.2s;
-      opacity: 0;
-      animation-fill-mode: forwards;
-      transition: transform 0.3s ease;
-    }
-
-    .hero-image:hover {
-      transform: translateY(-10px) scale(1.02);
-    }
-
-    .hero h1 {
-      font-size: 4rem;
-      font-weight: 800;
-      margin-bottom: 1.5rem;
-      line-height: 1.1;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      transition: transform 0.3s ease;
-    }
-
-    .hero h1:hover {
-      transform: scale(1.02);
-    }
-
-    .hero p {
-      font-size: 1.25rem;
-      color: #64748b;
-      margin-bottom: 2rem;
-      transition: transform 0.3s ease;
-    }
-
-    .hero p:hover {
-      transform: translateX(10px);
-    }
-
-    /* Enhanced Buttons */
-    .button-group {
-      display: flex;
-      gap: 1rem;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 1rem 2rem;
-      border-radius: 0.75rem;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-    }
-
-    .btn:hover::before {
-      transform: translateX(0);
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-    }
-
-    .btn-outline {
-      border: 2px solid var(--primary);
-      color: var(--primary);
-    }
-
-    .btn-outline:hover {
-      background: var(--primary);
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-    }
-
-    /* Enhanced Blog Cards */
-    .blog-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
-    }
-
-    .blog-card {
-      background: white;
-      border-radius: 1.5rem;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
-      position: relative;
-    }
-
-    .blog-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: 1;
-      border-radius: 1.5rem;
-    }
-
-    .blog-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    }
-
-    .blog-card:hover::before {
-      opacity: 0.1;
-    }
-
-    .blog-image {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-
-    .blog-card:hover .blog-image {
-      transform: scale(1.05);
-    }
-
-    .blog-content {
-      padding: 2rem;
-      position: relative;
-      z-index: 2;
-    }
-
-    .blog-content h3 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      transition: color 0.3s ease;
-    }
-
-    .blog-card:hover .blog-content h3 {
-      color: var(--primary);
-    }
-
-    .blog-content p {
-      color: #64748b;
-      margin-bottom: 1.5rem;
-      transition: transform 0.3s ease;
-    }
-
-    .blog-card:hover .blog-content p {
-      transform: translateX(5px);
-    }
-
-    /* Enhanced Quote Generator */
-    .quote-container {
-      max-width: 800px;
-      margin: 4rem auto;
-      padding: 3rem;
-      background: var(--card-bg);
-      border-radius: 2rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.3s ease;
-    }
-
-    .quote-container:hover {
-      transform: scale(1.02);
-    }
-
-    .quote-container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      opacity: 0.05;
-      transition: opacity 0.3s ease;
-    }
-
-    .quote-container:hover::before {
-      opacity: 0.1;
-    }
-
-    .quote-text {
-      font-size: 1.5rem;
-      font-weight: 500;
-      color: var(--text);
-      position: relative;
-      z-index: 1;
-      transition: all 0.5s ease;
-    }
-
-    /* Enhanced Footer */
-    .footer {
-      background: #1f2937;
-      color: white;
-      padding: 6rem 1rem 4rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .footer::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    }
-
-    .footer-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 4rem;
-      position: relative;
-    }
-
-    .footer-section {
-      transition: transform 0.3s ease;
-    }
-
-    .footer-section:hover {
-      transform: translateY(-5px);
-    }
-
-    .footer-section h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      color: white;
-    }
-
-    .footer-section p,
-    .footer-section a {
-      color: #9ca3af;
-      text-decoration: none;
-      margin-bottom: 0.75rem;
+    .hamburger-line {
       display: block;
-      transition: all 0.3s ease;
+      width: 30px;
+      height: 2px;
+      background: var(--text);
+      margin: 6px auto;
+      transition: all 0.3s ease-in-out;
     }
 
-    .footer-section a:hover {
-      color: white;
-      transform: translateX(5px);
+    .menu-open .hamburger-line:nth-child(1) {
+      transform: translateY(8px) rotate(45deg);
     }
 
-    .footer-bottom {
-      text-align: center;
-      padding-top: 3rem;
-      margin-top: 3rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      color: #9ca3af;
+    .menu-open .hamburger-line:nth-child(2) {
+      opacity: 0;
     }
 
-    /* Enhanced Modal */
-    .modal {
+    .menu-open .hamburger-line:nth-child(3) {
+      transform: translateY(-8px) rotate(-45deg);
+    }
+
+    .side-menu {
       position: fixed;
       top: 0;
-      right: 0;
-      width: 350px;
+      right: -300px;
+      width: 300px;
       height: 100vh;
-      background: white;
-      padding: 2rem;
-      transform: translateX(100%);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1001;
-      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      padding: 80px 20px 20px;
+      transition: right 0.3s ease-in-out;
     }
 
-    .modal.active {
-      transform: translateX(0);
+    .menu-open .side-menu {
+      right: 0;
     }
 
-    .modal h3 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .menu-text {
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 30px;
+      line-height: 1.6;
     }
 
     .social-links {
       display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-top: 2rem;
+      justify-content: center;
+      gap: 20px;
     }
 
     .social-link {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
       color: var(--text);
-      text-decoration: none;
-      padding: 1rem;
-      border-radius: 1rem;
-      transition: all 0.3s ease;
-      background: var(--card-bg);
+      font-size: 24px;
+      transition: color 0.3s ease;
     }
 
     .social-link:hover {
-      transform: translateX(5px);
+      color: var(--primary);
+    }
+
+    /* Quote Generator */
+    .quote-container {
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    }
+
+    .quote {
+      font-style: italic;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+      transition: opacity 0.5s ease;
+    }
+
+    /* Buttons */
+    .button-container {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 25px;
       background: var(--primary);
       color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
     }
 
-    .social-link svg {
-      transition: transform 0.3s ease;
+    .button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
     }
 
-    .social-link:hover svg {
-      transform: scale(1.1);
+    .button.secondary {
+      background: transparent;
+      border: 2px solid var(--primary);
     }
 
-    /* New styles for article section */
-    .article-section {
-      max-width: 800px;
-      margin: 4rem auto;
-      padding: 2rem;
+    .button.secondary:hover {
+      background: var(--primary);
     }
 
-    .article-content {
-      background: white;
-      border-radius: 2rem;
-      padding: 3rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .article-content h2 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 2rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .article-content p {
-      font-size: 1.125rem;
-      line-height: 1.8;
-      color: #4b5563;
-      margin-bottom: 1.5rem;
-    }
-
-    .article-content ul {
-      list-style: none;
-      margin: 2rem 0;
-      padding: 0;
-    }
-
-    .article-content li {
-      position: relative;
-      padding-left: 1.5rem;
-      margin-bottom: 1rem;
-      color: #4b5563;
-    }
-
-    .article-content li::before {
-      content: '•';
-      position: absolute;
-      left: 0;
-      color: var(--primary);
-      font-weight: bold;
-    }
-
-    /* Enhanced section titles */
-    .section-title {
-      text-align: center;
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin: 4rem 0 2rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* Enhanced about section */
-    .about-section {
-      max-width: 1200px;
-      margin: 6rem auto;
-      padding: 0 2rem;
-    }
-
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-    }
-
-    .about-image {
-      width: 100%;
-      height: auto;
-      border-radius: 2rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease;
-    }
-
-    .about-image:hover {
-      transform: scale(1.02);
-    }
-
-    .about-content {
-      padding: 2rem;
-    }
-
-    .about-content h2 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 2rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .about-content p {
-      font-size: 1.125rem;
-      line-height: 1.8;
-      color: #4b5563;
-      margin-bottom: 1.5rem;
-    }
-
-    /* Enhanced Animations */
+    /* Animations */
     @keyframes fadeInUp {
       from {
         opacity: 0;
@@ -636,68 +296,26 @@
       }
     }
 
-    @keyframes pulse {
-      0% {
-        transform: scale(1);
-        opacity: 0.5;
-      }
-      50% {
-        transform: scale(1.05);
-        opacity: 0.7;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 0.5;
-      }
-    }
-
-    /* Enhanced Responsive Design */
+    /* Responsive Design */
     @media (max-width: 768px) {
-      .hero-content {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 2rem;
-      }
-
-      .hero h1 {
+      .welcome-text {
         font-size: 2.5rem;
       }
 
-      .hero-image {
-        margin: 0 auto;
+      .subtitle {
+        font-size: 1.2rem;
       }
 
-      .button-group {
-        justify-content: center;
+      .button-container {
+        flex-direction: column;
+        align-items: center;
       }
 
-      .blog-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .modal {
-        width: 100%;
-      }
-
-      .quote-container {
-        margin: 2rem 1rem;
-        padding: 2rem;
-      }
-
-      .quote-text {
-        font-size: 1.25rem;
-      }
-      
-      .about-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .article-content {
-        padding: 1.5rem;
-      }
-      
-      .article-content h2 {
-        font-size: 2rem;
+      .robot {
+        top: 80px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
       }
     }
   </style>
@@ -705,261 +323,172 @@
 <body>
   <div class="snowfall" id="snowfall"></div>
 
-  <nav class="nav" id="nav">
-    <div class="nav-content">
-      <a href="#" class="nav-brand">Welcome</a>
-      <button class="hamburger" id="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+  <!-- Robot Animation -->
+  <div class="robot">
+    <div class="robot-head">
+      <div class="robot-antenna"></div>
+      <div class="robot-eye"></div>
     </div>
-  </nav>
+  </div>
 
-  <div class="modal" id="contactModal">
-    <h3>Давайте общаться</h3>
-    <p>Подписка необязательна, но мы будем рады видеть вас в нашем сообществе!</p>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="welcome-text">Welcome</h1>
+      <p class="subtitle">Добро пожаловать в блог о приложении Klyo и многом другом</p>
+      <div class="button-container">
+        <a href="#blog" class="button">Читать блог</a>
+        <a href="#about" class="button secondary">Узнать больше</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hamburger Menu -->
+  <button class="hamburger" onclick="toggleMenu()">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+  </button>
+
+  <!-- Side Menu -->
+  <div class="side-menu">
+    <p class="menu-text">Подписка необязательна, но мы будем рады видеть вас в нашем сообществе</p>
     <div class="social-links">
-      <a href="https://instagram.com/your_instagram" target="_blank" class="social-link">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-        </svg>
-        Instagram
+      <a href="https://instagram.com/your-username" class="social-link" target="_blank">
+        <i class="lucide-instagram"></i>
       </a>
-      <a href="https://t.me/your_telegram" target="_blank" class="social-link">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-17.15 6.498a2.268 2.268 0 0 0-.214 4.106l3.55 1.407 2.56-6.434L21.198 2.433zm-7.37 12.12l-2.56 6.434A2.268 2.268 0 0 0 14.294 24l.01-.001.006-.001a2.29 2.29 0 0 0 1.09-.363l5.941-4.876-7.513-4.206z"/>
-        </svg>
-        Telegram
+      <a href="https://t.me/your-username" class="social-link" target="_blank">
+        <i class="lucide-send"></i>
       </a>
     </div>
   </div>
 
-  <main>
-    <section class="hero">
-      <div class="hero-content">
-        <div class="hero-text">
-          <h1>Welcome</h1>
-          <p>Добро пожаловать в блог о приложении Klyo и многом другом</p>
-          <div class="button-group">
-            <a href="#blog" class="btn btn-primary">Читать блог</a>
-            <a href="#about" class="btn btn-outline">Узнать больше</a>
-          </div>
-        </div>
-        <img src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2020&q=80" alt="Hero Image" class="hero-image">
-      </div>
-    </section>
+  <!-- Quote Generator -->
+  <div class="quote-container">
+    <p class="quote" id="quote"></p>
+  </div>
 
-    <section class="about-section" id="about">
-      <div class="about-grid">
-        <img src="https://images.unsplash.com/photo-1553877522-43269d4ea984?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="About" class="about-image">
-        <div class="about-content">
-          <h2>О проекте</h2>
-          <p>Этот блог создан как платформа для обмена знаниями о разработке приложений, технологиях и инновациях. Здесь вы найдете информацию о создании мини-приложений на базе Telegram, узнаете о современных инструментах разработки и познакомитесь с проектом Klyo.</p>
-          <p>Telegram сегодня - это не просто мессенджер, а полноценная платформа для создания современных приложений. Благодаря открытому API и богатому функционалу, разработчики могут создавать инновационные решения для миллионов пользователей.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="blog">
-      <h2 class="section-title">Последние статьи</h2>
-      <div class="blog-grid">
-        <article class="blog-card">
-          <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80" alt="Разработка" class="blog-image">
-          <div class="blog-content">
-            <h3>Как создать своё приложение</h3>
-            <p>Пошаговое руководство по созданию современного приложения с использованием последних технологий.</p>
-            <a href="#" class="btn btn-outline">Читать дальше</a>
-          </div>
-        </article>
-        <article class="blog-card">
-          <img src="https://images.unsplash.com/photo-1555099962-4199c345e5dd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Программирование" class="blog-image">
-          <div class="blog-content">
-            <h3>Что такое программирование</h3>
-            <p>Основы программирования и лучшие практики для начинающих разработчиков.</p>
-            <a href="#" class="btn btn-outline">Читать дальше</a>
-          </div>
-        </article>
-        <article class="blog-card">
-          <img src="https://images.unsplash.com/photo-1611746872915-64382b5c76da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Telegram" class="blog-image">
-          <div class="blog-content">
-            <h3>Почему Telegram - платформа будущего</h3>
-            <p>Преимущества Telegram как платформы для современной разработки и коммуникации.</p>
-            <a href="#" class="btn btn-outline">Читать дальше</a>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <div class="quote-container">
-      <p class="quote-text" id="quote">Программирование - это искусство создавать будущее через код.</p>
-    </div>
-
-    <footer class="footer">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h3>О блоге</h3>
-          <p>Этот сайт создан как блог и платформа для изучения разработки приложений.</p>
-        </div>
-        <div class="footer-section">
-          <h3>Политика конфиденциальности</h3>
-          <p>Мы уважаем вашу конфиденциальность и не запрашиваем лишние данные.</p>
-        </div>
-        <div class="footer-section">
-          <h3>Связаться</h3>
-          <a href="#" onclick="toggleModal()">Наши контакты</a>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2025 Сергей. Все права защищены.</p>
-      </div>
-    </footer>
-  </main>
-
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script>
-    const nav = document.getElementById('nav');
-    let lastScroll = 0;
+    // Initialize Telegram WebApp
+    window.Telegram?.WebApp?.ready();
 
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Menu Toggle
+    function toggleMenu() {
+      document.body.classList.toggle('menu-open');
+    }
+
+    // Close menu on scroll
+    let lastScroll = 0;
     window.addEventListener('scroll', () => {
       const currentScroll = window.pageYOffset;
-      
-      if (currentScroll > lastScroll && currentScroll > 100) {
-        nav.classList.add('hidden');
-      } else {
-        nav.classList.remove('hidden');
+      if (currentScroll > lastScroll) {
+        document.body.classList.remove('menu-open');
       }
-      
       lastScroll = currentScroll;
     });
 
-    const hamburger = document.getElementById('hamburger');
-    const contactModal = document.getElementById('contactModal');
-    let isModalOpen = false;
-
-    function toggleModal() {
-      isModalOpen = !isModalOpen;
-      hamburger.classList.toggle('active');
-      contactModal.classList.toggle('active');
-    }
-
-    hamburger.addEventListener('click', toggleModal);
-
-    window.addEventListener('scroll', () => {
-      if (isModalOpen) {
-        toggleModal();
-      }
-    });
-
+    // Quote Generator
     const quotes = [
-      "Программирование - это искусство создавать будущее через код.",
-      "Лучший способ предсказать будущее - создать его.",
-      "Инновации отличают лидера от последователя.",
-      "Технологии лучше всего работают, когда они объединяют людей.",
-      "Единственный способ делать отличную работу - любить то, что ты делаешь."
+      "Программирование — это искусство организации сложности.",
+      "Лучший способ предсказать будущее — создать его.",
+      "Код — это поэзия, написанная логикой.",
+      "В программировании простота — это главная добродетель.",
+      "Каждая строка кода должна выглядеть так, будто она была написана с умыслом.",
+      "Программирование — это не о печатании, это о мышлении.",
+      "Будущее уже здесь, просто оно неравномерно распределено.",
+      "Совершенство достигается не тогда, когда нечего добавить, а когда нечего убрать.",
+      "Хороший код сам по себе является лучшей документацией.",
+      "Простота — необходимое условие надёжности."
     ];
 
-    const quoteElement = document.getElementById('quote');
-    let currentQuoteIndex = 0;
-
     function updateQuote() {
-      quoteElement.style.opacity = '0';
-      quoteElement.style.transform = 'translateY(10px)';
+      const quoteElement = document.getElementById('quote');
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
       
+      quoteElement.style.opacity = '0';
       setTimeout(() => {
-        currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
-        quoteElement.textContent = quotes[currentQuoteIndex];
+        quoteElement.textContent = randomQuote;
         quoteElement.style.opacity = '1';
-        quoteElement.style.transform = 'translateY(0)';
       }, 500);
     }
 
-    setInterval(updateQuote, 5000);
+    updateQuote();
+    setInterval(updateQuote, 10000);
 
+    // Snowfall Animation
     function createSnowflake() {
       const snowflake = document.createElement('div');
       snowflake.classList.add('snowflake');
       
-      const size = Math.random() * 4 + 2;
-      const blur = Math.random() * 2;
-      
+      const size = Math.random() * 2 + 2;
       snowflake.style.width = `${size}px`;
       snowflake.style.height = `${size}px`;
-      snowflake.style.filter = `blur(${blur}px)`;
-      snowflake.style.left = `${Math.random() * 100}vw`;
+      snowflake.style.left = `${Math.random() * 100}vw`;      const duration = Math.random() * 3 + 3;
+      const delay = Math.random() * 2;
+      snowflake.style.animation = `snowfall ${duration}s linear ${delay}s`;
       
-      const snowfall = const snowfall = document.getElementById('snowfall');
-      snowfall.appendChild(snowflake);
+      document.getElementById('snowfall').appendChild(snowflake);
       
-      const animationDuration = Math.random() * 3 + 2;
-      const startDelay = Math.random() * 2;
-      
-      snowflake.style.animation = `fall ${animationDuration}s linear ${startDelay}s`;
-      
-      snowflake.addEventListener('animationend', () => {
+      // Remove snowflake after animation
+      setTimeout(() => {
         snowflake.remove();
-      });
+      }, (duration + delay) * 1000);
     }
 
-    function startSnowfall() {
-      setInterval(createSnowflake, 200);
-    }
+    // Create new snowflakes periodically
+    setInterval(createSnowflake, 200);
 
-    startSnowfall();
+    // Add snowfall animation keyframes dynamically
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes snowfall {
+        0% {
+          transform: translateY(-10vh) translateX(0) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(100vh) translateX(20px) rotate(360deg);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
 
-    // Add smooth scrolling for anchor links
+    // Handle page navigation
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function(e) {
+      anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
+        const section = document.querySelector(this.getAttribute('href'));
+        if (section) {
+          section.scrollIntoView({
+            behavior: 'smooth'
           });
         }
       });
     });
 
-    // Add animation for blog cards on scroll
-    const blogCards = document.querySelectorAll('.blog-card');
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
-        }
-      });
-    }, observerOptions);
-
-    blogCards.forEach(card => {
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(20px)';
-      card.style.transition = 'all 0.6s ease-out';
-      observer.observe(card);
+    // Robot interaction
+    const robot = document.querySelector('.robot');
+    robot.addEventListener('click', () => {
+      const eye = robot.querySelector('.robot-eye');
+      eye.style.animation = 'none';
+      eye.style.background = '#ff0000';
+      
+      setTimeout(() => {
+        eye.style.animation = '';
+        eye.style.background = '';
+      }, 500);
     });
 
-    // Add keyframe animation for falling snowflakes
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = `
-      @keyframes fall {
-        0% {
-          transform: translateY(-5vh) rotate(0deg);
-          opacity: 1;
-        }
-        100% {
-          transform: translateY(105vh) rotate(360deg);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(styleSheet);
+    // Initialize theme based on Telegram WebApp
+    if (window.Telegram?.WebApp) {
+      const colorScheme = window.Telegram.WebApp.colorScheme;
+      document.documentElement.setAttribute('data-theme', colorScheme);
+    }
   </script>
 </body>
 </html>
