@@ -410,6 +410,82 @@
     .modal.show .modal-content {
       transform: translateY(0);
     }
+
+    /* Add new admin panel styles */
+    .admin-panel {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--background);
+      z-index: 2000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .admin-panel.show {
+      display: block;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .admin-close {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .admin-section {
+      margin-bottom: 30px;
+    }
+
+    .admin-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .admin-input {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+
+    .admin-input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .admin-task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .admin-task-item {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 8px;
+    }
   </style>
 </head>
 <body>
@@ -540,6 +616,47 @@
       </li>
     </ul>
   </nav>
+
+  <!-- Admin Panel -->
+  <div class="admin-panel" id="adminPanel">
+    <div class="admin-header">
+      <h1>Панель администратора</h1>
+      <button class="admin-close" onclick="hideAdminPanel()">×</button>
+    </div>
+
+    <div class="admin-section">
+      <h2>Добавить задание</h2>
+      <form class="admin-form" onsubmit="addTask(event)">
+        <input type="text" class="admin-input" placeholder="Название задания" id="taskTitle" required>
+        <input type="number" class="admin-input" placeholder="Награда (USDT)" id="taskReward" step="0.01" required>
+        <textarea class="admin-input" placeholder="Описание задания" id="taskDescription" required></textarea>
+        <button type="submit" class="button">
+          <span class="lucide-plus"></span>
+          Добавить задание
+        </button>
+      </form>
+    </div>
+
+    <div class="admin-section">
+      <h2>Управление заданиями</h2>
+      <div class="admin-task-list" id="adminTaskList">
+        <!-- Tasks will be loaded here -->
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <h2>Начисление USDT</h2>
+      <form class="admin-form" onsubmit="awardUsdt(event)">
+        <input type="text" class="admin-input" placeholder="Username пользователя" id="awardUsername" required>
+        <input type="number" class="admin-input" placeholder="Сумма USDT" id="awardAmount" step="0.01" required>
+        <textarea class="admin-input" placeholder="Причина начисления" id="awardReason" required></textarea>
+        <button type="submit" class="button">
+          <span class="lucide-dollar-sign"></span>
+          Начислить USDT
+        </button>
+      </form>
+    </div>
+  </div>
 
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
@@ -780,53 +897,175 @@
       modal.classList.remove('show');
     }
 
-    async function connectWallet(type) {
-      showToast(`Подключение к ${type}...`);
-      // Simulate wallet connection
-      setTimeout(() => {
-        hideWithdrawModal();
-        showToast('Средства успешно выведены!');
-      }, 2000);
-    }
+    // Admin functionality
+    let isAdmin = false; // This should be set based on Telegram user role
 
-    // Task functions
-    function startTask(taskId) {
-      showToast(`Задание #${taskId} начато!`);
-      // Simulate task progress
-      const task = mockData.tasks.find(t => t.id === taskId);
-      if (task) {
-        task.progress += 20;
-        if (task.progress >= 100) {
-          task.completed = true;
-          showToast(`Получено +${task.reward.toFixed(2)} USDT!`);
-        }
-        loadTasks();
+    function checkAdminStatus() {
+      // In production, this should verify with your backend
+      const adminUsernames = ['admin1', 'admin2']; // Example admin usernames
+      isAdmin = adminUsernames.includes(user.username);
+      
+      if (isAdmin) {
+        // Add admin button to navigation
+        const navList = document.querySelector('.nav-list');
+        const adminItem = document.createElement('li');
+        adminItem.className = 'nav-item';
+        adminItem.innerHTML = `
+          <span class="nav-icon lucide-settings" onclick="showAdminPanel()"></span>
+          <span>Админ</span>
+        `;
+        navList.appendChild(adminItem);
       }
     }
 
-    // Add the missing editProfile function
-    function editProfile() {
-      showToast('Редактирование профиля...');
-      // Here you would typically show a modal or form for editing
-      // For now, we'll just show a toast message
-      setTimeout(() => {
-        showToast('Профиль обновлен!');
-      }, 1000);
+    function showAdminPanel() {
+      if (!isAdmin) return;
+      document.getElementById('adminPanel').classList.add('show');
     }
 
-    // Initialize
+    function hideAdminPanel() {
+      document.getElementById('adminPanel').classList.remove('show');
+    }
+
+    function addTask(event) {
+      event.preventDefault();
+      if (!isAdmin) return;
+
+      const title = document.getElementById('taskTitle').value;
+      const reward = parseFloat(document.getElementById('taskReward').value);
+      const description = document.getElementById('taskDescription').value;
+
+      // In production, this should make an API call
+      mockData.tasks.push({
+        id: Date.now(),
+        title,
+        reward,
+        description,
+        progress: 0,
+        completed: false
+      });
+
+      loadTasks();
+      showToast('Задание добавлено');
+      event.target.reset();
+    }
+
+    function awardUsdt(event) {
+      event.preventDefault();
+      if (!isAdmin) return;
+
+      const username = document.getElementById('awardUsername').value;
+      const amount = parseFloat(document.getElementByIconst username = document.getElementById('awardUsername').value;
+      const amount = parseFloat(document.getElementById('awardAmount').value);
+      const reason = document.getElementById('awardReason').value;
+
+      // In production, this should make an API call
+      mockData.transactions.unshift({
+        id: Date.now(),
+        type: 'plus',
+        amount,
+        description: reason,
+        date: new Date().toISOString()
+      });
+
+      loadTransactions();
+      showToast(`Начислено ${amount} USDT пользователю @${username}`);
+      event.target.reset();
+    }
+
+    // Task management
+    function startTask(taskId) {
+      const task = mockData.tasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      showToast(`Начато задание: ${task.title}`);
+      
+      // In production, this should make an API call
+      task.progress = Math.min(100, task.progress + 20);
+      if (task.progress === 100 && !task.completed) {
+        task.completed = true;
+        // Add reward transaction
+        mockData.transactions.unshift({
+          id: Date.now(),
+          type: 'plus',
+          amount: task.reward,
+          description: `Выполнено задание: ${task.title}`,
+          date: new Date().toISOString()
+        });
+        showToast(`Получено ${task.reward} USDT за выполнение задания!`);
+      }
+
+      loadTasks();
+      loadTransactions();
+    }
+
+    // Profile management
+    function editProfile() {
+      window.Telegram?.WebApp?.showPopup({
+        title: 'Редактирование профиля',
+        message: 'Эта функция будет доступна в следующем обновлении',
+        buttons: [{
+          type: 'ok',
+          text: 'Понятно'
+        }]
+      });
+    }
+
+    // Enhanced wallet integration
+    async function connectWallet(type) {
+      showToast(`Подключение к ${type}...`);
+      
+      try {
+        if (type === 'tonkeeper') {
+          // Initialize TonConnect
+          const connector = new TonConnect();
+          await connector.connect();
+          
+          // Handle successful connection
+          showToast('Кошелек Tonkeeper подключен');
+        } else if (type === 'telegram') {
+          // Use Telegram Wallet API
+          window.Telegram?.WebApp?.showPopup({
+            title: 'Подключение кошелька',
+            message: 'Подтвердите подключение Telegram Wallet',
+            buttons: [{
+              type: 'ok',
+              text: 'Подключить'
+            }]
+          });
+        }
+        
+        hideWithdrawModal();
+      } catch (error) {
+        console.error('Wallet connection error:', error);
+        showToast('Ошибка подключения кошелька');
+      }
+    }
+
+    // Initialize application
     document.addEventListener('DOMContentLoaded', () => {
       updateProfile();
       loadTasks();
       loadLeaderboard();
       loadTransactions();
-    });
+      checkAdminStatus();
 
-    // Close modal when clicking outside
-    document.getElementById('withdrawModal').addEventListener('click', (e) => {
-      if (e.target.id === 'withdrawModal') {
-        hideWithdrawModal();
+      // Set theme based on Telegram WebApp color scheme
+      if (window.Telegram?.WebApp?.colorScheme === 'dark') {
+        document.documentElement.classList.add('dark');
       }
+
+      // Handle back button
+      window.Telegram?.WebApp?.BackButton?.onClick(() => {
+        if (document.getElementById('adminPanel').classList.contains('show')) {
+          hideAdminPanel();
+          return;
+        }
+        if (document.getElementById('withdrawModal').classList.contains('show')) {
+          hideWithdrawModal();
+          return;
+        }
+      });
     });
   </script>
 </body>
