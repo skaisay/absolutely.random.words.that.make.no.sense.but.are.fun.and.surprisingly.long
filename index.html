@@ -160,20 +160,57 @@
     }
 
     .social-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
       color: var(--text-secondary);
-      font-size: 24px;
-      transition: 0.3s;
+      border: 2px solid var(--text-secondary);
+      border-radius: 50%;
+      transition: all 0.3s ease;
     }
 
     .social-link:hover {
       color: var(--primary);
+      border-color: var(--primary);
+      transform: scale(1.1);
+    }
+
+    .social-link svg {
+      width: 24px;
+      height: 24px;
     }
 
     /* Blog Section */
     .blog {
       padding: 40px 20px;
-      max-width: 800px;
+      max-width: 1200px;
       margin: 0 auto;
+    }
+
+    .blog-vertical {
+      margin-bottom: 40px;
+    }
+
+    .blog-horizontal {
+      overflow-x: auto;
+      white-space: nowrap;
+      padding-bottom: 20px;
+      margin-bottom: 40px;
+      scrollbar-width: none; /* Firefox */
+    }
+
+    .blog-horizontal::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+
+    .blog-horizontal .blog-post {
+      display: inline-block;
+      width: 300px;
+      margin-right: 20px;
+      white-space: normal;
+      vertical-align: top;
     }
 
     .blog-post {
@@ -204,6 +241,48 @@
       line-height: 1.6;
     }
 
+    /* Bot Animation */
+    .bot {
+      position: fixed;
+      top: 20px;
+      right: 80px;
+      width: 40px;
+      height: 40px;
+      z-index: 1000;
+    }
+
+    .bot-eye {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #00ff00;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: blink 3s infinite;
+    }
+
+    /* Privacy Policy */
+    .privacy-policy {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 40px 20px;
+      text-align: center;
+      margin-top: 60px;
+    }
+
+    .privacy-policy h3 {
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+    }
+
+    .privacy-policy p {
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
     /* Animations */
     @keyframes fadeIn {
       from { opacity: 0; }
@@ -215,6 +294,11 @@
         opacity: 1;
         transform: translateY(0);
       }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.8); }
     }
 
     /* Snowfall */
@@ -250,6 +334,11 @@
     </div>
   </section>
 
+  <!-- Animated Bot -->
+  <div class="bot">
+    <div class="bot-eye"></div>
+  </div>
+
   <!-- Menu Button -->
   <button class="menu-button" onclick="toggleMenu()">
     <span class="menu-line"></span>
@@ -261,30 +350,49 @@
   <div class="side-menu">
     <p class="menu-text">Подписка необязательна, но мы будем рады видеть вас в нашем сообществе</p>
     <div class="social-links">
-      <a href="https://instagram.com/your-username" class="social-link" target="_blank">
-        <i class="lucide-instagram"></i>
+      <a href="https://www.instagram.com/serhii_stafiichuk?igsh=MXRsd2t2Z2I3Mzg2NA==" class="social-link" target="_blank" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+          <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+        </svg>
       </a>
-      <a href="https://t.me/your-username" class="social-link" target="_blank">
-        <i class="lucide-send"></i>
+      <a href="https://t.me/sangklasy" class="social-link" target="_blank" aria-label="Telegram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 2L11 13"/>
+          <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
+        </svg>
       </a>
     </div>
   </div>
 
   <!-- Blog Section -->
   <section id="blog" class="blog">
-    <!-- Blog posts will be dynamically added here -->
+    <div class="blog-vertical">
+      <!-- Vertical posts will be added here -->
+    </div>
+    <div class="blog-horizontal">
+      <!-- Horizontal posts will be added here -->
+    </div>
   </section>
+
+  <!-- Privacy Policy -->
+  <footer class="privacy-policy">
+    <h3>Политика конфиденциальности</h3>
+    <p>
+      Мы уважаем вашу приватность и не собираем персональные данные. Регистрация на сайте не требуется.
+      Мы не используем файлы cookie и не отслеживаем ваши действия. Вся информация, представленная на сайте,
+      предназначена исключительно для ознакомления. Используя наш сайт, вы можете быть уверены в
+      безопасности ваших данных.
+    </p>
+  </footer>
 
   <!-- Quote -->
   <div class="quote" id="quote"></div>
 
-  <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     // Initialize Telegram WebApp
     window.Telegram?.WebApp?.ready();
-
-    // Initialize Lucide icons
-    lucide.createIcons();
 
     // Menu Toggle
     function toggleMenu() {
@@ -344,27 +452,46 @@
     `;
     document.head.appendChild(styleSheet);
 
-    // Generate blog posts
+    // Updated blog posts
     const blogPosts = [
       {
         title: 'Что такое Telegram Mini Apps?',
-        content: 'Telegram Mini Apps - это новый способ создавать интерактивные приложения прямо внутри Telegram...',
+        content: 'Telegram Mini Apps - это новый способ создавать интерактивные приложения прямо внутри Telegram. Узнайте, как создать свое первое приложение...',
         image: 'https://images.unsplash.com/photo-1611746872915-64382b5c76da'
       },
       {
-        title: 'Как начать разработку на React',
-        content: 'React - это популярная библиотека для создания пользовательских интерфейсов...',
+        title: 'Начало работы с React',
+        content: 'React - это популярная библиотека для создания пользовательских интерфейсов. В этой статье мы рассмотрим основные концепции...',
         image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee'
       },
       {
         title: 'Будущее веб-разработки',
-        content: 'Технологии развиваются стремительно, и веб-разработка не исключение...',
+        content: 'Технологии развиваются стремительно, и веб-разработка не исключение. Давайте посмотрим на тренды...',
         image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd'
+      },
+      {
+        title: 'JavaScript для начинающих',
+        content: 'Изучаем основы JavaScript с нуля. Простые примеры и понятные объяснения...',
+        image: 'https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a'
+      },
+      {
+        title: 'Оптимизация производительности',
+        content: 'Советы и трюки по улучшению производительности веб-приложений...',
+        image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6'
+      },
+      {
+        title: 'Безопасность в веб-разработке',
+        content: 'Основные принципы безопасности при разработке веб-приложений...',
+        image: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb'
       }
     ];
 
-    const blogSection = document.getElementById('blog');
-    blogPosts.forEach((post, index) => {
+    // Split posts between vertical and horizontal sections
+    const verticalSection = document.querySelector('.blog-vertical');
+    const horizontalSection = document.querySelector('.blog-horizontal');
+
+    // Add first 3 posts vertically
+    blogPosts.slice(0, 3).forEach((post, index) => {
       const article = document.createElement('article');
       article.className = 'blog-post';
       article.style.animationDelay = `${index * 0.2}s`;
@@ -375,7 +502,22 @@
         <p>${post.content}</p>
       `;
       
-      blogSection.appendChild(article);
+      verticalSection.appendChild(article);
+    });
+
+    // Add remaining posts horizontally
+    blogPosts.slice(3).forEach((post, index) => {
+      const article = document.createElement('article');
+      article.className = 'blog-post';
+      article.style.animationDelay = `${index * 0.2}s`;
+      
+      article.innerHTML = `
+        <img src="${post.image}" alt="${post.title}">
+        <h2>${post.title}</h2>
+        <p>${post.content}</p>
+      `;
+      
+      horizontalSection.appendChild(article);
     });
 
     // Quotes rotation
