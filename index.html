@@ -4,41 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Web App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Основные стили */
-        body {
-            font-family: 'Inter', sans-serif;
+        /* Reset and base styles */
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
             background-color: #1a1a1a;
-            color: #ffffff;
-            height: 100vh;
+            color: white;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Стили для окон */
-        .window {
-            flex-grow: 1;
-            display: none;
+        /* Main container */
+        .container {
+            flex: 1;
             padding: 20px;
-            opacity: 0;
             transition: opacity 0.3s ease;
         }
 
-        .window.active {
-            display: block;
-            opacity: 1;
-        }
-
-        /* Стили для навигации */
-        .nav {
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #2a2a2a;
+            padding: 12px;
             display: flex;
             justify-content: space-around;
-            padding: 10px 0;
-            background-color: #2a2a2a;
+            align-items: center;
+            border-top: 1px solid #3a3a3a;
         }
 
         .nav-button {
@@ -46,92 +49,201 @@
             border: none;
             color: #6DA5C0;
             font-size: 24px;
+            padding: 8px;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: transform 0.2s ease, color 0.2s ease;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
         }
 
         .nav-button:active {
             transform: scale(0.9);
         }
 
-        /* Дополнительные стили */
-        h1 {
+        .nav-button.active {
             color: #FFD700;
+            background-color: #3a3a3a;
         }
 
-        button {
-            background-color: #6DA5C0;
-            color: #ffffff;
-            border: none;
-            padding: 10px 20px;
+        /* Content sections */
+        .section {
+            opacity: 0;
+            display: none;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+            margin-bottom: 70px;
+        }
+
+        .section.active {
+            opacity: 1;
+            display: block;
+        }
+
+        /* Profile section */
+        .profile-card {
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .profile-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background-color: #3a3a3a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        /* Settings section */
+        .settings-list {
+            list-style: none;
+        }
+
+        .settings-item {
+            background-color: #2a2a2a;
             margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Other section */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .grid-item {
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
             cursor: pointer;
-            border-radius: 5px;
+            transition: transform 0.2s ease;
+        }
+
+        .grid-item:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
 <body>
-    <!-- Окна приложения -->
-    <div id="home" class="window active">
-        <h1>Главная</h1>
-        <p>Добро пожаловать в наше Telegram Web App!</p>
+    <!-- Main content container -->
+    <div class="container">
+        <!-- Home section -->
+        <section id="home" class="section active">
+            <h1 style="font-size: 24px; margin-bottom: 20px;">Добро пожаловать!</h1>
+            <div style="background-color: #2a2a2a; border-radius: 12px; padding: 20px;">
+                <p style="margin-bottom: 15px;">Это ваше персональное пространство в Telegram Web App.</p>
+                <p style="color: #6DA5C0;">Используйте навигацию внизу для перемещения между разделами.</p>
+            </div>
+        </section>
+
+        <!-- Profile section -->
+        <section id="profile" class="section">
+            <h2 style="font-size: 20px; margin-bottom: 20px;">Профиль</h2>
+            <div class="profile-card">
+                <div class="profile-image">👤</div>
+                <h3 style="margin-bottom: 10px;">Пользователь</h3>
+                <p style="color: #6DA5C0;">@username</p>
+            </div>
+        </section>
+
+        <!-- Settings section -->
+        <section id="settings" class="section">
+            <h2 style="font-size: 20px; margin-bottom: 20px;">Настройки</h2>
+            <ul class="settings-list">
+                <li class="settings-item">
+                    Тёмная тема
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                    </label>
+                </li>
+                <li class="settings-item">
+                    Уведомления
+                    <label class="switch">
+                        <input type="checkbox">
+                    </label>
+                </li>
+                <li class="settings-item">
+                    Язык
+                    <span style="color: #6DA5C0;">Русский</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Other section -->
+        <section id="other" class="section">
+            <h2 style="font-size: 20px; margin-bottom: 20px;">Другое</h2>
+            <div class="grid-container">
+                <div class="grid-item">
+                    <span style="font-size: 24px;">📱</span>
+                    <p style="margin-top: 10px;">Устройства</p>
+                </div>
+                <div class="grid-item">
+                    <span style="font-size: 24px;">🔒</span>
+                    <p style="margin-top: 10px;">Безопасность</p>
+                </div>
+                <div class="grid-item">
+                    <span style="font-size: 24px;">💬</span>
+                    <p style="margin-top: 10px;">Чаты</p>
+                </div>
+                <div class="grid-item">
+                    <span style="font-size: 24px;">❓</span>
+                    <p style="margin-top: 10px;">Помощь</p>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <div id="profile" class="window">
-        <h1>Профиль</h1>
-        <p>Здесь будет информация о профиле пользователя.</p>
-    </div>
-
-    <div id="settings" class="window">
-        <h1>Настройки</h1>
-        <p>Здесь будут настройки приложения.</p>
-    </div>
-
-    <div id="other" class="window">
-        <h1>Другое</h1>
-        <p>Дополнительная информация и функции.</p>
-    </div>
-
-    <!-- Навигация -->
-    <nav class="nav">
-        <button class="nav-button" onclick="showWindow('home')">⚡️</button>
-        <button class="nav-button" onclick="showWindow('profile')">👤</button>
-        <button class="nav-button" onclick="showWindow('settings')">⚙️</button>
-        <button class="nav-button" onclick="showWindow('other')">➕</button>
+    <!-- Navigation bar -->
+    <nav class="nav-bar">
+        <button class="nav-button active" onclick="switchSection('home')">⚡️</button>
+        <button class="nav-button" onclick="switchSection('profile')">👤</button>
+        <button class="nav-button" onclick="switchSection('settings')">⚙️</button>
+        <button class="nav-button" onclick="switchSection('other')">➕</button>
     </nav>
 
     <script>
-        // Инициализация Telegram Web App
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.MainButton.hide();
+        // Initialize Telegram WebApp
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
 
-        // Функция для отображения окна
-        function showWindow(windowId) {
-            let windows = document.getElementsByClassName('window');
-            for (let window of windows) {
-                window.classList.remove('active');
-            }
-            document.getElementById(windowId).classList.add('active');
-        }
-
-        // Обработка нажатия кнопки "Назад"
-        tg.BackButton.onClick(() => {
-            showWindow('home');
-            tg.BackButton.hide();
-        });
-
-        // Показываем кнопку "Назад" при переходе на другие окна
-        let navButtons = document.getElementsByClassName('nav-button');
-        for (let button of navButtons) {
-            button.addEventListener('click', () => {
-                if (button.innerText !== '⚡️') {
-                    tg.BackButton.show();
-                } else {
-                    tg.BackButton.hide();
-                }
+        // Function to switch between sections
+        function switchSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
             });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update navigation buttons
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
         }
+
+        // Handle back button
+        window.addEventListener('popstate', function() {
+            switchSection('home');
+        });
     </script>
 </body>
 </html>
