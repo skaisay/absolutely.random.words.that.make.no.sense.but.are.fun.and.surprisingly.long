@@ -257,6 +257,7 @@
       padding: 30px;
       margin-bottom: 30px;
       transition: transform 0.3s ease;
+      cursor: pointer;
     }
 
     .article:hover {
@@ -281,21 +282,6 @@
       color: var(--text-secondary);
       line-height: 1.6;
       margin-bottom: 20px;
-    }
-
-    .read-more {
-      display: inline-block;
-      padding: 10px 20px;
-      background: var(--primary);
-      color: white;
-      text-decoration: none;
-      border-radius: 25px;
-      transition: all 0.3s ease;
-    }
-
-    .read-more:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 136, 204, 0.3);
     }
 
     /* Горизонтальная прокрутка статей */
@@ -612,318 +598,326 @@
   <section id="blog" class="blog">
     <!-- Вертикальные статьи -->
     <div class="blog-vertical">
-      <article class="article">
+      <article class="article" onclick="openChatbot('Что такое программирование?')">
         <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995" alt="Что такое программирование">
         <h2>Что такое программирование?</h2>
-        <p>Программирование - это искусство создания инструкций для компьютера. В этой статье мы разберем основные концепции, языки программирования и с чего начать свой путь в IT.</p>
-        <a href="#" class="read-more">Читать дальше</a>
-      </article>
+        <p>Программирование -<!-- Blog Section -->
+<section id="blog" class="blog">
+  <!-- Вертикальные статьи -->
+  <div class="blog-vertical">
+    <article class="article" onclick="openChatbot('Что такое программирование?')">
+      <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995" alt="Что такое программирование">
+      <h2>Что такое программирование?</h2>
+      <p>Программирование - это искусство создания инструкций для компьютера. В этой статье мы разберем основные концепции, языки программирования и с чего начать свой путь в IT.</p>
+    </article>
 
-      <article class="article">
-        <img src="https://images.unsplash.com/photo-1526498460520-4c246339dccb" alt="Создание приложения">
-        <h2>Как создать своё приложение?</h2>
-        <p>Пошаговое руководство по созданию мобильного приложения: от идеи до публикации в магазинах. Разберем технологии, инструменты и лучшие практики.</p>
-        <a href="#" class="read-more">Читать дальше</a>
-      </article>
+    <article class="article" onclick="openChatbot('Как создать своё приложение?')">
+      <img src="https://images.unsplash.com/photo-1526498460520-4c246339dccb" alt="Создание приложения">
+      <h2>Как создать своё приложение?</h2>
+      <p>Пошаговое руководство по созданию мобильного приложения: от идеи до публикации в магазинах. Разберем технологии, инструменты и лучшие практики.</p>
+    </article>
 
-      <article class="article">
-        <img src="https://images.unsplash.com/photo-1611746872915-64382b5c76da" alt="Telegram Platform">
-        <h2>Telegram как платформа будущего</h2>
-        <p>Telegram Mini Apps открывают новые возможности для разработчиков. Узнайте, как создавать приложения внутри мессенджера и почему это будущее мобильной разработки.</p>
-        <a href="#" class="read-more">Читать дальше</a>
-      </article>
-    </div>
-
-    <!-- Горизонтальные статьи -->
-    <div class="blog-horizontal">
-      <article class="article">
-        <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee" alt="React и современный фронтенд">
-        <h2>React и современный фронтенд</h2>
-        <p>Погружение в мир современной фронтенд-разработки. Узнайте, почему React стал таким популярным и как начать с ним работать.</p>
-        <a href="#" class="read-more">Читать дальше</a>
-      </article>
-
-      <article class="article">
-        <img src="https://images.unsplash.com/photo-1504639725590-34d0984388bd" alt="Искусственный интеллект">
-        <h2>Искусственный интеллект в 2024</h2>
-        <p>Обзор последних достижений в области ИИ и машинного обучения. Как технологии меняют нашу жизнь и работу.</p>
-        <a href="#" class="read-more">Читать дальше</a>
-      </article>
-
-      <article class="article">
-        <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb" alt="Кибербезопасность">
-        <h2>Основы кибербезопасности</h2>
-        <p>Защита данных в современном мире. Практические советы по обеспечению безопасности ваших приложений и данных.</p>
-        <a href="#" class="read-more">Читать дальше</a>
-      </article>
-    </div>
-  </section>
-
-  <!-- Чат-бот -->
-  <div class="chatbot" id="chatbot">
-    <div class="chatbot-header">
-      <div class="bot-face">
-        <div class="bot-eyes">
-          <div class="bot-eye"></div>
-          <div class="bot-eye"></div>
-        </div>
-      </div>
-      <h3>AI Помощник</h3>
-      <button class="chatbot-close" onclick="toggleChatbot()">✕</button>
-    </div>
-    <div class="chatbot-messages" id="chatMessages"></div>
-    <div class="suggestions" id="suggestions"></div>
-    <div class="chatbot-input">
-      <input type="text" id="userInput" placeholder="Задайте вопрос..." onkeypress="handleKeyPress(event)">
-      <button onclick="sendMessage()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2z"/>
-        </svg>
-      </button>
-    </div>
+    <article class="article" onclick="openChatbot('Telegram как платформа будущего')">
+      <img src="https://images.unsplash.com/photo-1611746872915-64382b5c76da" alt="Telegram Platform">
+      <h2>Telegram как платформа будущего</h2>
+      <p>Telegram Mini Apps открывают новые возможности для разработчиков. Узнайте, как создавать приложения внутри мессенджера и почему это будущее мобильной разработки.</p>
+    </article>
   </div>
 
-  <!-- Quote -->
-  <div class="quote" id="quote"></div>
+  <!-- Горизонтальные статьи -->
+  <div class="blog-horizontal">
+    <article class="article" onclick="openChatbot('React и современный фронтенд')">
+      <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee" alt="React и современный фронтенд">
+      <h2>React и современный фронтенд</h2>
+      <p>Погружение в мир современной фронтенд-разработки. Узнайте, почему React стал таким популярным и как начать с ним работать.</p>
+    </article>
 
-  <!-- Privacy Policy -->
-  <footer class="privacy-policy">
-    <h3>Политика конфиденциальности</h3>
-    <p>
-      Мы уважаем вашу приватность и не собираем персональные данные. Регистрация на сайте не требуется.
-      Мы не используем файлы cookie и не отслеживаем ваши действия. Вся информация, представленная на сайте,
-      предназначена исключительно для ознакомления.
-    </p>
-  </footer>
+    <article class="article" onclick="openChatbot('Искусственный интеллект в 2024')">
+      <img src="https://images.unsplash.com/photo-1504639725590-34d0984388bd" alt="Искусственный интеллект">
+      <h2>Искусственный интеллект в 2024</h2>
+      <p>Обзор последних достижений в области ИИ и машинного обучения. Как технологии меняют нашу жизнь и работу.</p>
+    </article>
 
-  <script>
-    // Initialize Telegram WebApp
-    window.Telegram?.WebApp?.ready();
+    <article class="article" onclick="openChatbot('Основы кибербезопасности')">
+      <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb" alt="Кибербезопасность">
+      <h2>Основы кибербезопасности</h2>
+      <p>Защита данных в современном мире. Практические советы по обеспечению безопасности ваших приложений и данных.</p>
+    </article>
+  </div>
+</section>
 
-    // Menu Toggle
-    function toggleMenu() {
-      document.body.classList.toggle('menu-open');
-    }
+<!-- Чат-бот -->
+<div class="chatbot" id="chatbot">
+  <div class="chatbot-header">
+    <div class="bot-face">
+      <div class="bot-eyes">
+        <div class="bot-eye"></div>
+        <div class="bot-eye"></div>
+      </div>
+    </div>
+    <h3>AI Помощник</h3>
+    <button class="chatbot-close" onclick="toggleChatbot()">✕</button>
+  </div>
+  <div class="chatbot-messages" id="chatMessages"></div>
+  <div class="suggestions" id="suggestions"></div>
+  <div class="chatbot-input">
+    <input type="text" id="userInput" placeholder="Задайте вопрос..." onkeypress="handleKeyPress(event)">
+    <button onclick="sendMessage()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2z"/>
+      </svg>
+    </button>
+  </div>
+</div>
 
-    // Close menu on scroll
-    window.addEventListener('scroll', () => {
-      document.body.classList.remove('menu-open');
-    });
+<!-- Quote -->
+<div class="quote" id="quote"></div>
 
-    // Smooth scroll
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-          behavior: 'smooth'
-        });
+<!-- Privacy Policy -->
+<footer class="privacy-policy">
+  <h3>Политика конфиденциальности</h3>
+  <p>
+    Мы уважаем вашу приватность и не собираем персональные данные. Регистрация на сайте не требуется.
+    Мы не используем файлы cookie и не отслеживаем ваши действия. Вся информация, представленная на сайте,
+    предназначена исключительно для ознакомления.
+  </p>
+</footer>
+
+<script>
+  // Initialize Telegram WebApp
+  window.Telegram?.WebApp?.ready();
+
+  // Menu Toggle
+  function toggleMenu() {
+    document.body.classList.toggle('menu-open');
+  }
+
+  // Close menu on scroll
+  window.addEventListener('scroll', () => {
+    document.body.classList.remove('menu-open');
+  });
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.querySelector(this.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth'
       });
     });
+  });
 
-    // Create snowflakes
-    function createSnowflake() {
-      const snowflake = document.createElement('div');
-      snowflake.className = 'snowflake';
-      
-      const size = Math.random() * 4 + 2;
-      const startingLeft = Math.random() * window.innerWidth;
-      
-      Object.assign(snowflake.style, {
-        width: size + 'px',
-        height: size + 'px',
-        left: startingLeft + 'px',
-        top: '-5px',
-        position: 'fixed',
-        animation: `fall ${Math.random() * 3 + 2}s linear`
-      });
-      
-      document.body.appendChild(snowflake);
-      
-      snowflake.addEventListener('animationend', () => {
-        snowflake.remove();
-      });
-    }
+  // Create snowflakes
+  function createSnowflake() {
+    const snowflake = document.createElement('div');
+    snowflake.className = 'snowflake';
+    
+    const size = Math.random() * 4 + 2;
+    const startingLeft = Math.random() * window.innerWidth;
+    
+    Object.assign(snowflake.style, {
+      width: size + 'px',
+      height: size + 'px',
+      left: startingLeft + 'px',
+      top: '-5px',
+      position: 'fixed',
+      animation: `fall ${Math.random() * 3 + 2}s linear`
+    });
+    
+    document.body.appendChild(snowflake);
+    
+    snowflake.addEventListener('animationend', () => {
+      snowflake.remove();
+    });
+  }
 
-    setInterval(createSnowflake, 100);
+  setInterval(createSnowflake, 100);
 
-    // Add keyframes for snowfall
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = `
-      @keyframes fall {
-        to {
-          transform: translateY(100vh) rotate(360deg);
-          opacity: 0;
-        }
+  // Add keyframes for snowfall
+  const styleSheet = document.createElement('style');
+  styleSheet.textContent = `
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
       }
-    `;
-    document.head.appendChild(styleSheet);
-
-    // Quotes rotation
-    const quotes = [
-      "Лучший способ предсказать будущее — создать его.",
-      "Программирование — это искусство организации сложности.",
-      "Простота — необходимое условие надёжности.",
-      "Совершенство достигается не тогда, когда нечего добавить, а когда нечего убрать.",
-      "Код — это поэзия, написанная логикой.",
-      "В программировании процесс так же важен, как и результат.",
-      "Любую достаточно развитую технологию невозможно отличить от магии.",
-      "Программирование — это не о печатании, это о мышлении.",
-      "Сложность — это враг. Любой дурак может сделать что-то сложным.",
-      "Красота кода заключается в его простоте."
-    ];
-
-    const quoteElement = document.getElementById('quote');
-    let currentQuote = 0;
-
-    function updateQuote() {
-      quoteElement.style.opacity = '0';
-      setTimeout(() => {
-        quoteElement.textContent = quotes[currentQuote];
-        quoteElement.style.opacity = '1';
-        currentQuote = (currentQuote + 1) % quotes.length;
-      }, 500);
     }
+  `;
+  document.head.appendChild(styleSheet);
 
-    updateQuote();
-    setInterval(updateQuote, 10000);
+  // Quotes rotation
+  const quotes = [
+    "Лучший способ предсказать будущее — создать его.",
+    "Программирование — это искусство организации сложности.",
+    "Простота — необходимое условие надёжности.",
+    "Совершенство достигается не тогда, когда нечего добавить, а когда нечего убрать.",
+    "Код — это поэзия, написанная логикой.",
+    "В программировании процесс так же важен, как и результат.",
+    "Любую достаточно развитую технологию невозможно отличить от магии.",
+    "Программирование — это не о печатании, это о мышлении.",
+    "Сложность — это враг. Любой дурак может сделать что-то сложным.",
+    "Красота кода заключается в его простоте."
+  ];
 
-    // База знаний для чат-бота
-    const knowledgeBase = {
-      'программирование': 'Программирование - это процесс создания компьютерных программ с помощью языков программирования. Это способ говорить с компьютером и указывать ему, что делать.',
-      'javascript': 'JavaScript - это мультипарадигменный язык программирования, который позволяет создавать интерактивные веб-страницы. Это один из трех столпов веб-разработки наряду с HTML и CSS.',
-      'python': 'Python - это высокоуровневый язык программирования с простым синтаксисом. Он отлично подходит для начинающих и используется в веб-разработке, науке о данных и машинном обучении.',
-      'telegram': 'Telegram - это мессенджер с открытым API, который позволяет создавать ботов и мини-приложения. Он известен своей безопасностью и широкими возможностями для разработчиков.',
-      'react': 'React - это библиотека JavaScript для создания пользовательских интерфейсов. Разработана Facebook, позволяет создавать сложные интерактивные приложения.',
-      'веб-разработка': 'Веб-разработка включает в себя создание веб-сайтов и веб-приложений. Основные технологии: HTML, CSS и JavaScript для фронтенда, различные языки и фреймворки для бэкенда.',
-      'искусственный интеллект': 'Искусственный интеллект (ИИ) - это способность компьютерных систем выполнять задачи, которые обычно требуют человеческого интеллекта.',
-      'мобильная разработка': 'Мобильная разработка - это создание приложений для смартфонов и планшетов. Основные платформы: iOS и Android.',
-      'базы данных': 'Базы данных - это организованные коллекции данных. Используются для хранения и управления информацией в приложениях.',
-      'api': 'API (Application Programming Interface) - это набор правил и протоколов для взаимодействия различных программ между собой.'
-    };
+  const quoteElement = document.getElementById('quote');
+  let currentQuote = 0;
 
-    // Подсказки для чат-бота
-    const suggestions = [
-      'Что такое программирование',
-      'Расскажи про JavaScript',
-      'Что такое Python',
-      'Как работает Telegram',
-      'Что такое React',
-      'Веб-разработка',
-      'Искусственный интеллект',
-      'Мобильная разработка'
-    ];
+  function updateQuote() {
+    quoteElement.style.opacity = '0';
+    setTimeout(() => {
+      quoteElement.textContent = quotes[currentQuote];
+      quoteElement.style.opacity = '1';
+      currentQuote = (currentQuote + 1) % quotes.length;
+    }, 500);
+  }
 
-    let isTyping = false;
+  updateQuote();
+  setInterval(updateQuote, 10000);
 
-    function toggleChatbot() {
-      const chatbot = document.getElementById('chatbot');
-      chatbot.classList.toggle('active');
-      
-      if (chatbot.classList.contains('active')) {
+  // База знаний для чат-бота
+  const knowledgeBase = {
+    'программирование': 'Программирование - это процесс создания компьютерных программ с помощью языков программирования. Это способ говорить с компьютером и указывать ему, что делать.',
+    'javascript': 'JavaScript - это мультипарадигменный язык программирования, который позволяет создавать интерактивные веб-страницы. Это один из трех столпов веб-разработки наряду с HTML и CSS.',
+    'python': 'Python - это высокоуровневый язык программирования с простым синтаксисом. Он отлично подходит для начинающих и используется в веб-разработке, науке о данных и машинном обучении.',
+    'telegram': 'Telegram - это мессенджер с открытым API, который позволяет создавать ботов и мини-приложения. Он известен своей безопасностью и широкими возможностями для разработчиков.',
+    'react': 'React - это библиотека JavaScript для создания пользовательских интерфейсов. Разработана Facebook, позволяет создавать сложные интерактивные приложения.',
+    'веб-разработка': 'Веб-разработка включает в себя создание веб-сайтов и веб-приложений. Основные технологии: HTML, CSS и JavaScript для фронтенда, различные языки и фреймворки для бэкенда.',
+    'искусственный интеллект': 'Искусственный интеллект (ИИ) - это способность компьютерных систем выполнять задачи, которые обычно требуют человеческого интеллекта.',
+    'мобильная разработка': 'Мобильная разработка - это создание приложений для смартфонов и планшетов. Основные платформы: iOS и Android.',
+    'базы данных': 'Базы данных - это организованные коллекции данных. Используются для хранения и управления информацией в приложениях.',
+    'api': 'API (Application Programming Interface) - это набор правил и протоколов для взаимодействия различных программ между собой.'
+  };
+
+  // Подсказки для чат-бота
+  const suggestions = [
+    'Что такое программирование',
+    'Расскажи про JavaScript',
+    'Что такое Python',
+    'Как работает Telegram',
+    'Что такое React',
+    'Веб-разработка',
+    'Искусственный интеллект',
+    'Мобильная разработка'
+  ];
+
+  let isTyping = false;
+
+  function toggleChatbot() {
+    const chatbot = document.getElementById('chatbot');
+    chatbot.classList.toggle('active');
+    
+    if (chatbot.classList.contains('active')) {
+      showSuggestions();
+      addBotMessage('Привет! Я AI помощник. Задайте мне вопрос о программировании или выберите одну из подсказок ниже.');
+    }
+  }
+
+  function showSuggestions() {
+    const suggestionsContainer = document.getElementById('suggestions');
+    suggestionsContainer.innerHTML = '';
+    
+    suggestions.forEach((text) => {
+      const suggestion = document.createElement('div');
+      suggestion.className = 'suggestion';
+      suggestion.textContent = text;
+      suggestion.onclick = () => handleSuggestion(text);
+      suggestionsContainer.appendChild(suggestion);
+    });
+  }
+
+  function handleSuggestion(text) {
+    document.getElementById('userInput').value = text;
+    sendMessage();
+  }
+
+  function addMessage(text, isBot = false) {
+    const messagesContainer = document.getElementById('chatMessages');
+    const message = document.createElement('div');
+    message.className = `message ${isBot ? 'message-bot' : 'message-user'}`;
+    message.textContent = text;
+    
+    messagesContainer.appendChild(message);
+    setTimeout(() => message.classList.add('show'), 50);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  function addBotMessage(text) {
+    if (isTyping) return;
+    isTyping = true;
+    
+    const words = text.split(' ');
+    let currentText = '';
+    let wordIndex = 0;
+    
+    const interval = setInterval(() => {
+      if (wordIndex >= words.length) {
+        clearInterval(interval);
+        isTyping = false;
         showSuggestions();
-        addBotMessage('Привет! Я AI помощник. Задайте мне вопрос о программировании или выберите одну из подсказок ниже.');
+        return;
+      }
+      
+      currentText += (wordIndex > 0 ? ' ' : '') + words[wordIndex];
+      const messagesContainer = document.getElementById('chatMessages');
+      const lastMessage = messagesContainer.lastElementChild;
+      
+      if (!lastMessage || !lastMessage.classList.contains('message-bot')) {
+        addMessage(currentText, true);
+      } else {
+        lastMessage.textContent = currentText;
+      }
+      
+      wordIndex++;
+    }, 100);
+  }
+
+  function findAnswer(question) {
+    question = question.toLowerCase().trim();
+    
+    // Прямое совпадение
+    if (knowledgeBase[question]) {
+      return knowledgeBase[question];
+    }
+    
+    // Поиск по ключевым словам
+    for (let key in knowledgeBase) {
+      if (question.includes(key)) {
+        return knowledgeBase[key];
       }
     }
+    
+    return 'Извините, я не знаю ответа на этот вопрос. Попробуйте спросить что-то другое или выберите тему из подсказок ниже.';
+  }
 
-    function showSuggestions() {
-      const suggestionsContainer = document.getElementById('suggestions');
-      suggestionsContainer.innerHTML = '';
-      
-      suggestions.forEach((text, index) => {
-        const suggestion = document.createElement('div');
-        suggestion.className = 'suggestion';
-        suggestion.textContent = text;
-        suggestion.onclick = () => handleSuggestion(text);
-        suggestionsContainer.appendChild(suggestion);
-      });
-    }
+  function sendMessage() {
+    const input = document.getElementById('userInput');
+    const question = input.value.trim();
+    
+    if (!question) return;
+    
+    addMessage(question);
+    input.value = '';
+    
+    setTimeout(() => {
+      const answer = findAnswer(question);
+      addBotMessage(answer);
+    }, 500);
+  }
 
-    function handleSuggestion(text) {
-      document.getElementById('userInput').value = text;
+  function handleKeyPress(event) {
+    if (event.key === 'Enter') {
       sendMessage();
     }
+  }
 
-    function addMessage(text, isBot = false) {
-      const messagesContainer = document.getElementById('chatMessages');
-      const message = document.createElement('div');
-      message.className = `message ${isBot ? 'message-bot' : 'message-user'}`;
-      message.textContent = text;
-      
-      messagesContainer.appendChild(message);
-      setTimeout(() => message.classList.add('show'), 50);
-      messagesContainer.scrollTop = messmessagesContainer.appendChild(message);
-      setTimeout(() => message.classList.add('show'), 50);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    function addBotMessage(text) {
-      if (isTyping) return;
-      isTyping = true;
-      
-      const words = text.split(' ');
-      let currentText = '';
-      let wordIndex = 0;
-      
-      const interval = setInterval(() => {
-        if (wordIndex >= words.length) {
-          clearInterval(interval);
-          isTyping = false;
-          showSuggestions();
-          return;
-        }
-        
-        currentText += (wordIndex > 0 ? ' ' : '') + words[wordIndex];
-        const messagesContainer = document.getElementById('chatMessages');
-        const lastMessage = messagesContainer.lastElementChild;
-        
-        if (!lastMessage || !lastMessage.classList.contains('message-bot')) {
-          addMessage(currentText, true);
-        } else {
-          lastMessage.textContent = currentText;
-        }
-        
-        wordIndex++;
-      }, 100);
-    }
-
-    function findAnswer(question) {
-      question = question.toLowerCase().trim();
-      
-      // Прямое совпадение
-      if (knowledgeBase[question]) {
-        return knowledgeBase[question];
-      }
-      
-      // Поиск по ключевым словам
-      for (let key in knowledgeBase) {
-        if (question.includes(key)) {
-          return knowledgeBase[key];
-        }
-      }
-      
-      return 'Извините, я не знаю ответа на этот вопрос. Попробуйте спросить что-то другое или выберите тему из подсказок ниже.';
-    }
-
-    function sendMessage() {
-      const input = document.getElementById('userInput');
-      const question = input.value.trim();
-      
-      if (!question) return;
-      
+  function openChatbot(question) {
+    toggleChatbot();
+    setTimeout(() => {
       addMessage(question);
-      input.value = '';
-      
-      setTimeout(() => {
-        const answer = findAnswer(question);
-        addBotMessage(answer);
-      }, 500);
-    }
-
-    function handleKeyPress(event) {
-      if (event.key === 'Enter') {
-        sendMessage();
-      }
-    }
-  </script>
+      const answer = findAnswer(question);
+      addBotMessage(answer);
+    }, 500);
+  }
+</script>
 </body>
 </html>
