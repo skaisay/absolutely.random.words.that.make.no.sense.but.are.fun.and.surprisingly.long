@@ -257,7 +257,7 @@
       padding: 30px;
       margin-bottom: 30px;
       transition: transform 0.3s ease;
-      cursor: default;
+      cursor: pointer;
     }
 
     .article:hover {
@@ -606,18 +606,7 @@
 
       <article class="article">
         <img src="https://images.unsplash.com/photo-1526498460520-4c246339dccb" alt="Создание приложения">
-        <h<section id="blog" class="blog">
-  <!-- Вертикальные статьи -->
-  <div class="blog-vertical">
-    <article class="article">
-      <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995" alt="Что такое программирование">
-      <h2>Что такое программирование?</h2>
-      <p>Программирование - это искусство создания инструкций для компьютера. В этой статье мы разберем основные концепции, языки программирования и с чего начать свой путь в IT.</p>
-    </article>
-
-    <article class="article">
-      <img src="https://images.unsplash.com/photo-1526498460520-4c246339dccb" alt="Создание приложения">
-      <h2>Как создать своё приложение?</h2>
+        <h2>Как создать своё приложение<h2>Как создать своё приложение?</h2>
       <p>Пошаговое руководство по созданию мобильного приложения: от идеи до публикации в магазинах. Разберем технологии, инструменты и лучшие практики.</p>
     </article>
 
@@ -794,6 +783,10 @@
 
   // Подсказки для чат-бота
   const suggestions = [
+    'Что такое программирование',
+    'Расскажи про JavaScript',
+    'Что такое Python',
+    'Как работает Telegram',
     'Что такое React',
     'Веб-разработка',
     'Искусственный интеллект',
@@ -908,15 +901,6 @@
     if (event.key === 'Enter') {
       sendMessage();
     }
-  }
-
-  function openChatbot(question) {
-    toggleChatbot();
-    setTimeout(() => {
-      addMessage(question);
-      const answer = findAnswer(question);
-      addBotMessage(answer);
-    }, 500);
   }
 </script>
 </body>
