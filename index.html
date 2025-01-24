@@ -177,9 +177,71 @@
       transform: scale(1.1);
     }
 
-    .social-link svg {
-      width: 24px;
-      height: 24px;
+    /* Bot Animation */
+    .bot {
+      position: fixed;
+      top: 20px;
+      right: 80px;
+      width: 60px;
+      height: 60px;
+      z-index: 1000;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .bot-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    .bot-eyes {
+      position: absolute;
+      top: 35%;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      padding: 0 15%;
+    }
+
+    .bot-eye {
+      width: 12px;
+      height: 12px;
+      background: #fff;
+      border-radius: 50%;
+      position: relative;
+      animation: blink 3s infinite;
+    }
+
+    .bot-eye::after {
+      content: '';
+      position: absolute;
+      top: 25%;
+      left: 25%;
+      width: 4px;
+      height: 4px;
+      background: #000;
+      border-radius: 50%;
+      animation: look 4s infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(5deg); }
+    }
+
+    @keyframes blink {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(0.1); }
+    }
+
+    @keyframes look {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(2px, 0); }
+      75% { transform: translate(-2px, 0); }
     }
 
     /* Blog Section */
@@ -189,78 +251,86 @@
       margin: 0 auto;
     }
 
-    .blog-vertical {
-      margin-bottom: 40px;
-    }
-
-    .blog-horizontal {
-      overflow-x: auto;
-      white-space: nowrap;
-      padding-bottom: 20px;
-      margin-bottom: 40px;
-      scrollbar-width: none; /* Firefox */
-    }
-
-    .blog-horizontal::-webkit-scrollbar {
-      display: none; /* Chrome, Safari, Opera */
-    }
-
-    .blog-horizontal .blog-post {
-      display: inline-block;
-      width: 300px;
-      margin-right: 20px;
-      white-space: normal;
-      vertical-align: top;
-    }
-
-    .blog-post {
+    .article {
       background: rgba(255, 255, 255, 0.05);
       border-radius: 15px;
-      padding: 20px;
+      padding: 30px;
       margin-bottom: 30px;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: slideUp 0.6s ease forwards;
+      transition: transform 0.3s ease;
     }
 
-    .blog-post img {
+    .article:hover {
+      transform: translateY(-5px);
+    }
+
+    .article img {
       width: 100%;
-      height: 200px;
+      height: 300px;
       object-fit: cover;
       border-radius: 10px;
       margin-bottom: 20px;
     }
 
-    .blog-post h2 {
-      font-size: 1.5rem;
+    .article h2 {
+      font-size: 24px;
       margin-bottom: 10px;
+      color: var(--primary);
     }
 
-    .blog-post p {
+    .article p {
       color: var(--text-secondary);
       line-height: 1.6;
+      margin-bottom: 20px;
     }
 
-    /* Bot Animation */
-    .bot {
+    .read-more {
+      display: inline-block;
+      padding: 10px 20px;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+    }
+
+    .read-more:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 136, 204, 0.3);
+    }
+
+    /* Горизонтальная прокрутка статей */
+    .blog-horizontal {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 20px;
+      padding: 20px 0;
+      margin: 40px 0;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .blog-horizontal::-webkit-scrollbar {
+      display: none;
+    }
+
+    .blog-horizontal .article {
+      min-width: 300px;
+      scroll-snap-align: start;
+      margin-bottom: 0;
+    }
+
+    /* Quote Section */
+    .quote {
       position: fixed;
-      top: 20px;
-      right: 80px;
-      width: 40px;
-      height: 40px;
-      z-index: 1000;
-    }
-
-    .bot-eye {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: #00ff00;
-      border-radius: 50%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      animation: blink 3s infinite;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      padding: 20px;
+      color: var(--text-secondary);
+      font-style: italic;
+      transition: opacity 0.5s ease;
     }
 
     /* Privacy Policy */
@@ -283,24 +353,6 @@
       color: var(--text-secondary);
     }
 
-    /* Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-      50% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.8); }
-    }
-
     /* Snowfall */
     .snowflake {
       position: fixed;
@@ -310,20 +362,19 @@
       opacity: 0.6;
     }
 
-    /* Quote */
-    .quote {
-      position: fixed;
-      bottom: 20px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      padding: 20px;
-      color: var(--text-secondary);
-      font-style: italic;
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
-    /* Chatbot Styles */
-    .chatbot-container {
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Стили чат-бота */
+    .chatbot {
       display: none;
       position: fixed;
       top: 50%;
@@ -331,97 +382,55 @@
       transform: translate(-50%, -50%);
       width: 90%;
       max-width: 400px;
-      max-height: 80vh;
+      height: 80vh;
+      max-height: 600px;
       background: rgba(0, 0, 0, 0.95);
       border-radius: 20px;
-      padding: 20px;
-      z-index: 1000;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1001;
+      overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
 
-    .chatbot-container.active {
-      display: block;
+    @media (min-width: 768px) {
+      .chatbot {
+        right: 20px;
+        left: auto;
+        top: auto;
+        bottom: 20px;
+        transform: none;
+        height: 500px;
+      }
+    }
+
+    .chatbot.active {
+      display: flex;
+      flex-direction: column;
       animation: chatbotFadeIn 0.3s ease forwards;
+    }
+
+    .chatbot-header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .chatbot-close {
       position: absolute;
-      top: 15px;
-      right: 15px;
-      width: 30px;
-      height: 30px;
-      border: none;
+      right: 20px;
+      top: 20px;
       background: none;
+      border: none;
       color: var(--text-secondary);
       cursor: pointer;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .chatbot-close:hover {
-      color: var(--text);
-      transform: scale(1.1);
-    }
-
-    .chatbot-close svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    @keyframes chatbotFadeIn {
-      from {
-        opacity: 0;
-        transform: translate(-50%, -40%);
-      }
-      to {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-      }
-    }
-
-    .chatbot-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .chatbot-avatar {
-      width: 40px;
-      height: 40px;
-      background: var(--primary);
-      border-radius: 50%;
-      position: relative;
-      margin-right: 15px;
-    }
-
-    .chatbot-eye {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: #00ff00;
-      border-radius: 50%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      animation: blink 3s infinite;
-    }
-
-    .chatbot-title {
-      color: var(--text);
-      font-size: 1.2rem;
-      font-weight: 600;
+      padding: 5px;
     }
 
     .chatbot-messages {
-      height: 300px;
+      flex: 1;
       overflow-y: auto;
-      margin-bottom: 15px;
-      padding-right: 10px;
+      padding: 20px;
     }
 
     .message {
@@ -431,7 +440,9 @@
     }
 
     .message.show {
-      animation: messageSlideUp 0.3s ease forwards;
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.3s ease;
     }
 
     .message-bot {
@@ -451,8 +462,10 @@
     }
 
     .chatbot-input {
+      padding: 20px;
       display: flex;
       gap: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .chatbot-input input {
@@ -463,11 +476,6 @@
       border-radius: 25px;
       color: var(--text);
       font-size: 1rem;
-    }
-
-    .chatbot-input input:focus {
-      outline: none;
-      background: rgba(255, 255, 255, 0.15);
     }
 
     .chatbot-input button {
@@ -481,18 +489,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.2s;
-    }
-
-    .chatbot-input button:hover {
-      transform: scale(1.1);
     }
 
     .suggestions {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 15px;
+      padding: 0 20px 20px;
     }
 
     .suggestion {
@@ -502,47 +505,71 @@
       font-size: 0.9rem;
       cursor: pointer;
       transition: all 0.2s;
-      opacity: 0;
-      transform: translateY(10px);
-    }
-
-    .suggestion.show {
-      animation: suggestionFadeIn 0.3s ease forwards;
     }
 
     .suggestion:hover {
       background: rgba(255, 255, 255, 0.2);
     }
 
-    @keyframes messageSlideUp {
+    @keyframes chatbotFadeIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+      }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translate(-50%, -50%);
       }
     }
 
-    @keyframes suggestionFadeIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
+    @media (min-width: 768px) {
+      @keyframes chatbotFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .welcome-text {
+        font-size: 3rem;
+      }
+
+      .button-container {
+        flex-direction: column;
+      }
+
+      .article img {
+        height: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .welcome-text {
+        font-size: 2.5rem;
+      }
+
+      .social-links {
+        flex-wrap: wrap;
       }
     }
   </style>
 </head>
 <body>
-  <!-- Hero Section -->
-  <section class="hero">
-    <h1 class="welcome-text">Welcome</h1>
-    <p class="subtitle">Добро пожаловать в блог о приложении Klyo и многом другом</p>
-    <div class="button-container">
-      <a href="#blog" class="button primary">Читать блог</a>
-      <button onclick="toggleChatbot()" class="button secondary">Задать вопрос</button>
-    </div>
-  </section>
-
-  <!-- Animated Bot -->
+  <!-- Bot Animation -->
   <div class="bot">
-    <div class="bot-eye"></div>
+    <div class="bot-face">
+      <div class="bot-eyes">
+        <div class="bot-eye"></div>
+        <div class="bot-eye"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Menu Button -->
@@ -556,56 +583,108 @@
   <div class="side-menu">
     <p class="menu-text">Подписка необязательна, но мы будем рады видеть вас в нашем сообществе</p>
     <div class="social-links">
-      <a href="https://www.instagram.com/serhii_stafiichuk?igsh=MXRsd2t2Z2I3Mzg2NA==" class="social-link" target="_blank" aria-label="Instagram">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <a href="https://t.me/sangklasy" class="social-link" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2z"/>
+        </svg>
+      </a>
+      <a href="https://www.instagram.com/serhii_stafiichuk?igsh=MXRsd2t2Z2I3Mzg2NA==" class="social-link" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
           <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
           <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
         </svg>
       </a>
-      <a href="https://t.me/sangklasy" class="social-link" target="_blank" aria-label="Telegram">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 2L11 13"/>
-          <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
-        </svg>
-      </a>
     </div>
   </div>
 
-  <!-- Chatbot Container -->
-  <div class="chatbot-container" id="chatbot">
-    <button class="chatbot-close" onclick="toggleChatbot()">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M18 6L6 18M6 6l12 12"/>
-      </svg>
-    </button>
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1 class="welcome-text">Welcome</h1>
+    <p class="subtitle">Добро пожаловать в блог о приложении Klyo и многом другом</p>
+    <div class="button-container">
+      <a href="#blog" class="button primary">Читать блог</a>
+      <button onclick="toggleChatbot()" class="button secondary">Узнать больше</button>
+    </div>
+  </section>
+
+  <!-- Blog Section -->
+  <section id="blog" class="blog">
+    <!-- Вертикальные статьи -->
+    <div class="blog-vertical">
+      <article class="article">
+        <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995" alt="Что такое программирование">
+        <h2>Что такое программирование?</h2>
+        <p>Программирование - это искусство создания инструкций для компьютера. В этой статье мы разберем основные концепции, языки программирования и с чего начать свой путь в IT.</p>
+        <a href="#" class="read-more">Читать дальше</a>
+      </article>
+
+      <article class="article">
+        <img src="https://images.unsplash.com/photo-1526498460520-4c246339dccb" alt="Создание приложения">
+        <h2>Как создать своё приложение?</h2>
+        <p>Пошаговое руководство по созданию мобильного приложения: от идеи до публикации в магазинах. Разберем технологии, инструменты и лучшие практики.</p>
+        <a href="#" class="read-more">Читать дальше</a>
+      </article>
+
+      <article class="article">
+        <img src="https://images.unsplash.com/photo-1611746872915-64382b5c76da" alt="Telegram Platform">
+        <h2>Telegram как платформа будущего</h2>
+        <p>Telegram Mini Apps открывают новые возможности для разработчиков. Узнайте, как создавать приложения внутри мессенджера и почему это будущее мобильной разработки.</p>
+        <a href="#" class="read-more">Читать дальше</a>
+      </article>
+    </div>
+
+    <!-- Горизонтальные статьи -->
+    <div class="blog-horizontal">
+      <article class="article">
+        <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee" alt="React и современный фронтенд">
+        <h2>React и современный фронтенд</h2>
+        <p>Погружение в мир современной фронтенд-разработки. Узнайте, почему React стал таким популярным и как начать с ним работать.</p>
+        <a href="#" class="read-more">Читать дальше</a>
+      </article>
+
+      <article class="article">
+        <img src="https://images.unsplash.com/photo-1504639725590-34d0984388bd" alt="Искусственный интеллект">
+        <h2>Искусственный интеллект в 2024</h2>
+        <p>Обзор последних достижений в области ИИ и машинного обучения. Как технологии меняют нашу жизнь и работу.</p>
+        <a href="#" class="read-more">Читать дальше</a>
+      </article>
+
+      <article class="article">
+        <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb" alt="Кибербезопасность">
+        <h2>Основы кибербезопасности</h2>
+        <p>Защита данных в современном мире. Практические советы по обеспечению безопасности ваших приложений и данных.</p>
+        <a href="#" class="read-more">Читать дальше</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- Чат-бот -->
+  <div class="chatbot" id="chatbot">
     <div class="chatbot-header">
-      <div class="chatbot-avatar">
-        <div class="chatbot-eye"></div>
+      <div class="bot-face">
+        <div class="bot-eyes">
+          <div class="bot-eye"></div>
+          <div class="bot-eye"></div>
+        </div>
       </div>
-      <div class="chatbot-title">AI Помощник</div>
+      <h3>AI Помощник</h3>
+      <button class="chatbot-close" onclick="toggleChatbot()">✕</button>
     </div>
     <div class="chatbot-messages" id="chatMessages"></div>
+    <div class="suggestions" id="suggestions"></div>
     <div class="chatbot-input">
       <input type="text" id="userInput" placeholder="Задайте вопрос..." onkeypress="handleKeyPress(event)">
       <button onclick="sendMessage()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z"/>
+          <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2z"/>
         </svg>
       </button>
     </div>
-    <div class="suggestions" id="suggestions"></div>
   </div>
 
-  <!-- Blog Section -->
-  <section id="blog" class="blog">
-    <div class="blog-vertical">
-      <!-- Vertical posts will be added here -->
-    </div>
-    <div class="blog-horizontal">
-      <!-- Horizontal posts will be added here -->
-    </div>
-  </section>
+  <!-- Quote -->
+  <div class="quote" id="quote"></div>
 
   <!-- Privacy Policy -->
   <footer class="privacy-policy">
@@ -613,13 +692,9 @@
     <p>
       Мы уважаем вашу приватность и не собираем персональные данные. Регистрация на сайте не требуется.
       Мы не используем файлы cookie и не отслеживаем ваши действия. Вся информация, представленная на сайте,
-      предназначена исключительно для ознакомления. Используя наш сайт, вы можете быть уверены в
-      безопасности ваших данных.
+      предназначена исключительно для ознакомления.
     </p>
   </footer>
-
-  <!-- Quote -->
-  <div class="quote" id="quote"></div>
 
   <script>
     // Initialize Telegram WebApp
@@ -683,79 +758,18 @@
     `;
     document.head.appendChild(styleSheet);
 
-    // Updated blog posts
-    const blogPosts = [
-      {
-        title: 'Что такое Telegram Mini Apps?',
-        content: 'Telegram Mini Apps - это новый способ создавать интерактивные приложения прямо внутри Telegram. Узнайте, как создать свое первое приложение...',
-        image: 'https://images.unsplash.com/photo-1611746872915-64382b5c76da'
-      },
-      {
-        title: 'Начало работы с React',
-        content: 'React - это популярная библиотека для создания пользовательских интерфейсов. В этой статье мы рассмотрим основные концепции...',
-        image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee'
-      },
-      {
-        title: 'Будущее веб-разработки',
-        content: 'Технологии развиваются стремительно, и веб-разработка не исключение. Давайте посмотрим на тренды...',
-        image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd'
-      },
-      {
-        title: 'JavaScript для начинающих',
-        content: 'Изучаем основы JavaScript с нуля. Простые примеры и понятные объяснения...',
-        image: 'https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a'
-      },
-      {
-        title: 'Оптимизация производительности',
-        content: 'Советы и трюки по улучшению производительности веб-приложений...',
-        image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6'
-      },
-      {
-        title: 'Безопасность в веб-разработке',
-        content: 'Основные принципы безопасности при разработке веб-приложений...',
-        image: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb'
-      }
-    ];
-
-    // Split posts between vertical and horizontal sections
-    const verticalSection = document.querySelector('.blog-vertical');
-    const horizontalSection = document.querySelector('.blog-horizontal');
-
-    // Add first 3 posts vertically
-    blogPosts.slice(0, 3).forEach((post, index) => {
-      const article = document.createElement('article');
-      article.className = 'blog-post';
-      article.style.animationDelay = `${index * 0.2}s`;
-      
-      article.innerHTML = `
-        <img src="${post.image}" alt="${post.title}">
-        <h2>${post.title}</h2>
-        <p>${post.content}</p>
-      `;
-      
-      verticalSection.appendChild(article);
-    });
-
-    // Add remaining posts horizontally
-    blogPosts.slice(3).forEach((post, index) => {
-      const article = document.createElement('article');
-      article.className = 'blog-post';
-      article.style.animationDelay = `${index * 0.2}s`;
-      
-      article.innerHTML = `
-        <img src="${post.image}" alt="${post.title}">
-        <h2>${post.title}</h2>
-        <p>${post.content}</p>
-      `;
-      
-      horizontalSection.appendChild(article);
-    });
-
     // Quotes rotation
     const quotes = [
       "Лучший способ предсказать будущее — создать его.",
       "Программирование — это искусство организации сложности.",
-      "Простота — необходимое условие надёжности."
+      "Простота — необходимое условие надёжности.",
+      "Совершенство достигается не тогда, когда нечего добавить, а когда нечего убрать.",
+      "Код — это поэзия, написанная логикой.",
+      "В программировании процесс так же важен, как и результат.",
+      "Любую достаточно развитую технологию невозможно отличить от магии.",
+      "Программирование — это не о печатании, это о мышлении.",
+      "Сложность — это враг. Любой дурак может сделать что-то сложным.",
+      "Красота кода заключается в его простоте."
     ];
 
     const quoteElement = document.getElementById('quote');
@@ -773,41 +787,30 @@
     updateQuote();
     setInterval(updateQuote, 10000);
 
-    // Chatbot Knowledge Base
+    // База знаний для чат-бота
     const knowledgeBase = {
-      'что такое программирование': 'Программирование - это процесс создания компьютерных программ с помощью языков программирования. Это способ говорить с компьютером и указывать ему, что делать.',
+      'программирование': 'Программирование - это процесс создания компьютерных программ с помощью языков программирования. Это способ говорить с компьютером и указывать ему, что делать.',
       'javascript': 'JavaScript - это мультипарадигменный язык программирования, который позволяет создавать интерактивные веб-страницы. Это один из трех столпов веб-разработки наряду с HTML и CSS.',
-      'что такое веб-приложение': 'Веб-приложение - это программа, которая работает в браузере. В отличие от обычных сайтов, веб-приложения более интерактивны и могут работать как полноценные программы.',
-      'telegram': 'Telegram - это мессенджер с открытым API, который позволяет создавать ботов и мини-приложения. Он известен своей безопасностью и широкими возможностями для разработчиков.',
       'python': 'Python - это высокоуровневый язык программирования с простым синтаксисом. Он отлично подходит для начинающих и используется в веб-разработке, науке о данных и машинном обучении.',
-      'искусственный интеллект': 'Искусственный интеллект (ИИ) - это способность компьютерных систем выполнять задачи, которые обычно требуют человеческого интеллекта. Например, распознавание речи или принятие решений.',
-      'html': 'HTML (HyperText Markup Language) - это стандартный язык разметки для создания веб-страниц. Он определяет структуру и содержание веб-страницы.',
-      'css': 'CSS (Cascading Style Sheets) - это язык стилей, который определяет внешний вид HTML-документов. С его помощью можно управлять цветами, шрифтами, отступами и другими визуальными аспектами.',
+      'telegram': 'Telegram - это мессенджер с открытым API, который позволяет создавать ботов и мини-приложения. Он известен своей безопасностью и широкими возможностями для разработчиков.',
       'react': 'React - это библиотека JavaScript для создания пользовательских интерфейсов. Разработана Facebook, позволяет создавать сложные интерактивные приложения.',
-      'база данных': 'База данных - это организованная коллекция данных, которая позволяет хранить, управлять и получать информацию. Существуют различные типы баз данных: реляционные, NoSQL и другие.',
-      'api': 'API (Application Programming Interface) - это набор правил и протоколов, которые позволяют различным программам взаимодействовать друг с другом.',
-      'фронтенд': 'Frontend (фронтенд) - это клиентская часть веб-приложения, с которой взаимодействует пользователь. Включает HTML, CSS и JavaScript.',
-      'бэкенд': 'Backend (бэкенд) - это серверная часть приложения, которая обрабатывает данные, работает с базами данных и обеспечивает безопасность.',
-      'git': 'Git - это система контроля версий, которая позволяет отслеживать изменения в коде и работать над проектом совместно с другими разработчиками.',
-      'docker': 'Docker - это платформа для разработки, доставки и запуска приложений в контейнерах. Контейнеры позволяют упаковать приложение со всеми его зависимостями.',
-      'облачные технологии': 'Облачные технологии позволяют получить доступ к вычислительным ресурсам через интернет. Примеры: AWS, Google Cloud, Microsoft Azure.',
-      'кибербезопасность': 'Кибербезопасность - это защита компьютерных систем от кражи или повреждения оборудования, программного обеспечения или данных.',
-      'машинное обучение': 'Машинное обучение - это подраздел искусственного интеллекта, который позволяет компьютерам учиться на основе данных без явного программирования.',
-      'blockchain': 'Blockchain (блокчейн) - это распределенная база данных, которая хранит информацию о всех транзакциях участников системы в виде цепочки блоков.',
-      'devops': 'DevOps - это набор практик, направленных на автоматизацию процессов между разработкой ПО и ИТ-специалистами для создания, тестирования и выпуска ПО.'
+      'веб-разработка': 'Веб-разработка включает в себя создание веб-сайтов и веб-приложений. Основные технологии: HTML, CSS и JavaScript для фронтенда, различные языки и фреймворки для бэкенда.',
+      'искусственный интеллект': 'Искусственный интеллект (ИИ) - это способность компьютерных систем выполнять задачи, которые обычно требуют человеческого интеллекта.',
+      'мобильная разработка': 'Мобильная разработка - это создание приложений для смартфонов и планшетов. Основные платформы: iOS и Android.',
+      'базы данных': 'Базы данных - это организованные коллекции данных. Используются для хранения и управления информацией в приложениях.',
+      'api': 'API (Application Programming Interface) - это набор правил и протоколов для взаимодействия различных программ между собой.'
     };
 
+    // Подсказки для чат-бота
     const suggestions = [
       'Что такое программирование',
-      'JavaScript',
-      'Python',
-      'HTML',
-      'CSS',
-      'React',
-      'База данных',
-      'Frontend',
-      'Backend',
-      'DevOps'
+      'Расскажи про JavaScript',
+      'Что такое Python',
+      'Как работает Telegram',
+      'Что такое React',
+      'Веб-разработка',
+      'Искусственный интеллект',
+      'Мобильная разработка'
     ];
 
     let isTyping = false;
@@ -815,10 +818,12 @@
     function toggleChatbot() {
       const chatbot = document.getElementById('chatbot');
       chatbot.classList.toggle('active');
+      
       if (chatbot.classList.contains('active')) {
         showSuggestions();
-        addBotMessage('Привет!addBotMessage('Привет! Я AI помощник. Задайте мне вопрос о программировании или выберите одну из подсказок ниже.');
+        addBotMessage('Привет! Я AI помощник. Задайте мне вопрос о программировании или выберите одну из подсказок ниже.');
       }
+    }
 
     function showSuggestions() {
       const suggestionsContainer = document.getElementById('suggestions');
@@ -828,10 +833,7 @@
         const suggestion = document.createElement('div');
         suggestion.className = 'suggestion';
         suggestion.textContent = text;
-        suggestion.style.animationDelay = `${index * 0.1}s`;
         suggestion.onclick = () => handleSuggestion(text);
-        
-        setTimeout(() => suggestion.classList.add('show'), 50);
         suggestionsContainer.appendChild(suggestion);
       });
     }
@@ -849,6 +851,8 @@
       
       messagesContainer.appendChild(message);
       setTimeout(() => message.classList.add('show'), 50);
+      messagesContainer.scrollTop = messmessagesContainer.appendChild(message);
+      setTimeout(() => message.classList.add('show'), 50);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
@@ -864,6 +868,7 @@
         if (wordIndex >= words.length) {
           clearInterval(interval);
           isTyping = false;
+          showSuggestions();
           return;
         }
         
@@ -911,7 +916,6 @@
       setTimeout(() => {
         const answer = findAnswer(question);
         addBotMessage(answer);
-        showSuggestions();
       }, 500);
     }
 
