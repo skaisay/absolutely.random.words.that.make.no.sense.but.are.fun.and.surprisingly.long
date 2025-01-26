@@ -3,164 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Assistant Chat Interface">
+    <meta name="theme-color" content="#000000">
     <title>AI Assistant</title>
+    
+    <!-- Telegram Web App Integration -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        /* Общие стили */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-
-        body {
-            background: #000;
-            color: #fff;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Анимации снежинок */
-        .snowflake {
-            position: fixed;
-            width: 4px;
-            height: 4px;
-            background: #fff;
-            border-radius: 50%;
-            animation: fall linear infinite;
-            opacity: 0.6;
-        }
-
-        @keyframes fall {
-            to {
-                transform: translateY(100vh);
-            }
-        }
-
-        /* Робот */
-        .robot {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 60px;
-            background: #2ea6ff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Чат */
-        .chat-container {
-            padding: 80px 20px 100px;
-            height: 100vh;
-            overflow-y: auto;
-        }
-
-        .message {
-            margin: 10px 0;
-            padding: 12px;
-            border-radius: 12px;
-            max-width: 80%;
-        }
-
-        .user-message {
-            background: #2ea6ff;
-            margin-left: auto;
-        }
-
-        .bot-message {
-            background: #444;
-            margin-right: auto;
-        }
-
-        /* Поле ввода */
-        .input-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 15px;
-            display: flex;
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .input-field {
-            flex: 1;
-            padding: 10px;
-            border-radius: 12px;
-            background: #222;
-            color: white;
-        }
-
-        .send-button {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #2ea6ff;
-            margin-left: 10px;
-        }
-    </style>
+    
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Робот -->
-    <div class="robot"></div>
-
-    <!-- Чат -->
-    <div class="chat-container" id="chatContainer"></div>
-
-    <!-- Поле ввода -->
-    <div class="input-container">
-        <input type="text" class="input-field" id="inputField" placeholder="Введите ваш вопрос...">
-        <button class="send-button" id="sendButton">></button>
+    <!-- Animated Robot Avatar -->
+    <div class="robot">
+        <svg viewBox="0 0 24 24">
+            <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" />
+        </svg>
     </div>
 
-    <script>
-        // Telegram WebApp API инициализация
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.expand();
-            tg.ready();
-        }
+    <!-- Chat Container -->
+    <div class="chat-container" id="chatContainer">
+        <div class="messages-wrapper" id="messagesWrapper"></div>
+    </div>
 
-        // Снежинки
-        function createSnowflake() {
-            const snowflake = document.createElement('div');
-            snowflake.classList.add('snowflake');
-            snowflake.style.left = Math.random() * 100 + 'vw';
-            snowflake.style.animationDuration = Math.random() * 5 + 3 + 's';
-            document.body.appendChild(snowflake);
-            snowflake.addEventListener('animationend', () => snowflake.remove());
-        }
-        setInterval(createSnowflake, 500);
+    <!-- Input Container -->
+    <div class="input-container">
+        <input type="text" class="input-field" id="questionInput" placeholder="Введите ваш вопрос...">
+        <button class="mic-button" id="micButton">
+            <svg viewBox="0 0 24 24">
+                <path d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"/>
+            </svg>
+        </button>
+        <button class="send-button" id="sendButton">
+            <svg viewBox="0 0 24 24">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+        </button>
+    </div>
 
-        // Работа чата
-        const chatContainer = document.getElementById('chatContainer');
-        const inputField = document.getElementById('inputField');
-        const sendButton = document.getElementById('sendButton');
-
-        sendButton.addEventListener('click', () => {
-            const userMessage = inputField.value.trim();
-            if (!userMessage) return;
-
-            // Добавляем сообщение пользователя
-            const userMessageElement = document.createElement('div');
-            userMessageElement.classList.add('message', 'user-message');
-            userMessageElement.textContent = userMessage;
-            chatContainer.appendChild(userMessageElement);
-
-            // Ответ бота (тестовый)
-            const botMessageElement = document.createElement('div');
-            botMessageElement.classList.add('message', 'bot-message');
-            botMessageElement.textContent = 'Это ваш ответ!';
-            chatContainer.appendChild(botMessageElement);
-
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            inputField.value = '';
-        });
-    </script>
+    <!-- Application Scripts -->
+    <script type="module" src="./main.js"></script>
+    <script type="module" src="./database.js"></script>
 </body>
 </html>
