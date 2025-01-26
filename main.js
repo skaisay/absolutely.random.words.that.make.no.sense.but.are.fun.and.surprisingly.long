@@ -1,10 +1,15 @@
 import { database, communicationStyles, emotionalTriggers, findBestMatch, findLinks, getRandomResponse } from './database.js';
 
-// Инициализация Telegram WebApp
-const tg = window.Telegram?.WebApp;
-if (tg) {
-    tg.expand();
-    tg.ready();
+// Безопасная инициализация Telegram WebApp
+let tg = null;
+try {
+    tg = window.Telegram?.WebApp;
+    if (tg) {
+        tg.expand();
+        tg.ready();
+    }
+} catch (error) {
+    console.warn('Telegram WebApp not available:', error);
 }
 
 // DOM элементы
@@ -14,11 +19,16 @@ const questionInput = document.getElementById('questionInput');
 const sendButton = document.getElementById('sendButton');
 const micButton = document.getElementById('micButton');
 
+// Проверка наличия элементов
+if (!chatContainer || !messagesWrapper || !questionInput || !sendButton || !micButton) {
+    console.error('Required DOM elements not found');
+    throw new Error('Required DOM elements not found');
+}
+
 // Функция создания элемента сообщения
 function createMessageElement(text, isUser) {
     const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message');
-    messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+    messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
 
     if (!isUser) {
         const iconDiv = document.createElement('div');
@@ -31,68 +41,75 @@ function createMessageElement(text, isUser) {
     }
 
     const textSpan = document.createElement('span');
-    // Проверка на URL в тексте
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const parts = text.split(urlRegex);
 
-    parts.forEach((part, index) => {
+    parts.forEach(part => {
         if (part.match(urlRegex)) {
             const link = document.createElement('a');
             link.href = part;
             link.textContent = part;
             link.target = '_blank';
+            link.rel = 'noopener noreferrer';
             textSpan.appendChild(link);
         } else {
             textSpan.appendChild(document.createTextNode(part));
         }
     });
+
     messageDiv.appendChild(textSpan);
     return messageDiv;
 }
 
 // Функция анимированного вывода ответа
 async function typeResponse(text) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    if (!text) return;
 
-    const messageElement = createMessageElement('', false);
-    const textSpan = messageElement.querySelector('span');
-    messagesWrapper.appendChild(messageElement);
+    try {
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const parts = text.split(urlRegex);
+        const messageElement = createMessageElement('', false);
+        const textSpan = messageElement.querySelector('span');
+        messagesWrapper.appendChild(messageElement);
 
-    for (const part of parts) {
-        if (part.match(urlRegex)) {
-            const link = document.createElement('a');
-            link.href = part;
-            link.textContent = part;
-            link.target = '_blank';
-            textSpan.appendChild(link);
-            await new Promise(resolve => setTimeout(resolve, 100));
-        } else {
-            const words = part.split(' ');
-            for (const word of words) {
-                await new Promise(resolve => {
-                    requestAnimationFrame(() => {
-                        textSpan.appendChild(document.createTextNode(word + ' '));
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                        setTimeout(resolve, 50);
-                    });
-                });
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        const parts = text.split(urlRegex);
+
+        for (const part of parts) {
+            if (part.match(urlRegex)) {
+                const link = document.createElement('a');
+                link.href = part;
+                link.textContent = part;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                textSpan.appendChild(link);
+            } else {
+                for (const char of part) {
+                    textSpan.appendChild(document.createTextNode(char));
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    await new Promise(resolve => setTimeout(resolve, 20));
+                }
             }
         }
+    } catch (error) {
+        console.error('Error in typeResponse:', error);
     }
 }
 
-// Функция определения эмоции
+// Определение эмоции
 async function detectEmotion(text) {
-    const normalizedText = text.toLowerCase();
-    for (const [emotion, triggers] of Object.entries(emotionalTriggers)) {
-        if (triggers.some(trigger => normalizedText.includes(trigger))) {
-            return emotion;
+    try {
+        const normalizedText = text.toLowerCase();
+        for (const [emotion, triggers] of Object.entries(emotionalTriggers)) {
+            if (triggers.some(trigger => normalizedText.includes(trigger))) {
+                return emotion;
+            }
         }
+        return 'neutral';
+    } catch (error) {
+        console.error('Error in detectEmotion:', error);
+        return 'neutral';
     }
-    return 'neutral';
 }
 
 // Обработчик вопросов
@@ -100,38 +117,29 @@ async function handleQuestion() {
     const question = questionInput.value.trim();
     if (!question) return;
 
-    const messageElement = createMessageElement(question, true);
-    messagesWrapper.appendChild(messageElement);
-    questionInput.value = '';
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-
     try {
-        // Определение эмоционального состояния
+        // Добавляем сообщение пользователя
+        const messageElement = createMessageElement(question, true);
+        messagesWrapper.appendChild(messageElement);
+        questionInput.value = '';
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        // Определяем эмоцию и стиль общения
         const emotion = await detectEmotion(question);
-        currentStyle = emotion === 'neutral' ? 'friendly' : 'emotional';
+        const currentStyle = emotion === 'neutral' ? 'friendly' : 'emotional';
 
-        // Поиск ответа в разных источниках
-        let answer;
-
-        // 1. Проверяем прямые совпадения в базе данных
-        answer = findBestMatch(question);
-        if (answer) {
-            answer = getRandomResponse(answer);
-        } else {
-            // 2. Проверяем наличие ссылок
+        // Ищем ответ
+        let answer = findBestMatch(question);
+        if (!answer) {
             const links = findLinks(question);
-            if (links) {
-                answer = getRandomResponse(links);
-            } else {
-                // 3. Если ответ не найден
-                answer = communicationStyles[currentStyle].responses.unclear;
-            }
+            answer = links || communicationStyles[currentStyle].responses.unclear;
         }
 
-        await typeResponse(answer);
+        // Выводим ответ
+        await typeResponse(getRandomResponse(answer));
     } catch (error) {
-        console.error('Ошибка обработки вопроса:', error);
-        await typeResponse(communicationStyles[currentStyle].responses.error);
+        console.error('Error in handleQuestion:', error);
+        await typeResponse(communicationStyles.friendly.responses.error);
     }
 }
 
@@ -145,8 +153,6 @@ questionInput.addEventListener('keypress', (e) => {
 
 sendButton.addEventListener('click', handleQuestion);
 
-let currentStyle = 'friendly';
-
 // Приветственное сообщение
 setTimeout(() => {
     typeResponse(communicationStyles.friendly.greeting);
@@ -154,51 +160,55 @@ setTimeout(() => {
 
 // Инициализация распознавания речи
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'ru-RU';
-    recognition.continuous = false;
-    recognition.interimResults = true;
+    try {
+        const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'ru-RU';
+        recognition.continuous = false;
+        recognition.interimResults = true;
 
-    let isRecording = false;
+        let isRecording = false;
 
-    recognition.onstart = () => {
-        isRecording = true;
-        micButton.classList.add('recording');
-        questionInput.value = '';
-        questionInput.placeholder = 'Говорите...';
-    };
+        recognition.onstart = () => {
+            isRecording = true;
+            micButton.classList.add('recording');
+            questionInput.placeholder = 'Говорите...';
+        };
 
-    recognition.onend = () => {
-        isRecording = false;
-        micButton.classList.remove('recording');
-        questionInput.placeholder = 'Введите ваш вопрос...';
-    };
+        recognition.onend = () => {
+            isRecording = false;
+            micButton.classList.remove('recording');
+            questionInput.placeholder = 'Введите ваш вопрос...';
+        };
 
-    recognition.onresult = (event) => {
-        const transcript = Array.from(event.results)
-            .map(result => result[0].transcript)
-            .join('');
-        questionInput.value = transcript;
-        if (event.results[0].isFinal) {
-            handleQuestion();
+        recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0].transcript)
+                .join('');
+            questionInput.value = transcript;
+            if (event.results[0].isFinal) {
+                handleQuestion();
+                recognition.stop();
+            }
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
             recognition.stop();
-        }
-    };
+        };
 
-    recognition.onerror = (event) => {
-        console.error('Ошибка распознавания:', event.error);
-        recognition.stop();
-    };
-
-    micButton.addEventListener('click', () => {
-        if (!isRecording) {
-            recognition.start();
-        } else {
-            recognition.stop();
-        }
-    });
+        micButton.addEventListener('click', () => {
+            if (!isRecording) {
+                recognition.start();
+            } else {
+                recognition.stop();
+            }
+        });
+    } catch (error) {
+        console.error('Error initializing speech recognition:', error);
+        micButton.style.display = 'none';
+    }
 } else {
+    console.log('Speech recognition not supported');
     micButton.style.display = 'none';
-    console.log('Распознавание речи не поддерживается в этом браузере');
 }
