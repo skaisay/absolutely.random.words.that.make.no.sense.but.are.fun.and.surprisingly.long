@@ -7,42 +7,69 @@
     <meta name="theme-color" content="#000000">
     <title>AI Assistant</title>
     
-    <!-- Telegram Web App Integration -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Безопасная загрузка Telegram Web App -->
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            const script = document.createElement('script');
+            script.src = "https://telegram.org/js/telegram-web-app.js";
+            script.onerror = function() {
+                console.warn('Telegram Web App script failed to load. Continuing without Telegram features.');
+            };
+            document.head.appendChild(script);
+        });
+    </script>
     
-    <!-- External Stylesheets -->
-    <link rel="stylesheet" href="styles.css">
+    <!-- Стили -->
+    <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-    <!-- Animated Robot Avatar -->
-    <div class="robot">
-        <svg viewBox="0 0 24 24">
-            <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" />
-        </svg>
-    </div>
-
-    <!-- Chat Container -->
-    <div class="chat-container" id="chatContainer">
-        <div class="messages-wrapper" id="messagesWrapper"></div>
-    </div>
-
-    <!-- Input Container -->
-    <div class="input-container">
-        <input type="text" class="input-field" id="questionInput" placeholder="Введите ваш вопрос...">
-        <button class="mic-button" id="micButton">
+    <div id="app">
+        <!-- Animated Robot Avatar -->
+        <div class="robot">
             <svg viewBox="0 0 24 24">
-                <path d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"/>
+                <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" />
             </svg>
-        </button>
-        <button class="send-button" id="sendButton">
-            <svg viewBox="0 0 24 24">
-                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-            </svg>
-        </button>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container" id="chatContainer">
+            <div class="messages-wrapper" id="messagesWrapper"></div>
+        </div>
+
+        <!-- Input Container -->
+        <div class="input-container">
+            <input type="text" class="input-field" id="questionInput" placeholder="Введите ваш вопрос...">
+            <button class="mic-button" id="micButton">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"/>
+                </svg>
+            </button>
+            <button class="send-button" id="sendButton">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
     </div>
 
-    <!-- Application Scripts -->
-    <script type="module" src="./main.js"></script>
-    <script type="module" src="./database.js"></script>
-</body>
-</html>
+    <!-- Загрузка скриптов с обработкой ошибок -->
+    <script type="module">
+        // Функция для загрузки скрипта с обработкой ошибок
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+                document.body.appendChild(script);
+            });
+        }
+
+        // Загрузка основных скриптов
+        Promise.all([
+            loadScript('./database.js'),
+            loadScript('./main.js')
+        ]).catch(error => {
+            console.error('Error loading scripts:', error);
+            document.getElementById('messagesWrapper'
