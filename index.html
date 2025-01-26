@@ -12,14 +12,12 @@
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
-
         body {
             background: #000000;
             color: #ffffff;
             min-height: 100vh;
             overflow-x: hidden;
         }
-
         /* Снежинки */
         .snowflake {
             position: fixed;
@@ -34,13 +32,11 @@
             box-shadow: 0 0 5px #ffffff;
             opacity: 0.6;
         }
-
         @keyframes fall {
             to {
                 transform: translateY(100vh) rotate(360deg);
             }
         }
-
         /* Анимированный робот */
         .robot {
             position: fixed;
@@ -58,7 +54,6 @@
             animation: float 3s ease-in-out infinite;
             box-shadow: 0 0 30px #2ea6ff;
         }
-
         .robot svg {
             width: 40px;
             height: 40px;
@@ -66,17 +61,14 @@
             filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
             animation: pulse 2s ease-in-out infinite;
         }
-
         @keyframes float {
             0%, 100% { transform: translateX(-50%) translateY(0); }
             50% { transform: translateX(-50%) translateY(-10px); }
         }
-
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 0.9; }
             50% { transform: scale(1.1); opacity: 1; }
         }
-
         /* Чат */
         .chat-container {
             padding: 80px 20px 100px;
@@ -85,13 +77,11 @@
             position: relative;
             z-index: 2;
         }
-
         .messages-wrapper {
             max-width: 800px;
             margin: 0 auto;
             width: 100%;
         }
-
         .message {
             margin: 10px 0;
             padding: 12px 16px;
@@ -104,13 +94,11 @@
             background: rgba(45, 45, 45, 0.5);
             backdrop-filter: blur(10px);
         }
-
         .user-message {
             background: rgba(46, 166, 255, 0.8);
             margin-left: auto;
             border-bottom-right-radius: 4px;
         }
-
         .bot-message {
             background: rgba(45, 45, 45, 0.5);
             margin-right: auto;
@@ -119,20 +107,16 @@
             cursor: pointer;
             transition: background 0.3s ease;
         }
-
         .bot-message {
             cursor: default;
         }
-
         .bot-message a {
             color: #2ea6ff;
             text-decoration: none;
         }
-
         .bot-message a:hover {
             text-decoration: underline;
         }
-
         .message-icon {
             position: absolute;
             left: 8px;
@@ -144,19 +128,16 @@
             align-items: center;
             justify-content: center;
         }
-
         .message-icon svg {
             width: 24px;
             height: 24px;
             fill: #2ea6ff;
             filter: drop-shadow(0 0 3px #2ea6ff);
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         /* Поле ввода */
         .input-container {
             position: fixed;
@@ -170,7 +151,6 @@
             gap: 12px;
             z-index: 1000;
         }
-
         .input-field {
             flex: 1;
             padding: 12px 16px;
@@ -183,12 +163,10 @@
             max-width: 800px;
             margin: 0 auto;
         }
-
         .input-field:focus {
             outline: none;
             background: rgba(255, 255, 255, 0.15);
         }
-
         .send-button {
             width: 44px;
             height: 44px;
@@ -203,19 +181,16 @@
             padding: 0;
             box-shadow: 0 0 15px #2ea6ff;
         }
-
         .send-button:hover {
             background: #52b5ff;
             transform: scale(1.05);
         }
-
         .send-button svg {
             width: 24px;
             height: 24px;
             fill: white;
             transform: rotate(45deg);
         }
-
         .mic-button {
             width: 44px;
             height: 44px;
@@ -231,43 +206,35 @@
             box-shadow: 0 0 15px #2ea6ff;
             margin-right: 8px;
         }
-
         .mic-button.recording {
             background: #ff4444;
             box-shadow: 0 0 15px #ff4444;
             animation: pulse 1.5s ease-in-out infinite;
         }
-
         .mic-button svg {
             width: 24px;
             height: 24px;
             fill: white;
         }
-
         /* Скроллбар */
         .chat-container::-webkit-scrollbar {
             width: 6px;
         }
-
         .chat-container::-webkit-scrollbar-track {
             background: transparent;
         }
-
         .chat-container::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
             border-radius: 3px;
         }
-
         @media (max-width: 600px) {
             .chat-container {
                 padding: 80px 10px 90px;
             }
-
             .message {
                 max-width: 85%;
                 font-size: 15px;
             }
-
             .input-container {
                 padding: 10px;
             }
@@ -281,12 +248,10 @@
             <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" />
         </svg>
     </div>
-
     <!-- Чат -->
     <div class="chat-container" id="chatContainer">
         <div class="messages-wrapper" id="messagesWrapper"></div>
     </div>
-
     <!-- Поле ввода -->
     <div class="input-container">
         <input type="text" class="input-field" id="questionInput" placeholder="Введите ваш вопрос...">
@@ -301,304 +266,12 @@
             </svg>
         </button>
     </div>
-
-    <script type="module" src="./main.js"></script>
-    <script type="module" src="./database.js"></script>
-
     <script>
-        // База данных вопросов и ответов будет импортирована из database.js
-
-// Инициализация Telegram WebApp
+        // Инициализация Telegram WebApp
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.expand();
             tg.ready();
-        }
-
-        // Функция поиска похожих вопросов
-        function findSimilarQuestions(input) {
-            const userInput = input.trim().toLowerCase().replace(/[.,?!]/g, '');
-            const normalizedInput = userInput.replace(/\s+/g, ' ');
-            const inputWords = normalizedInput.split(' ');
-
-            // Ключевые слова для запросов ссылок
-            const linkKeywords = ['ссылк', 'линк', 'url', 'адрес', 'сайт', 'открыть', 'найти', 'где', 'куда', 'путь', 'перейти', 'скин', 'кин', 'отправ', 'дай', 'напиши', 'подскаж', 'покаж'];
-
-            // Проверяем, является ли запрос просьбой о ссылке
-            const isLinkRequest = linkKeywords.some(keyword => 
-                normalizedInput.includes(keyword)
-            );
-
-            if (isLinkRequest) {
-                // Ищем вопросы, связанные со ссылками с повышенным приоритетом
-                const linkQuestions = Object.keys(database).filter(q => 
-                    q.toLowerCase().includes('ссылк') || 
-                    q.toLowerCase().includes('где найти') ||
-                    q.toLowerCase().includes('url') ||
-                    q.toLowerCase().includes('сайт')
-                );
-
-                if (linkQuestions.length > 0) {
-                    return linkQuestions;
-                }
-            }
-
-            const results = Object.keys(database).map(question => {
-                const normalizedQuestion = question.toLowerCase().replace(/[.,?!]/g, '').replace(/\s+/g, ' ');
-                const questionWords = normalizedQuestion.split(' ');
-
-                let matchScore = 0;
-                inputWords.forEach(word => {
-                    if (word.length > 2 && questionWords.some(qWord => qWord.includes(word) || word.includes(qWord))) {
-                        matchScore++;
-                    }
-                });
-
-                // Повышаем релевантность для запросов со ссылками
-                if (isLinkRequest && (question.toLowerCase().includes('ссылк') || question.toLowerCase().includes('url'))) {
-                    matchScore *= 1.5;
-                }
-
-                return {
-                    question,
-                    score: matchScore / Math.max(inputWords.length, questionWords.length)
-                };
-            });
-
-            return results
-                .filter(result => result.score > 0.3)
-                .sort((a, b) => b.score - a.score)
-                .map(result => result.question);
-        }
-
-        // Оптимизированное создание снежинок
-        let snowflakeCount = 0;
-        const MAX_SNOWFLAKES = 15;
-
-        function createSnowflakes() {
-            if (snowflakeCount >= MAX_SNOWFLAKES) {
-                return;
-            }
-
-            const snowflake = document.createElement('div');
-            snowflake.classList.add('snowflake');
-            snowflake.style.left = Math.random() * 100 + 'vw';
-            snowflake.style.animationDuration = Math.random() * 5 + 3 + 's';
-            snowflake.style.opacity = Math.random() * 0.2 + 0.1;
-            document.body.appendChild(snowflake);
-
-            snowflake.style.top = -10 + 'px';
-            snowflakeCount++;
-
-            snowflake.addEventListener('animationend', () => {
-                snowflake.remove();
-                snowflakeCount--;
-            });
-        }
-
-        function determineCategory(question) {
-            const categories = {
-                психология: ['стресс', 'самооценка', 'мотивация', 'психолог'],
-                дом: ['уборка', 'ремонт', 'готовка', 'хозяйство'],
-                история: ['когда', 'исторический', 'война', 'древний'],
-                наука: ['открытие', 'исследование', 'теория', 'эксперимент'],
-                конфликты: ['ссора', 'спор', 'конфликт', 'решение']
-            };
-
-            question = question.toLowerCase();
-            for (let category in categories) {
-                if (categories[category].some(keyword => question.includes(keyword))) {
-                    return category;
-                }
-            }
-            return 'общее';
-        }
-
-        setInterval(createSnowflakes, 800);
-
-        // Функции чата
-        const chatContainer = document.getElementById('chatContainer');
-        const messagesWrapper = document.getElementById('messagesWrapper');
-        const questionInput = document.getElementById('questionInput');
-        const sendButton = document.getElementById('sendButton');
-
-        function createMessageElement(text, isUser) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
-
-            if (!isUser) {
-                const iconDiv = document.createElement('div');
-                iconDiv.classList.add('message-icon');
-                iconDiv.innerHTML = `
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" />
-                    </svg>`;
-                messageDiv.appendChild(iconDiv);
-            }
-
-            const textSpan = document.createElement('span');
-            // Check if text contains a URL
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
-            const parts = text.split(urlRegex);
-
-            parts.forEach((part, index) => {
-                if (part.match(urlRegex)) {
-                    const link = document.createElement('a');
-                    link.href = part;
-                    link.textContent = part;
-                    link.target = '_blank';
-                    textSpan.appendChild(link);
-                } else {
-                    textSpan.appendChild(document.createTextNode(part));
-                }
-            });
-            messageDiv.appendChild(textSpan);
-            return messageDiv;
-        }
-
-        async function typeResponse(text) {
-            // Initial delay before starting to type
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            const messageElement = createMessageElement('', false);
-            const textSpan = messageElement.querySelector('span');
-            messagesWrapper.appendChild(messageElement);
-
-            // Convert URLs into clickable links
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
-            const parts = text.split(urlRegex);
-
-            for (const part of parts) {
-                if (part.match(urlRegex)) {
-                    const link = document.createElement('a');
-                    link.href = part;
-                    link.textContent = part.includes('javascript') ? 'JavaScript' :
-                                     part.includes('python') ? 'Python' :
-                                     part.includes('w3schools') ? 'W3Schools' :
-                                     part.includes('freecodecamp') ? 'FreeCodeCamp' :
-                                     part.includes('codecademy') ? 'Codecademy' :
-                                     'перейти на сайт';
-                    link.target = '_blank';
-                    textSpan.appendChild(link);
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                } else {
-                    const words = part.split(' ');
-                    for (const word of words) {
-                        await new Promise(resolve => {
-                            requestAnimationFrame(() => {
-                                textSpan.appendChild(document.createTextNode(word + ' '));
-                                chatContainer.scrollTop = chatContainer.scrollHeight;
-                                setTimeout(resolve, 50);
-                            });
-                        });
-                    }
-                }
-            }
-        }
-
-        let currentStyle = 'friendly'; // По умолчанию дружеский стиль
-let lastQuestionCategory = '';
-let questionCount = 0;
-
-async function detectEmotion(text) {
-    const normalizedText = text.toLowerCase();
-    for (const [emotion, triggers] of Object.entries(emotionalTriggers)) {
-        if (triggers.some(trigger => normalizedText.includes(trigger))) {
-            return emotion;
-        }
-    }
-    return 'neutral';
-}
-
-async function handleQuestion() {
-    const question = questionInput.value.trim();
-    if (!question) return;
-
-    const messageElement = createMessageElement(question, true);
-    messagesWrapper.appendChild(messageElement);
-    questionInput.value = '';
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-
-    try {
-        const normalizedQuestion = question.toLowerCase().replace(/\s+/g, ' ');
-        let answer = database[normalizedQuestion];
-
-        if (!answer) {
-            answer = "Извините, я не нашёл ответа на ваш вопрос. Попробуйте задать другой вопрос.";
-        }
-
-        await typeResponse(answer);
-    } catch (error) {
-        console.error('Ошибка обработки вопроса:', error);
-        await typeResponse("Извините, произошла ошибка при обработке вашего вопроса. Попробуйте еще раз.");
-    }
-}
-
-        questionInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleQuestion();
-            }
-        });
-
-        sendButton.addEventListener('click', handleQuestion);
-
-        // Приветственное сообщение
-        setTimeout(() => {
-            typeResponse("Привет! Задайте мне вопрос голосом или текстом, и я постараюсь на него ответить.");
-        }, 500);
-
-        // Инициализация распознавания речи
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'ru-RU';
-            recognition.continuous = false;
-            recognition.interimResults = true;
-
-            const micButton = document.getElementById('micButton');
-            let isRecording = false;
-
-            recognition.onstart = () => {
-                isRecording = true;
-                micButton.classList.add('recording');
-                questionInput.value = '';
-                questionInput.placeholder = 'Говорите...';
-            };
-
-            recognition.onend = () => {
-                isRecording = false;
-                micButton.classList.remove('recording');
-                questionInput.placeholder = 'Введите ваш вопрос...';
-            };
-
-            recognition.onresult = (event) => {
-                const transcript = Array.from(event.results)
-                    .map(result => result[0].transcript)
-                    .join('');
-                questionInput.value = transcript;
-                if (event.results[0].isFinal) {
-                    handleQuestion();
-                    recognition.stop();
-                }
-            };
-
-            recognition.onerror = (event) => {
-                console.error('Ошибка распознавания:', event.error);
-                recognition.stop();
-            };
-
-            micButton.addEventListener('click', () => {
-                if (!isRecording) {
-                    recognition.start();
-                } else {
-                    recognition.stop();
-                }
-            });
-        } else {
-            document.getElementById('micButton').style.display = 'none';
-            console.log('Распознавание речи не поддерживается в этом браузере');
         }
     </script>
 </body>
