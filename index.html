@@ -302,49 +302,7 @@
         </button>
     </div>
 
-    <script>
-        const questionInput = document.getElementById('questionInput');
-        const sendButton = document.getElementById('sendButton');
-        const micButton = document.getElementById('micButton');
-        const messagesWrapper = document.getElementById('messagesWrapper');
-
-        // Приветственное сообщение
-        window.onload = function() {
-            const welcomeMessage = "Здравствуйте! Чем могу помочь?";
-            sendMessage(welcomeMessage);
-        };
-
-        // Функция для отправки сообщения
-        function sendMessage(message) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', 'user-message');
-            messageElement.textContent = message;
-            messagesWrapper.appendChild(messageElement);
-            questionInput.value = ''; // Очищаем поле ввода
-            messagesWrapper.scrollTop = messagesWrapper.scrollHeight; // Прокручиваем вниз
-        }
-
-        // Обработчик события для кнопки отправки
-        sendButton.addEventListener('click', () => {
-            const message = questionInput.value.trim();
-            if (message) {
-                sendMessage(message);
-                // Здесь вы можете добавить логику для обработки отправки сообщения в бота
-            }
-        });
-
-        // Обработчик события для кнопки микрофона
-        micButton.addEventListener('click', () => {
-            // Ваша логика для записи голоса или активации микрофона
-            console.log('Кнопка микрофона нажата');
-        });
-    </script>
-
-    <!-- Снежинки -->
-    <div class="snowflake" style="animation-delay: 0s;">❄</div>
-    <div class="snowflake" style="animation-delay: 2s;">❄</div>
-    <div class="snowflake" style="animation-delay: 4s;">❄</div>
-    <div class="snowflake" style="animation-delay: 6s;">❄</div>
-    <div class="snowflake" style="animation-delay: 8s;">❄</div>
-</body>
+    <script type="module" src="main.js"></script>
+    </body>
 </html>
+  
