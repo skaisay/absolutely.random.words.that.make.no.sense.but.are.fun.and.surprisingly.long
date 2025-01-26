@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Assistant</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -274,6 +275,8 @@
             tg.ready();
         }
     </script>
+    <script type="module" src="./main.js"></script>
+    <script type="module" src="./database.js"></script>
     <script>
         // Приветствие
         const messagesWrapper = document.getElementById('messagesWrapper');
@@ -295,9 +298,21 @@
                 message.textContent = userMessage;
                 messagesWrapper.appendChild(message);
                 questionInput.value = '';
-                // Здесь можно добавить логику обработки сообщения
+                // Логика обработки сообщения
+                handleQuestion(userMessage);
             }
         });
+
+        // Обработка вопроса
+        function handleQuestion(question) {
+            const response = database['приветствия'].includes(question)
+                ? 'Привет! Чем могу помочь?'
+                : 'Извините, я не понимаю ваш вопрос.';
+            const botMessage = document.createElement('div');
+            botMessage.className = 'message bot-message';
+            botMessage.textContent = response;
+            messagesWrapper.appendChild(botMessage);
+        }
 
         // Отображение приветствия при загрузке страницы
         displayGreeting();
