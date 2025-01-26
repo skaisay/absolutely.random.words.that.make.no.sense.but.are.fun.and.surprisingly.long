@@ -308,6 +308,12 @@
         const micButton = document.getElementById('micButton');
         const messagesWrapper = document.getElementById('messagesWrapper');
 
+        // Приветственное сообщение
+        window.onload = function() {
+            const welcomeMessage = "Здравствуйте! Чем могу помочь?";
+            sendMessage(welcomeMessage);
+        };
+
         // Функция для отправки сообщения
         function sendMessage(message) {
             const messageElement = document.createElement('div');
