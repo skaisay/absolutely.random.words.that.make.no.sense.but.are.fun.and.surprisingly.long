@@ -274,5 +274,33 @@
             tg.ready();
         }
     </script>
+    <script>
+        // Приветствие
+        const messagesWrapper = document.getElementById('messagesWrapper');
+        const questionInput = document.getElementById('questionInput');
+        const sendButton = document.getElementById('sendButton');
+
+        function displayGreeting() {
+            const greetingMessage = document.createElement('div');
+            greetingMessage.className = 'message bot-message';
+            greetingMessage.textContent = 'Здравствуйте! Как я могу вам помочь?';
+            messagesWrapper.appendChild(greetingMessage);
+        }
+
+        sendButton.addEventListener('click', () => {
+            const userMessage = questionInput.value;
+            if (userMessage) {
+                const message = document.createElement('div');
+                message.className = 'message user-message';
+                message.textContent = userMessage;
+                messagesWrapper.appendChild(message);
+                questionInput.value = '';
+                // Здесь можно добавить логику обработки сообщения
+            }
+        });
+
+        // Отображение приветствия при загрузке страницы
+        displayGreeting();
+    </script>
 </body>
 </html>
