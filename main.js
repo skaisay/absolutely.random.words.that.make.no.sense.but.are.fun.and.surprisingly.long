@@ -1,4 +1,4 @@
-import { database, communicationStyles, emotionalTriggers, findBestMatch, findLinks, findConversationResponse, getRandomResponse } from './database.js';
+import { database, communicationStyles, emotionalTriggers, findBestMatch, findLinks, getRandomResponse } from './database.js';
 
 // Инициализация Telegram WebApp
 const tg = window.Telegram?.WebApp;
@@ -123,11 +123,8 @@ async function handleQuestion() {
             if (links) {
                 answer = getRandomResponse(links);
             } else {
-                // 3. Проверяем базу диалогов
-                answer = findConversationResponse(question);
-                if (!answer) {
-                    answer = "Извините, я не совсем понял ваш вопрос. Можете переформулировать?";
-                }
+                // 3. Если ответ не найден
+                answer = communicationStyles[currentStyle].responses.unclear;
             }
         }
 
