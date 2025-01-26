@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Чат-бот</title>
     <style>
-        /* Простая стилизация */
+        /* Основные стили */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -13,31 +13,71 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
+            background: #f0f8ff; /* Светлый фон */
+            overflow: hidden;
         }
+
         #chatContainer {
             flex: 1;
             overflow-y: auto;
             padding: 10px;
             border: 1px solid #ccc;
+            background: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон для контейнера */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         .user-message {
             text-align: right;
             color: blue;
         }
+
         .bot-message {
             text-align: left;
             color: green;
         }
+
         #input-container {
             display: flex;
             border-top: 1px solid #ccc;
+            padding: 10px;
+            background: #fff; /* Белый фон для ввода */
+            border-radius: 10px;
         }
+
         #questionInput {
             flex: 1;
             padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
         }
+
         #sendButton {
             padding: 10px;
+            background-color: #4CAF50; /* Зеленый цвет */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #sendButton:hover {
+            background-color: #45a049; /* Темнее при наведении */
+        }
+
+        /* Анимация снежинок */
+        @keyframes snow {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            left: calc(100% * Math.random());
+            opacity: 0.7;
+            animation: snow 10s linear infinite;
         }
     </style>
 </head>
@@ -48,5 +88,12 @@
         <button id="sendButton">Отправить</button>
     </div>
     <script type="module" src="main.js"></script>
+
+    <!-- Снежинки -->
+    <div class="snowflake" style="animation-delay: 0s;">❄</div>
+    <div class="snowflake" style="animation-delay: 2s;">❄</div>
+    <div class="snowflake" style="animation-delay: 4s;">❄</div>
+    <div class="snowflake" style="animation-delay: 6s;">❄</div>
+    <div class="snowflake" style="animation-delay: 8s;">❄</div>
 </body>
 </html>
