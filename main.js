@@ -6,33 +6,38 @@ if (tg) {
     tg.ready();
 }
 
-// Функция поиска похожих вопросов
-function findSimilarQuestions(input) {
-    // Логика поиска
-}
-
-// Функции чата
+// Элементы DOM
 const chatContainer = document.getElementById('chatContainer');
 const questionInput = document.getElementById('questionInput');
 const sendButton = document.getElementById('sendButton');
 
+// Функция для добавления сообщений в чат
 function createMessageElement(text, isUser) {
-    // Логика создания сообщения
+    const messageElement = document.createElement('div');
+    messageElement.textContent = text;
+    messageElement.className = isUser ? 'user-message' : 'bot-message';
+    chatContainer.appendChild(messageElement);
 }
 
-function typeResponse(text) {
-    // Логика ответа
-}
-
+// Функция обработки ответа бота
 function handleQuestion() {
-    const question = questionInput.value;
-    // Логика обработки вопроса
+    const question = questionInput.value.trim();
+    if (!question) return; // Если поле ввода пустое
+
+    createMessageElement(question, true); // Добавляем сообщение пользователя
+    questionInput.value = ''; // Очищаем поле ввода
+
+    // Ищем ответ в базе данных
+    const response = database["приветствия"].includes(question)
+        ? "Привет! Чем могу помочь?"
+        : "Извините, я не понимаю ваш вопрос.";
+    createMessageElement(response, false); // Добавляем ответ бота
 }
 
+// Обработчик нажатия кнопки отправки
 sendButton.addEventListener('click', handleQuestion);
+
+// Обработчик нажатия Enter
 questionInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        handleQuestion();
-    }
+    if (e.key === 'Enter') handleQuestion();
 });
