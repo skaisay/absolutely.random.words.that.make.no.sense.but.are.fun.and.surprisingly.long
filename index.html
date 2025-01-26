@@ -306,80 +306,7 @@
     <script type="module" src="./database.js"></script>
 
     <script>
-        // Стили общения
-const communicationStyles = {
-    formal: {
-        greeting: "Здравствуйте! Чем могу помочь?",
-        farewell: "До свидания! Всего доброго.",
-        style: "официальный",
-        responses: {
-            unclear: "Прошу уточнить ваш вопрос.",
-            thinking: "Позвольте обдумать ваш вопрос.",
-            error: "К сожалению, произошла ошибка."
-        }
-    },
-    friendly: {
-        greeting: "Привет! Как дела? 😊",
-        farewell: "Пока! Заходи еще! 👋",
-        style: "дружеский",
-        responses: {
-            unclear: "Не совсем понял, можешь пояснить? 🤔",
-            thinking: "Хмм, дай подумать... 🤓",
-            error: "Упс! Что-то пошло не так 😅"
-        }
-    },
-    humorous: {
-        greeting: "Привет-привет! Готов к интересной беседе? 😄",
-        farewell: "Пока-пока! Было весело! 🎉",
-        style: "юмористический",
-        responses: {
-            unclear: "Это что-то новенькое! Расскажи поподробнее 😋",
-            thinking: "Загружаю свои супермощные нейроны... 🤖",
-            error: "Ой, кажется я споткнулся о баг! 🙈"
-        }
-    },
-    emotional: {
-        greeting: "Привет! Как твое настроение сегодня? 💭",
-        farewell: "До встречи! Береги себя! 💝",
-        style: "эмоциональный",
-        responses: {
-            unclear: "Я чувствую, что ты хочешь сказать что-то важное...",
-            thinking: "Это интересный вопрос, давай вместе разберемся",
-            error: "Мне жаль, что я не смог помочь сейчас"
-        }
-    }
-};
-
-// Эмоциональные триггеры
-const emotionalTriggers = {
-    positive: ['счастлив', 'рад', 'весело', 'круто', 'супер', 'отлично'],
-    negative: ['грустно', 'плохо', 'ужасно', 'печально', 'тяжело'],
-    angry: ['бесит', 'раздражает', 'злит', 'ненавижу'],
-    confused: ['непонятно', 'сложно', 'запутался', 'трудно']
-};
-
-// Учебные модули
-const learningModules = {
-    programming: [
-        "Урок 1: Переменные - это контейнеры для хранения данных",
-        "Урок 2: Функции - это блоки кода для выполнения определенных задач",
-        "Урок 3: Циклы позволяют повторять действия"
-    ],
-    languages: {
-        english: {
-            hello: "Hello - Привет",
-            goodbye: "Goodbye - До свидания",
-            thanks: "Thank you - Спасибо"
-        }
-    },
-    worldFacts: [
-        "Океаны покрывают 71% поверхности Земли",
-        "В человеческом теле около 37 триллионов клеток",
-        "Свет преодолевает 299,792 километра в секунду"
-    ]
-};
-
-// База данных вопросов и ответов будет импортирована из database.js
+        // База данных вопросов и ответов будет импортирована из database.js
 
 // Инициализация Telegram WebApp
         const tg = window.Telegram?.WebApp;
@@ -588,174 +515,25 @@ async function handleQuestion() {
     const question = questionInput.value.trim();
     if (!question) return;
 
-    // Проверяем историю диалога
-    if (window.lastContext && window.awaitingConfirmation) {
-        if (question.toLowerCase() === 'да') {
-            await typeResponse(window.lastContext.answer);
-            window.lastContext = null;
-            window.awaitingConfirmation = false;
-            return;
-        } else if (question.toLowerCase() === 'нет') {
-            await typeResponse("Хорошо, пожалуйста, уточните ваш вопрос.");
-            window.lastContext = null;
-            window.awaitingConfirmation = false;
-            return;
+    const messageElement = createMessageElement(question, true);
+    messagesWrapper.appendChild(messageElement);
+    questionInput.value = '';
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    try {
+        const normalizedQuestion = question.toLowerCase().replace(/\s+/g, ' ');
+        let answer = database[normalizedQuestion];
+
+        if (!answer) {
+            answer = "Извините, я не нашёл ответа на ваш вопрос. Попробуйте задать другой вопрос.";
         }
+
+        await typeResponse(answer);
+    } catch (error) {
+        console.error('Ошибка обработки вопроса:', error);
+        await typeResponse("Извините, произошла ошибка при обработке вашего вопроса. Попробуйте еще раз.");
     }
-
-    // Определение эмоционального состояния
-    const emotion = await detectEmotion(question);
-    let currentStyle = emotion === 'neutral' ? 'friendly' : 'emotional';
-
-    // Обработка специальных вводов
-    if (/^[0-9]+$/.test(question)) {
-        await typeResponse("Хмм, похоже это какой-то код. Что он означает? 🤔");
-        return;
-    }
-
-    if (/^[^а-яА-Яa-zA-Z0-9\s]/.test(question)) {
-        await typeResponse("Интересные символы! Давай лучше общаться словами 😊");
-        return;
-    }
-
-            // Увеличиваем счетчик вопросов
-            questionCount++;
-
-            // Определяем категорию вопроса
-            const category = determineCategory(question);
-
-            // Анализируем контекст
-            if (category === lastQuestionCategory) {
-                // Если это третий вопрос из той же категории, предлагаем обобщенную информацию
-                if (questionCount >= 3) {
-                    await typeResponse("Похоже, вас интересует тема " + category + ". Могу предложить более подробную информацию по этой теме.");
-                    questionCount = 0;
-                }
-            } else {
-                lastQuestionCategory = category;
-                questionCount = 1;
-            }
-
-            // Проверяем на команды изменения стиля
-            if (question.toLowerCase().includes('говори официально')) {
-                currentStyle = 'formal';
-                await typeResponse(communicationStyles[currentStyle].greeting);
-                return;
-            } else if (question.toLowerCase().includes('говори дружелюбно')) {
-                currentStyle = 'friendly';
-                await typeResponse(communicationStyles[currentStyle].greeting);
-                return;
-            } else if (question.toLowerCase().includes('говори с юмором')) {
-                currentStyle = 'humorous';
-                await typeResponse(communicationStyles[currentStyle].greeting);
-                return;
-            }
-
-            // Проверяем запросы на обучение
-            if (question.toLowerCase().includes('урок программирования')) {
-                const lesson = learningModules.programming[Math.floor(Math.random() * learningModules.programming.length)];
-                await typeResponse(lesson);
-                return;
-            } else if (question.toLowerCase().includes('интересный факт')) {
-                const fact = learningModules.worldFacts[Math.floor(Math.random() * learningModules.worldFacts.length)];
-                await typeResponse(fact);
-                return;
-            }
-
-            const messageElement = createMessageElement(question, true);
-            messagesWrapper.appendChild(messageElement);
-            questionInput.value = '';
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            try {
-                // Проверка на повторяющийся вопрос
-                if (window.lastQuestion === question.toLowerCase()) {
-                    await typeResponse("Вы уже спрашивали об этом. Хотите узнать что-то другое?");
-                    return;
-                }
-                window.lastQuestion = question.toLowerCase();
-
-                // Поиск точного совпадения
-                const normalizedQuestion = question.toLowerCase().replace(/\s+/g, ' ');
-                let answer = database[normalizedQuestion];
-
-                // Обработка запросов на ссылки
-                if (normalizedQuestion.includes('ссылк') || normalizedQuestion.includes('сайт')) {
-                    await typeResponse("Уточните, пожалуйста, какая тема вас интересует?\n1. Программирование\n2. Дизайн\n3. Языки");
-                    window.awaitingTopic = true;
-                    return;
-                }
-
-                // Если точного совпадения нет, ищем похожие вопросы
-                if (!answer) {
-                    const similarQuestions = findSimilarQuestions(question);
-                    if (similarQuestions.length > 0) {
-                        // Если найден вопрос с высоким сходством, сразу даём ответ
-                        const bestMatch = similarQuestions[0];
-                        const bestMatchNormalized = bestMatch.toLowerCase().replace(/[.,?!]/g, '').replace(/\s+/g, ' ');
-                        const questionNormalized = question.toLowerCase().replace(/[.,?!]/g, '').replace(/\s+/g, ' ');
-
-                        if (bestMatchNormalized.includes(questionNormalized) ||
-                            questionNormalized.includes(bestMatchNormalized) ||
-                            (questionNormalized.length > 3 && bestMatchNormalized.includes(questionNormalized.substring(0, questionNormalized.length - 1)))) {
-                            answer = database[bestMatch];
-                        } else {
-                            let currentSuggestions = similarQuestions.slice(0, 3);
-                            window.lastSuggestions = currentSuggestions;
-                            answer = "Возможно, вы имели в виду:\n\n" +
-                                    currentSuggestions.map(q => "• " + q).join("\n") +
-                                    "\n\nОтветьте 'да', если какой-то из этих вопросов вам подходит, или 'нет' для других вариантов.";
-                        }
-                    } else {
-                        answer = "Извините, я не нашёл похожих вопросов в моей базе данных. Попробуйте переформулировать вопрос или задать другой.";
-                    }
-                }
-
-                // Обработка прощаний и благодарностей
-                const farewells = {
-                    'спасибо': ['Не за что! Всегда рад помочь! 😊', 'Пожалуйста! Обращайтесь ещё! 👋', 'Рад был помочь! Если будут вопросы - обращайтесь!'],
-                    'пока': ['До свидания! Хорошего дня! 👋', 'Пока! Буду рад помочь снова! 😊', 'До встречи! Возвращайтесь с новыми вопросами!'],
-                    'до свидания': ['До свидания! Всего хорошего! 👋', 'Всего доброго! Приходите ещё! 😊', 'До новых встреч! Буду рад помочь снова!']
-                };
-
-                // Проверяем на прощания и благодарности
-                for (let farewell in farewells) {
-                    if (normalizedQuestion.includes(farewell)) {
-                        const responses = farewells[farewell];
-                        answer = responses[Math.floor(Math.random() * responses.length)];
-                        window.lastSuggestions = null;
-                        break;
-                    }
-                }
-
-                // Обработка ответов да/нет
-                if (!answer) {
-                    if (normalizedQuestion === 'да' && window.lastSuggestions?.length > 0) {
-                        answer = database[window.lastSuggestions[0]];
-                        window.lastSuggestions = null;
-                    } else if (normalizedQuestion === 'нет' && window.lastSuggestions?.length > 0) {
-                        const remainingSuggestions = findSimilarQuestions(question)
-                            .filter(q => !window.lastSuggestions.includes(q))
-                            .slice(0, 3);
-
-                        if (remainingSuggestions.length > 0) {
-                            window.lastSuggestions = remainingSuggestions;
-                            answer = "Вот другие варианты:\n\n" +
-                                    remainingSuggestions.map(q => "• " + q).join("\n") +
-                                    "\n\nОтветьте 'да', если какой-то из этих вопросов вам подходит, или 'нет' для других вариантов.";
-                        } else {
-                            window.lastSuggestions = null;
-                            answer = "Больше нет похожих вопросов. Попробуйте переформулировать ваш вопрос.";
-                        }
-                    }
-                }
-
-                await typeResponse(answer);
-            } catch (error) {
-                console.error('Ошибка обработки вопроса:', error);
-                await typeResponse("Извините, произошла ошибка при обработке вашего вопроса. Попробуйте еще раз.");
-            }
-        }
+}
 
         questionInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
