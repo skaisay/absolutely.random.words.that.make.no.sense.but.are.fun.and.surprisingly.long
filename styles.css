@@ -10,16 +10,7 @@ body {
   background: #000000;
   color: #ffffff;
   min-height: 100vh;
-  overflow: hidden;
-  position: relative;
-}
-
-.app-container {
-  position: relative;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* Снежинки */
@@ -75,20 +66,17 @@ body {
 
 /* Чат */
 .chat-container {
-  flex: 1;
-  padding: 80px 20px 90px;
+  padding: 80px 20px 100px;
+  height: 100vh;
   overflow-y: auto;
   position: relative;
   z-index: 2;
-  -webkit-overflow-scrolling: touch;
 }
 
 .messages-wrapper {
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
-  display: flex;
-  flex-direction: column;
 }
 
 .message {
@@ -102,14 +90,12 @@ body {
   word-wrap: break-word;
   background: rgba(45, 45, 45, 0.5);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 .user-message {
   background: rgba(46, 166, 255, 0.8);
   margin-left: auto;
   border-bottom-right-radius: 4px;
-  align-self: flex-end;
 }
 
 .bot-message {
@@ -117,7 +103,6 @@ body {
   margin-right: auto;
   border-bottom-left-radius: 4px;
   padding-left: 45px;
-  align-self: flex-start;
 }
 
 .message-icon {
@@ -153,18 +138,14 @@ body {
   padding: 15px;
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  z-index: 1000;
-}
-
-.input-wrapper {
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
   display: flex;
   gap: 12px;
-  align-items: center;
-  padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
+  z-index: 1000;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .input-field {
@@ -176,6 +157,7 @@ body {
   color: white;
   font-size: 16px;
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 .input-field:focus {
@@ -186,6 +168,7 @@ body {
 .buttons-container {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .send-button,
@@ -201,14 +184,14 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0;
-  box-shadow: 0 0 15px rgba(46, 166, 255, 0.5);
+  box-shadow: 0 0 15px #2ea6ff;
+  flex-shrink: 0;
 }
 
 .send-button:hover,
 .mic-button:hover {
   background: #52b5ff;
   transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(46, 166, 255, 0.7);
 }
 
 .send-button svg,
@@ -224,7 +207,7 @@ body {
 
 .mic-button.recording {
   background: #ff4444;
-  box-shadow: 0 0 15px rgba(255, 68, 68, 0.5);
+  box-shadow: 0 0 15px #ff4444;
   animation: pulse 1.5s ease-in-out infinite;
 }
 
@@ -248,7 +231,7 @@ body {
   border-radius: 3px;
 }
 
-/* Мобильная версия */
+/* Адаптивность */
 @media (max-width: 600px) {
   .chat-container {
     padding: 80px 10px 90px;
@@ -261,7 +244,8 @@ body {
 
   .input-container {
     padding: 10px;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    width: calc(100% - 20px);
+    max-width: none;
   }
 
   .input-field {
@@ -272,5 +256,20 @@ body {
   .mic-button {
     width: 40px;
     height: 40px;
+  }
+}
+
+/* Планшеты */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .input-container {
+    width: calc(100% - 40px);
+    max-width: 600px;
+  }
+}
+
+/* Десктопы */
+@media (min-width: 1025px) {
+  .input-container {
+    max-width: 800px;
   }
 }
