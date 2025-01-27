@@ -1,122 +1,205 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ChatLogic } from './chatLogic';
-import { ChatMessage } from './components/ChatMessage';
-import { ChatInput } from './components/ChatInput';
-import { Robot } from './components/Robot';
-import { useSpeechRecognition } from './hooks/useSpeechRecognition';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chat Interface</title>
+  <!-- Add Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Add Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div id="root"></div>
 
-const chatLogic = new ChatLogic();
+  <!-- Add React and ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-function App() {
-  const [messages, setMessages] = useState<{text: string; isUser: boolean}[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const snowflakesContainerRef = useRef<HTMLDivElement>(null);
-
-  const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
-
-    const userMessage = inputValue.trim();
-    setInputValue('');
-    setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
-
-    try {
-      const response = await chatLogic.processQuestion(userMessage);
-      if (response) {
-        setMessages(prev => [...prev, { text: response, isUser: false }]);
+  <!-- Main Application Code -->
+  <script type="text/babel">
+    // Database
+    const knowledgeBase = [
+      {
+        keywords: ['hello', 'hi', 'hey'],
+        response: 'Hello! How can I help you today?'
+      },
+      {
+        keywords: ['how', 'are', 'you'],
+        response: "I'm doing well, thank you for asking! How can I assist you?"
+      },
+      {
+        keywords: ['weather', 'temperature', 'forecast'],
+        response: "I can't provide real-time weather information, but I can help you with other questions!"
+      },
+      {
+        keywords: ['help', 'support', 'assistance'],
+        response: "I'm here to help! Feel free to ask any questions you have."
+      },
+      {
+        keywords: ['bye', 'goodbye', 'see you'],
+        response: "Goodbye! Have a great day!"
       }
-    } catch (error) {
-      console.error('Ошибка обработки вопроса:', error);
-      setMessages(prev => [...prev, { text: "Извините, произошла ошибка при обработке вашего вопроса. Попробуйте еще раз.", isUser: false }]);
-    }
-  };
+    ];
 
-  const { isRecording, toggleRecording } = useSpeechRecognition({
-    onResult: (text) => {
-      setInputValue(text);
-      if (text.trim()) {
-        handleSendMessage();
+    const findResponse = (input) => {
+      const lowercaseInput = input.toLowerCase();
+      const words = lowercaseInput.split(' ');
+      
+      for (const entry of knowledgeBase) {
+        if (entry.keywords.some(keyword => words.includes(keyword))) {
+          return entry.response;
+        }
       }
-    },
-    onError: (error) => {
-      console.error('Speech recognition error:', error);
-      setMessages(prev => [...prev, { text: "Извините, произошла ошибка при распознавании речи. Попробуйте еще раз или введите текст.", isUser: false }]);
-    }
-  });
+      
+      return "I'm not sure how to respond to that. Could you please rephrase your question?";
+    };
 
-  useEffect(() => {
-    // Приветственное сообщение
-    setTimeout(() => {
-      setMessages([{ text: "Привет! Задайте мне вопрос голосом или текстом, и я постараюсь на него ответить.", isUser: false }]);
-    }, 500);
+    // ChatMessage Component
+    const ChatMessage = ({ message }) => {
+      const isAI = message.sender === 'ai';
+      
+      return (
+        <div className={`flex gap-3 ${isAI ? 'flex-row' : 'flex-row-reverse'} mb-4`}>
+          <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
+            ${isAI ? 'bg-blue-500' : 'bg-gray-200'}`}>
+            {isAI ? (
+              <i data-lucide="bot" className="w-5 h-5 text-white"></i>
+            ) : (
+              <i data-lucide="message-circle" className="w-5 h-5 text-gray-600"></i>
+            )}
+          </div>
+          <div className={`max-w-[80%] px-4 py-2 rounded-lg
+            ${isAI ? 'bg-blue-50' : 'bg-gray-100'}`}>
+            <p className="text-gray-800">{message.content}</p>
+            <span className="text-xs text-gray-500 mt-1 block">
+              {new Date(message.timestamp).toLocaleTimeString()}
+            </span>
+          </div>
+        </div>
+      );
+    };
 
-    // Создание снежинок
-    const createSnowflake = () => {
-      if (!snowflakesContainerRef.current) return;
+    // ChatInput Component
+    const ChatInput = ({ onSendMessage }) => {
+      const [input, setInput] = React.useState('');
 
-      try {
-        const snowflake = document.createElement('div');
-        snowflake.classList.add('snowflake');
-        snowflake.style.left = `${Math.random() * 100}vw`;
-        snowflake.style.animationDuration = `${Math.random() * 5 + 3}s`;
-        snowflake.style.opacity = `${Math.random() * 0.2 + 0.1}`;
-        snowflakesContainerRef.current.appendChild(snowflake);
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (input.trim()) {
+          onSendMessage(input);
+          setInput('');
+        }
+      };
 
-        const handleAnimationEnd = () => {
-          if (snowflake && snowflake.parentNode) {
-            snowflake.removeEventListener('animationend', handleAnimationEnd);
-            snowflake.parentNode.removeChild(snowflake);
-          }
+      return (
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors
+              flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!input.trim()}
+          >
+            <i data-lucide="send" className="w-4 h-4"></i>
+            <span className="hidden sm:inline">Send</span>
+          </button>
+        </form>
+      );
+    };
+
+    // Main App Component
+    function App() {
+      const [messages, setMessages] = React.useState([]);
+      const chatContainerRef = React.useRef(null);
+
+      React.useEffect(() => {
+        if (chatContainerRef.current) {
+          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+        // Initialize Lucide icons after each render
+        lucide.createIcons();
+      }, [messages]);
+
+      const handleSendMessage = (content) => {
+        const userMessage = {
+          id: Date.now().toString(),
+          content,
+          sender: 'user',
+          timestamp: new Date(),
         };
 
-        snowflake.addEventListener('animationend', handleAnimationEnd);
-      } catch (error) {
-        console.error('Error creating snowflake:', error);
-      }
-    };
+        setMessages(prev => [...prev, userMessage]);
 
-    const snowflakeInterval = setInterval(createSnowflake, 800);
-    return () => {
-      clearInterval(snowflakeInterval);
-      if (snowflakesContainerRef.current) {
-        snowflakesContainerRef.current.innerHTML = '';
-      }
-    };
-  }, []);
+        // Simulate AI response with slight delay
+        setTimeout(() => {
+          const aiResponse = {
+            id: (Date.now() + 1).toString(),
+            content: findResponse(content),
+            sender: 'ai',
+            timestamp: new Date(),
+          };
+          setMessages(prev => [...prev, aiResponse]);
+        }, 500);
+      };
 
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
+      return (
+        <div className="min-h-screen bg-gray-50">
+          <div className="max-w-4xl mx-auto px-4 py-8">
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                <i data-lucide="bot" className="w-8 h-8 text-white"></i>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">AI Assistant</h1>
+                <p className="text-gray-600">Ask me anything!</p>
+              </div>
+            </div>
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white relative overflow-hidden">
-      {/* Контейнер для снежинок */}
-      <div ref={snowflakesContainerRef} className="fixed inset-0 pointer-events-none z-0" />
+            {/* Chat Container */}
+            <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
+              <div
+                ref={chatContainerRef}
+                className="h-[60vh] overflow-y-auto mb-4 scroll-smooth"
+              >
+                {messages.length === 0 ? (
+                  <div className="h-full flex items-center justify-center text-gray-500">
+                    <p>Start a conversation by sending a message!</p>
+                  </div>
+                ) : (
+                  messages.map(message => (
+                    <ChatMessage key={message.id} message={message} />
+                  ))
+                )}
+              </div>
+              
+              <ChatInput onSendMessage={handleSendMessage} />
+            </div>
 
-      {/* Анимированный робот */}
-      <Robot />
-
-      {/* Чат контейнер */}
-      <div ref={chatContainerRef} className="pt-20 pb-24 px-4 overflow-y-auto h-screen relative z-10">
-        <div className="max-w-2xl mx-auto space-y-4">
-          {messages.map((message, index) => (
-            <ChatMessage key={index} {...message} />
-          ))}
+            {/* Footer */}
+            <footer className="text-center text-sm text-gray-500">
+              Powered by AI Technology • Responsive Design
+            </footer>
+          </div>
         </div>
-      </div>
+      );
+    }
 
-      {/* Поле ввода */}
-      <ChatInput
-        value={inputValue}
-        onChange={setInputValue}
-        onSend={handleSendMessage}
-        onMicClick={toggleRecording}
-        isRecording={isRecording}
-      />
-    </div>
-  );
-}
-
-export default App;
+    // Render the App
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+  </script>
+</body>
+</html>
