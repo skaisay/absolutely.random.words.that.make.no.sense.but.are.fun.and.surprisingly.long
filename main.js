@@ -206,7 +206,7 @@ async function handleSendMessage() {
   await addMessage(userMessage, true);
   
   setTimeout(() => {
-    const response = MessageProcessor.processUserMessage(userMessage);
+    const response = window.processMessage(userMessage);
     addMessage(response, false);
   }, 500);
 }
