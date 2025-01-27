@@ -41,6 +41,17 @@ function createInterface() {
   const inputContainer = document.createElement('div');
   inputContainer.className = 'input-container';
   
+  inputField = document.createElement('input');
+  inputField.type = 'text';
+  inputField.className = 'input-field';
+  inputField.placeholder = 'Введите ваш вопрос...';
+  inputField.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') handleSendMessage();
+  });
+
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.className = 'buttons-container';
+  
   micButton = document.createElement('button');
   micButton.className = 'mic-button';
   micButton.innerHTML = `
@@ -49,14 +60,6 @@ function createInterface() {
     </svg>
   `;
   micButton.addEventListener('click', handleVoiceInput);
-  
-  inputField = document.createElement('input');
-  inputField.type = 'text';
-  inputField.className = 'input-field';
-  inputField.placeholder = 'Введите ваш вопрос...';
-  inputField.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') handleSendMessage();
-  });
   
   sendButton = document.createElement('button');
   sendButton.className = 'send-button';
@@ -67,9 +70,11 @@ function createInterface() {
   `;
   sendButton.addEventListener('click', handleSendMessage);
   
-  inputContainer.appendChild(micButton);
+  buttonsContainer.appendChild(micButton);
+  buttonsContainer.appendChild(sendButton);
+  
   inputContainer.appendChild(inputField);
-  inputContainer.appendChild(sendButton);
+  inputContainer.appendChild(buttonsContainer);
   
   root.appendChild(robot);
   root.appendChild(chatContainer);
@@ -106,4 +111,118 @@ function initializeSnowflakes() {
 // Показ приветственного сообщения
 function showWelcomeMessage() {
   setTimeout(() => {
-    addMessage
+    addMessage("Привет! Задайте мне вопрос голосом или текстом, и я постараюсь на него ответить.", false);
+  }, 500);
+}
+
+// Обработка скролла
+function handleScroll() {
+  if (chatContainer) {
+    const { scrollTop, scrollHeight, clientHeight } = chatContainer;
+    shouldAutoScroll = Math.abs(scrollHeight - clientHeight - scrollTop) < 50;
+  }
+}
+
+// Добавление сообщения
+async function addMessage(text, isUser) {
+  const message = document.createElement('div');
+  message.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+  
+  if (!isUser) {
+    const icon = document.createElement('div');
+    icon.className = 'message-icon';
+    icon.innerHTML = `
+      <svg viewBox="0 0 24 24">
+        <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" />
+      </svg>
+    `;
+    message.appendChild(icon);
+  }
+
+  const content = document.createElement('span');
+  message.appendChild(content);
+
+  messagesWrapper.appendChild(message);
+
+  if (!isUser) {
+    isTyping = true;
+    let displayedText = '';
+    
+    for (let i = 0; i < text.length; i++) {
+      displayedText += text[i];
+      content.textContent = displayedText;
+      await new Promise(resolve => setTimeout(resolve, 20));
+    }
+    
+    isTyping = false;
+  } else {
+    content.textContent = text;
+  }
+
+  if (shouldAutoScroll) {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+}
+
+// Обработка отправки сообщения
+async function handleSendMessage() {
+  if (!inputField.value.trim() || isTyping) return;
+
+  const userMessage = inputField.value;
+  inputField.value = '';
+  
+  await addMessage(userMessage, true);
+  
+  setTimeout(() => {
+    const response = processMessage(userMessage);
+    addMessage(response, false);
+  }, 500);
+}
+
+// Обработка голосового ввода
+function handleVoiceInput() {
+  if ('webkitSpeechRecognition' in window) {
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = 'ru-RU';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      isRecording = true;
+      micButton.classList.add('recording');
+      inputField.value = 'Говорите...';
+      inputField.disabled = true;
+    };
+
+    recognition.onend = () => {
+      isRecording = false;
+      micButton.classList.remove('recording');
+      inputField.disabled = false;
+      if (inputField.value === 'Говорите...') {
+        inputField.value = '';
+      }
+      inputField.focus();
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      inputField.value = transcript;
+      
+      if (event.results[0].isFinal) {
+        recognition.stop();
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Ошибка распознавания:', event.error);
+      isRecording = false;
+      micButton.classList.remove('recording');
+      inputField.disabled = false;
+      inputField.value = '';
+    };
+
+    recognition.start();
+  } else {
+    alert('К сожалению, ваш браузер не поддерживает распознавание речи.');
+  }
+}
