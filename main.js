@@ -1,3 +1,5 @@
+import { MessageProcessor } from './src/utils/messageProcessor.ts';
+
 // Основные элементы интерфейса
 let chatContainer;
 let messagesWrapper;
@@ -207,7 +209,7 @@ async function handleSendMessage() {
   await addMessage(userMessage, true);
   
   setTimeout(() => {
-    const response = window.processMessage(userMessage);
+    const response = MessageProcessor.processMessage(userMessage);
     addMessage(response, false);
   }, 500);
 }
