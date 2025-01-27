@@ -1,107 +1,26 @@
+// Класс для обработки сообщений
 class MessageProcessor {
   static useOpenAI = false;
   static openAIKey = null;
 
-  static async initOpenAI(apiKey) {
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [{ role: 'system', content: 'Test connection' }],
-          max_tokens: 5
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      this.openAIKey = apiKey;
-      return true;
-    } catch (error) {
-      console.error('Failed to initialize OpenAI:', error);
-      return false;
-    }
-  }
-
-  static async getOpenAIResponse(userInput) {
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.openAIKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [{ role: 'user', content: userInput }],
-          temperature: 0.7,
-          max_tokens: 150
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.choices[0].message.content.trim();
-    } catch (error) {
-      console.error('Error getting OpenAI response:', error);
-      throw error;
-    }
-  }
-
-  static async toggleOpenAI() {
-    try {
-      if (!this.useOpenAI) {
-        if (!this.openAIKey) {
-          const key = prompt('Пожалуйста, введите ваш OpenAI API ключ:');
-          if (!key) {
-            throw new Error('API ключ не предоставлен');
-          }
-          
-          const initialized = await this.initOpenAI(key);
-          if (!initialized) {
-            throw new Error('Не удалось инициализировать OpenAI');
-          }
-        }
-      }
-      
-      this.useOpenAI = !this.useOpenAI;
-      return this.useOpenAI 
-        ? "Режим OpenAI включен. Теперь я буду использовать ИИ для ответов."
-        : "Режим OpenAI выключен. Возврат к стандартному режиму.";
-    } catch (error) {
-      console.error('Error toggling OpenAI:', error);
-      throw error;
-    }
-  }
-
-  static async processMessage(text) {
-    if (this.useOpenAI) {
-      try {
-        return await this.getOpenAIResponse(text);
-      } catch (error) {
-        console.error('OpenAI error:', error);
-        return "Извините, произошла ошибка при обработке запроса. Попробуйте позже или переключитесь в обычный режим.";
-      }
-    }
-
-    // Локальная обработка
+  // Обработка сообщений
+  static processMessage(text) {
+    // Нормализация текста
     const normalizedText = text.toLowerCase().trim()
       .replace(/[.,!?]/g, '')
       .replace(/\s+/g, ' ');
 
+    // Проверка пустой строки
+    if (!normalizedText) {
+      return "Пожалуйста, введите сообщение.";
+    }
+
+    // Поиск точного совпадения
     if (window.database[normalizedText]) {
       return window.database[normalizedText];
     }
 
+    // Поиск похожих фраз
     const words = normalizedText.split(' ');
     let bestMatch = {
       response: '',
@@ -131,6 +50,14 @@ class MessageProcessor {
     return bestMatch.confidence > 0
       ? bestMatch.response
       : "Извините, я не совсем понял ваш вопрос. Можете переформулировать?";
+  }
+
+  // Переключение режима OpenAI
+  static toggleOpenAI() {
+    this.useOpenAI = !this.useOpenAI;
+    return this.useOpenAI 
+      ? "Режим OpenAI включен. Теперь я буду использовать ИИ для ответов."
+      : "Режим OpenAI выключен. Возврат к стандартному режиму.";
   }
 }
 
