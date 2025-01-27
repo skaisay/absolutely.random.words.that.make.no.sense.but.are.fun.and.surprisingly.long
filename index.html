@@ -20,6 +20,7 @@
             overflow-x: hidden;
         }
 
+        /* Снежинки */
         .snowflake {
             position: fixed;
             width: 4px;
@@ -35,9 +36,12 @@
         }
 
         @keyframes fall {
-            to { transform: translateY(100vh) rotate(360deg); }
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
         }
 
+        /* Анимированный робот */
         .robot {
             position: fixed;
             top: 20px;
@@ -73,6 +77,7 @@
             50% { transform: scale(1.1); opacity: 1; }
         }
 
+        /* Чат */
         .chat-container {
             padding: 80px 20px 100px;
             height: 100vh;
@@ -93,6 +98,7 @@
             border-radius: 16px;
             max-width: 80%;
             animation: fadeIn 0.3s ease-in-out;
+            position: relative;
             line-height: 1.5;
             word-wrap: break-word;
             background: rgba(45, 45, 45, 0.5);
@@ -110,6 +116,12 @@
             margin-right: auto;
             border-bottom-left-radius: 4px;
             padding-left: 45px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .bot-message {
+            cursor: default;
         }
 
         .bot-message a {
@@ -145,6 +157,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Поле ввода */
         .input-container {
             position: fixed;
             bottom: 0;
@@ -176,7 +189,7 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
-        .send-button, .mic-button {
+        .send-button {
             width: 44px;
             height: 44px;
             border: none;
@@ -203,6 +216,22 @@
             transform: rotate(45deg);
         }
 
+        .mic-button {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 50%;
+            background: #2ea6ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            box-shadow: 0 0 15px #2ea6ff;
+            margin-right: 8px;
+        }
+
         .mic-button.recording {
             background: #ff4444;
             box-shadow: 0 0 15px #ff4444;
@@ -215,24 +244,50 @@
             fill: white;
         }
 
+        /* Скроллбар */
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
         @media (max-width: 600px) {
-            .chat-container { padding: 80px 10px 90px; }
-            .message { max-width: 85%; font-size: 15px; }
-            .input-container { padding: 10px; }
+            .chat-container {
+                padding: 80px 10px 90px;
+            }
+
+            .message {
+                max-width: 85%;
+                font-size: 15px;
+            }
+
+            .input-container {
+                padding: 10px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Анимированный робот -->
     <div class="robot">
         <svg viewBox="0 0 24 24">
             <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" />
         </svg>
     </div>
 
+    <!-- Чат -->
     <div class="chat-container" id="chatContainer">
         <div class="messages-wrapper" id="messagesWrapper"></div>
     </div>
 
+    <!-- Поле ввода -->
     <div class="input-container">
         <input type="text" class="input-field" id="questionInput" placeholder="Введите ваш вопрос...">
         <button class="mic-button" id="micButton">
@@ -247,137 +302,464 @@
         </button>
     </div>
 
+    <script type="module" src="./main.js"></script>
+    <script type="module" src="./database.js"></script>
+
     <script>
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.expand();
-            tg.ready();
+        // Стили общения
+const communicationStyles = {
+    formal: {
+        greeting: "Здравствуйте! Чем могу помочь?",
+        farewell: "До свидания! Всего доброго.",
+        style: "официальный",
+        responses: {
+            unclear: "Прошу уточнить ваш вопрос.",
+            thinking: "Позвольте обдумать ваш вопрос.",
+            error: "К сожалению, произошла ошибка."
         }
-
-        let snowflakeCount = 0;
-        const MAX_SNOWFLAKES = 15;
-
-        function createSnowflakes() {
-            if (snowflakeCount >= MAX_SNOWFLAKES) return;
-            const snowflake = document.createElement('div');
-            snowflake.classList.add('snowflake');
-            snowflake.style.left = Math.random() * 100 + 'vw';
-            snowflake.style.animationDuration = Math.random() * 5 + 3 + 's';
-            snowflake.style.opacity = Math.random() * 0.2 + 0.1;
-            document.body.appendChild(snowflake);
-            snowflake.style.top = -10 + 'px';
-            snowflakeCount++;
-            snowflake.addEventListener('animationend', () => {
-                snowflake.remove();
-                snowflakeCount--;
-            });
+    },
+    friendly: {
+        greeting: "Привет! Как дела? 😊",
+        farewell: "Пока! Заходи еще! 👋",
+        style: "дружеский",
+        responses: {
+            unclear: "Не совсем понял, можешь пояснить? 🤔",
+            thinking: "Хмм, дай подумать... 🤓",
+            error: "Упс! Что-то пошло не так 😅"
         }
-
-        setInterval(createSnowflakes, 800);
-
-        const chatContainer = document.getElementById('chatContainer');
-        const messagesWrapper = document.getElementById('messagesWrapper');
-        const questionInput = document.getElementById('questionInput');
-        const sendButton = document.getElementById('sendButton');
-
-        function createMessageElement(text, isUser) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
-
-            if (!isUser) {
-                const iconDiv = document.createElement('div');
-                iconDiv.classList.add('message-icon');
-                iconDiv.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" /></svg>';
-                messageDiv.appendChild(iconDiv);
-            }
-
-            const textSpan = document.createElement('span');
-            textSpan.textContent = text;
-            messageDiv.appendChild(textSpan);
-            return messageDiv;
+    },
+    humorous: {
+        greeting: "Привет-привет! Готов к интересной беседе? 😄",
+        farewell: "Пока-пока! Было весело! 🎉",
+        style: "юмористический",
+        responses: {
+            unclear: "Это что-то новенькое! Расскажи поподробнее 😋",
+            thinking: "Загружаю свои супермощные нейроны... 🤖",
+            error: "Ой, кажется я споткнулся о баг! 🙈"
         }
-
-        async function handleQuestion() {
-            const question = questionInput.value.trim();
-            if (!question) return;
-
-            const messageElement = createMessageElement(question, true);
-            messagesWrapper.appendChild(messageElement);
-            questionInput.value = '';
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            setTimeout(() => {
-                const botMessage = createMessageElement("Я получил ваше сообщение: " + question, false);
-                messagesWrapper.appendChild(botMessage);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }, 1000);
+    },
+    emotional: {
+        greeting: "Привет! Как твое настроение сегодня? 💭",
+        farewell: "До встречи! Береги себя! 💝",
+        style: "эмоциональный",
+        responses: {
+            unclear: "Я чувствую, что ты хочешь сказать что-то важное...",
+            thinking: "Это интересный вопрос, давай вместе разберемся",
+            error: "Мне жаль, что я не смог помочь сейчас"
         }
+    }
+};
 
-        questionInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleQuestion();
-            }
-        });
+// Эмоциональные триггеры
+const emotionalTriggers = {
+    positive: ['счастлив', 'рад', 'весело', 'круто', 'супер', 'отлично'],
+    negative: ['грустно', 'плохо', 'ужасно', 'печально', 'тяжело'],
+    angry: ['бесит', 'раздражает', 'злит', 'ненавижу'],
+    confused: ['непонятно', 'сложно', 'запутался', 'трудно']
+};
 
-        sendButton.addEventListener('click', handleQuestion);
+// Учебные модули
+const learningModules = {
+    programming: [
+        "Урок 1: Переменные - это контейнеры для хранения данных",
+        "Урок 2: Функции - это блоки кода для выполнения определенных задач",
+        "Урок 3: Циклы позволяют повторять действия"
+    ],
+    languages: {
+        english: {
+            hello: "Hello - Привет",
+            goodbye: "Goodbye - До свидания",
+            thanks: "Thank you - Спасибо"
+        }
+    },
+    worldFacts: [
+        "Океаны покрывают 71% поверхности Земли",
+        "В человеческом теле около 37 триллионов клеток",
+        "Свет преодолевает 299,792 километра в секунду"
+    ]
+};
 
-        // Инициализация распознавания речи
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'ru-RU';
-            recognition.continuous = false;
-            recognition.interimResults = true;
+// База данных будет импортирована из database.js
+const database = {};
 
-            const micButton = document.getElementById('micButton');
-            let isRecording = false;
+// Оптимизированное создание снежинок
+let snowflakeCount = 0;
+const MAX_SNOWFLAKES = 15;
 
-            recognition.onstart = () => {
-                isRecording = true;
-                micButton.classList.add('recording');
-                questionInput.value = '';
-                questionInput.placeholder = 'Говорите...';
-            };
+function createSnowflakes() {
+    if (snowflakeCount >= MAX_SNOWFLAKES) {
+        return;
+    }
 
-            recognition.onend = () => {
-                isRecording = false;
-                micButton.classList.remove('recording');
-                questionInput.placeholder = 'Введите ваш вопрос...';
-            };
+    const snowflake = document.createElement('div');
+    snowflake.classList.add('snowflake');
+    snowflake.style.left = Math.random() * 100 + 'vw';
+    snowflake.style.animationDuration = Math.random() * 5 + 3 + 's';
+    snowflake.style.opacity = Math.random() * 0.2 + 0.1;
+    document.body.appendChild(snowflake);
 
-            recognition.onresult = (event) => {
-                const transcript = Array.from(event.results)
-                    .map(result => result[0].transcript)
-                    .join('');
-                questionInput.value = transcript;
-                if (event.results[0].isFinal) {
-                    handleQuestion();
-                    recognition.stop();
-                }
-            };
+    snowflake.style.top = -10 + 'px';
+    snowflakeCount++;
 
-            recognition.onerror = (event) => {
-                console.error('Ошибка распознавания:', event.error);
-                recognition.stop();
-            };
+    snowflake.addEventListener('animationend', () => {
+        snowflake.remove();
+        snowflakeCount--;
+    });
+}
 
-            micButton.addEventListener('click', () => {
-                if (!isRecording) {
-                    recognition.start();
-                } else {
-                    recognition.stop();
-                }
-            });
+function determineCategory(question) {
+    const categories = {
+        психология: ['стресс', 'самооценка', 'мотивация', 'психолог'],
+        дом: ['уборка', 'ремонт', 'готовка', 'хозяйство'],
+        история: ['когда', 'исторический', 'война', 'древний'],
+        наука: ['открытие', 'исследование', 'теория', 'эксперимент'],
+        конфликты: ['ссора', 'спор', 'конфликт', 'решение']
+    };
+
+    question = question.toLowerCase();
+    for (let category in categories) {
+        if (categories[category].some(keyword => question.includes(keyword))) {
+            return category;
+        }
+    }
+    return 'общее';
+}
+
+setInterval(createSnowflakes, 800);
+
+// Функции чата
+const chatContainer = document.getElementById('chatContainer');
+const messagesWrapper = document.getElementById('messagesWrapper');
+const questionInput = document.getElementById('questionInput');
+const sendButton = document.getElementById('sendButton');
+
+function createMessageElement(text, isUser) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
+    messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+
+    if (!isUser) {
+        const iconDiv = document.createElement('div');
+        iconDiv.classList.add('message-icon');
+        iconDiv.innerHTML = `
+            <svg viewBox="0 0 24 24">
+                <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" />
+            </svg>`;
+        messageDiv.appendChild(iconDiv);
+    }
+
+    const textSpan = document.createElement('span');
+    // Check if text contains a URL
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+
+    parts.forEach((part, index) => {
+        if (part.match(urlRegex)) {
+            const link = document.createElement('a');
+            link.href = part;
+            link.textContent = part;
+            link.target = '_blank';
+            textSpan.appendChild(link);
         } else {
-            document.getElementById('micButton').style.display = 'none';
+            textSpan.appendChild(document.createTextNode(part));
+        }
+    });
+    messageDiv.appendChild(textSpan);
+    return messageDiv;
+}
+
+async function typeResponse(text) {
+    // Initial delay before starting to type
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    const messageElement = createMessageElement('', false);
+    const textSpan = messageElement.querySelector('span');
+    messagesWrapper.appendChild(messageElement);
+
+    // Convert URLs into clickable links
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+
+    for (const part of parts) {
+        if (part.match(urlRegex)) {
+            const link = document.createElement('a');
+            link.href = part;
+            link.textContent = part.includes('javascript') ? 'JavaScript' :
+                               part.includes('python') ? 'Python' :
+                               part.includes('w3schools') ? 'W3Schools' :
+                               part.includes('freecodecamp') ? 'FreeCodeCamp' :
+                               part.includes('codecademy') ? 'Codecademy' :
+                               'перейти на сайт';
+            link.target = '_blank';
+            textSpan.appendChild(link);
+            await new Promise(resolve => setTimeout(resolve, 100));
+        } else {
+            const words = part.split(' ');
+            for (const word of words) {
+                await new Promise(resolve => {
+                    requestAnimationFrame(() => {
+                        textSpan.appendChild(document.createTextNode(word + ' '));
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        setTimeout(resolve, 50);
+                    });
+                });
+            }
+        }
+    }
+}
+
+let currentStyle = 'friendly'; // По умолчанию дружеский стиль
+let lastQuestionCategory = '';
+let questionCount = 0;
+
+async function detectEmotion(text) {
+    const normalizedText = text.toLowerCase();
+    for (const [emotion, triggers] of Object.entries(emotionalTriggers)) {
+        if (triggers.some(trigger => normalizedText.includes(trigger))) {
+            return emotion;
+        }
+    }
+    return 'neutral';
+}
+
+async function handleQuestion() {
+    const question = questionInput.value.trim();
+    if (!question) return;
+
+    // Проверяем историю диалога
+    if (window.lastContext && window.awaitingConfirmation) {
+        if (question.toLowerCase() === 'да') {
+            await typeResponse(window.lastContext.answer);
+            window.lastContext = null;
+            window.awaitingConfirmation = false;
+            return;
+        } else if (question.toLowerCase() === 'нет') {
+            await typeResponse("Хорошо, пожалуйста, уточните ваш вопрос.");
+            window.lastContext = null;
+            window.awaitingConfirmation = false;
+            return;
+        }
+    }
+
+    // Определение эмоционального состояния
+    const emotion = await detectEmotion(question);
+    let currentStyle = emotion === 'neutral' ? 'friendly' : 'emotional';
+
+    // Обработка специальных вводов
+    if (/^[0-9]+$/.test(question)) {
+        await typeResponse("Хмм, похоже это какой-то код. Что он означает? 🤔");
+        return;
+    }
+
+    if (/^[^а-яА-Яa-zA-Z0-9\s]/.test(question)) {
+        await typeResponse("Интересные символы! Давай лучше общаться словами 😊");
+        return;
+    }
+
+    // Увеличиваем счетчик вопросов
+    questionCount++;
+
+    // Определяем категорию вопроса
+    const category = determineCategory(question);
+
+    // Анализируем контекст
+    if (category === lastQuestionCategory) {
+        // Если это третий вопрос из той же категории, предлагаем обобщенную информацию
+        if (questionCount >= 3) {
+            await typeResponse("Похоже, вас интересует тема " + category + ". Могу предложить более подробную информацию по этой теме.");
+            questionCount = 0;
+        }
+    } else {
+        lastQuestionCategory = category;
+        questionCount = 1;
+    }
+
+    // Проверяем на команды изменения стиля
+    if (question.toLowerCase().includes('говори официально')) {
+        currentStyle = 'formal';
+        await typeResponse(communicationStyles[currentStyle].greeting);
+        return;
+    } else if (question.toLowerCase().includes('говори дружелюбно')) {
+        currentStyle = 'friendly';
+        await typeResponse(communicationStyles[currentStyle].greeting);
+        return;
+    } else if (question.toLowerCase().includes('говори с юмором')) {
+        currentStyle = 'humorous';
+        await typeResponse(communicationStyles[currentStyle].greeting);
+        return;
+    }
+
+    // Проверяем запросы на обучение
+    if (question.toLowerCase().includes('урок программирования')) {
+        const lesson = learningModules.programming[Math.floor(Math.random() * learningModules.programming.length)];
+        await typeResponse(lesson);
+        return;
+    } else if (question.toLowerCase().includes('интересный факт')) {
+        const fact = learningModules.worldFacts[Math.floor(Math.random() * learningModules.worldFacts.length)];
+        await typeResponse(fact);
+        return;
+    }
+
+    const messageElement = createMessageElement(question, true);
+    messagesWrapper.appendChild(messageElement);
+    questionInput.value = '';
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    try {
+        // Проверка на повторяющийся вопрос
+        if (window.lastQuestion === question.toLowerCase()) {
+            await typeResponse("Вы уже спрашивали об этом. Хотите узнать что-то другое?");
+            return;
+        }
+        window.lastQuestion = question.toLowerCase();
+
+        // Поиск точного совпадения
+        const normalizedQuestion = question.toLowerCase().replace(/\s+/g, ' ');
+        let answer = database[normalizedQuestion];
+
+        // Обработка запросов на ссылки
+        if (normalizedQuestion.includes('ссылк') || normalizedQuestion.includes('сайт')) {
+            await typeResponse("Уточните, пожалуйста, какая тема вас интересует?\n1. Программирование\n2. Дизайн\n3. Языки");
+            window.awaitingTopic = true;
+            return;
         }
 
-        // Приветственное сообщение
-        setTimeout(() => {
-            const welcomeMessage = createMessageElement("Привет! Задайте мне вопрос голосом или текстом, и я постараюсь на него ответить.", false);
-            messagesWrapper.appendChild(welcomeMessage);
-        }, 500);
+        // Если точного совпадения нет, ищем похожие вопросы
+        if (!answer) {
+            const similarQuestions = findSimilarQuestions(question);
+            if (similarQuestions.length > 0) {
+                // Если найден вопрос с высоким сходством, сразу даём ответ
+                const bestMatch = similarQuestions[0];
+                const bestMatchNormalized = bestMatch.toLowerCase().replace(/[.,?!]/g, '').replace(/\s+/g, ' ');
+                const questionNormalized = question.toLowerCase().replace(/[.,?!]/g, '').replace(/\s+/g, ' ');
+
+                if (bestMatchNormalized.includes(questionNormalized) ||
+                    questionNormalized.includes(bestMatchNormalized) ||
+                    (questionNormalized.length > 3 && bestMatchNormalized.includes(questionNormalized.substring(0, questionNormalized.length - 1)))) {
+                    answer = database[bestMatch];
+                } else {
+                    let currentSuggestions = similarQuestions.slice(0, 3);
+                    window.lastSuggestions = currentSuggestions;
+                    answer = "Возможно, вы имели в виду:\n\n" +
+                            currentSuggestions.map(q => "• " + q).join("\n") +
+                            "\n\nОтветьте 'да', если какой-то из этих вопросов вам подходит, или 'нет' для других вариантов.";
+                }
+            } else {
+                answer = "Извините, я не нашёл похожих вопросов в моей базе данных. Попробуйте переформулировать вопрос или задать другой.";
+            }
+        }
+
+        // Обработка прощаний и благодарностей
+        const farewells = {
+            'спасибо': ['Не за что! Всегда рад помочь! 😊', 'Пожалуйста! Обращайтесь ещё! 👋', 'Рад был помочь! Если будут вопросы - обращайтесь!'],
+            'пока': ['До свидания! Хорошего дня! 👋', 'Пока! Буду рад помочь снова! 😊', 'До встречи! Возвращайтесь с новыми вопросами!'],
+            'до свидания': ['До свидания! Всего хорошего! 👋', 'Всего доброго! Приходите ещё! 😊', 'До новых встреч! Буду рад помочь снова!']
+        };
+
+        // Проверяем на прощания и благодарности
+        for (let farewell in farewells) {
+            if (normalizedQuestion.includes(farewell)) {
+                const responses = farewells[farewell];
+                answer = responses[Math.floor(Math.random() * responses.length)];
+                window.lastSuggestions = null;
+                break;
+            }
+        }
+
+        // Обработка ответов да/нет
+        if (!answer) {
+            if (normalizedQuestion === 'да' && window.lastSuggestions?.length > 0) {
+                answer = database[window.lastSuggestions[0]];
+                window.lastSuggestions = null;
+            } else if (normalizedQuestion === 'нет' && window.lastSuggestions?.length > 0) {
+                const remainingSuggestions = findSimilarQuestions(question)
+                    .filter(q => !window.lastSuggestions.includes(q))
+                    .slice(0, 3);
+
+                if (remainingSuggestions.length > 0) {
+                    window.lastSuggestions = remainingSuggestions;
+                    answer = "Вот другие варианты:\n\n" +
+                            remainingSuggestions.map(q => "• " + q).join("\n") +
+                            "\n\nОтветьте 'да', если какой-то из этих вопросов вам подходит, или 'нет' для других вариантов.";
+                } else {
+                    window.lastSuggestions = null;
+                    answer = "Больше нет похожих вопросов. Попробуйте переформулировать ваш вопрос.";
+                }
+            }
+        }
+
+        await typeResponse(answer);
+    } catch (error) {
+        console.error('Ошибка обработки вопроса:', error);
+        await typeResponse("Извините, произошла ошибка при обработке вашего вопроса. Попробуйте еще раз.");
+    }
+}
+
+questionInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleQuestion();
+    }
+});
+
+sendButton.addEventListener('click', handleQuestion);
+
+// Приветственное сообщение
+setTimeout(() => {
+    typeResponse("Привет! Задайте мне вопрос голосом или текстом, и я постараюсь на него ответить.");
+}, 500);
+
+// Инициализация распознавания речи
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ru-RU';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    const micButton = document.getElementById('micButton');
+    let isRecording = false;
+
+    recognition.onstart = () => {
+        isRecording = true;
+        micButton.classList.add('recording');
+        questionInput.value = '';
+        questionInput.placeholder = 'Говорите...';
+    };
+
+    recognition.onend = () => {
+        isRecording = false;
+        micButton.classList.remove('recording');
+        questionInput.placeholder = 'Введите ваш вопрос...';
+    };
+
+    recognition.onresult = (event) => {
+        const transcript = Array.from(event.results)
+            .map(result => result[0].transcript)
+            .join('');
+        questionInput.value = transcript;
+        if (event.results[0].isFinal) {
+            handleQuestion();
+            recognition.stop();
+        }
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Ошибка распознавания:', event.error);
+        recognition.stop();
+    };
+
+    micButton.addEventListener('click', () => {
+        if (!isRecording) {
+            recognition.start();
+        } else {
+            recognition.stop();
+        }
+    });
+} else {
+    document.getElementById('micButton').style.display = 'none';
+    console.log('Распознавание речи не поддерживается в этом браузере');
+}
     </script>
 </body>
 </html>
