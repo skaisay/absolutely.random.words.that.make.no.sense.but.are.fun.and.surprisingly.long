@@ -211,6 +211,12 @@ body {
   animation: pulse 1.5s ease-in-out infinite;
 }
 
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
+}
+
 /* Скроллбар */
 .chat-container::-webkit-scrollbar {
   width: 6px;
@@ -238,8 +244,8 @@ body {
 
   .input-container {
     padding: 10px;
-    width: calc(100% - 20px); /* Учитываем отступы по бокам */
-    max-width: none; /* Убираем максимальную ширину на мобильных */
+    width: calc(100% - 20px);
+    max-width: none;
   }
 
   .input-field {
