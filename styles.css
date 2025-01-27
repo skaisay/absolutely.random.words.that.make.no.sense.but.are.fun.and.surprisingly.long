@@ -293,5 +293,6 @@ body {
     left: 20px;
     height: 28px;
     font-size: 12px;
+    bottom: calc(100% + 12px);
   }
 }
