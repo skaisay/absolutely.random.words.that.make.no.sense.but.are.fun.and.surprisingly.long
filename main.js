@@ -4,6 +4,7 @@ let messagesWrapper;
 let inputField;
 let sendButton;
 let micButton;
+let paeButton;
 let isRecording = false;
 let isTyping = false;
 let shouldAutoScroll = true;
@@ -18,10 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // Создание интерфейса
 function createInterface() {
   const root = document.getElementById('root');
-  
-  // Создаем основной контейнер
-  const appContainer = document.createElement('div');
-  appContainer.className = 'app-container';
   
   // Создаем робота
   const robot = document.createElement('div');
@@ -47,6 +44,16 @@ function createInterface() {
   
   const inputWrapper = document.createElement('div');
   inputWrapper.className = 'input-wrapper';
+
+  // Создаем кнопку PAE
+  paeButton = document.createElement('button');
+  paeButton.className = 'pae-button';
+  paeButton.textContent = 'PAE';
+  paeButton.addEventListener('click', async () => {
+    const response = await window.MessageProcessor.toggleOpenAI();
+    addMessage(response, false);
+  });
+  inputWrapper.appendChild(paeButton);
   
   inputField = document.createElement('input');
   inputField.type = 'text';
@@ -54,6 +61,9 @@ function createInterface() {
   inputField.placeholder = 'Введите ваш вопрос...';
   inputField.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') handleSendMessage();
+  });
+  inputField.addEventListener('input', () => {
+    paeButton.style.display = inputField.value ? 'none' : 'flex';
   });
 
   const buttonsContainer = document.createElement('div');
@@ -84,11 +94,9 @@ function createInterface() {
   inputWrapper.appendChild(buttonsContainer);
   inputContainer.appendChild(inputWrapper);
   
-  appContainer.appendChild(robot);
-  appContainer.appendChild(chatContainer);
-  appContainer.appendChild(inputContainer);
-  
-  root.appendChild(appContainer);
+  root.appendChild(robot);
+  root.appendChild(chatContainer);
+  root.appendChild(inputContainer);
 }
 
 // Инициализация снежинок
@@ -125,28 +133,11 @@ function showWelcomeMessage() {
   }, 500);
 }
 
-// Плавная прокрутка к последнему сообщению
-function scrollToBottom(instant = false) {
-  if (chatContainer) {
-    const scrollOptions = {
-      top: chatContainer.scrollHeight,
-      behavior: instant ? 'instant' : 'smooth'
-    };
-    chatContainer.scrollTo(scrollOptions);
-  }
-}
-
-// Проверка, находится ли скролл внизу
-function isScrolledToBottom() {
-  if (!chatContainer) return true;
-  const threshold = 50; // пикселей от нижней границы
-  return (chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight) <= threshold;
-}
-
 // Обработка скролла
 function handleScroll() {
   if (chatContainer) {
-    shouldAutoScroll = isScrolledToBottom();
+    const { scrollTop, scrollHeight, clientHeight } = chatContainer;
+    shouldAutoScroll = Math.abs(scrollHeight - clientHeight - scrollTop) < 50;
   }
 }
 
@@ -167,7 +158,6 @@ async function addMessage(text, isUser) {
   }
 
   const content = document.createElement('span');
-  content.textContent = text;
   message.appendChild(content);
   messagesWrapper.appendChild(message);
 
@@ -182,19 +172,18 @@ async function addMessage(text, isUser) {
       await new Promise(resolve => setTimeout(resolve, 20));
       
       if (shouldAutoScroll) {
-        scrollToBottom(true);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
       }
     }
     
     isTyping = false;
+  } else {
+    content.textContent = text;
   }
 
-  // Прокручиваем к новому сообщению
   if (shouldAutoScroll) {
-    scrollToBottom();
+    chatContainer.scrollTop = chatContainer.scrollHeight;
   }
-
-  return message;
 }
 
 // Обработка отправки сообщения
@@ -203,13 +192,17 @@ async function handleSendMessage() {
 
   const userMessage = inputField.value;
   inputField.value = '';
+  paeButton.style.display = 'flex';
   
   await addMessage(userMessage, true);
   
-  setTimeout(() => {
-    const response = window.processMessage(userMessage);
-    addMessage(response, false);
-  }, 500);
+  try {
+    const response = await window.MessageProcessor.processMessage(userMessage);
+    await addMessage(response, false);
+  } catch (error) {
+    console.error('Error processing message:', error);
+    await addMessage("Извините, произошла ошибка при обработке сообщения.", false);
+  }
 }
 
 // Обработка голосового ввода
@@ -243,6 +236,7 @@ function handleVoiceInput() {
       
       if (event.results[0].isFinal) {
         recognition.stop();
+        handleSendMessage();
       }
     };
 
