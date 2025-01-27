@@ -1,5 +1,5 @@
 class MessageProcessor {
-  static processUserMessage(text) {
+  static processMessage(text: string): string {
     return window.processMessage(text);
   }
 }
