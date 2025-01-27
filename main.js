@@ -49,14 +49,9 @@ function createInterface() {
   paeButton = document.createElement('button');
   paeButton.className = 'pae-button';
   paeButton.textContent = 'PAE';
-  paeButton.addEventListener('click', async () => {
-    try {
-      const response = await window.MessageProcessor.toggleOpenAI();
-      await addMessage(response, false);
-    } catch (error) {
-      console.error('Error toggling OpenAI:', error);
-      await addMessage(error.message, false);
-    }
+  paeButton.addEventListener('click', () => {
+    const response = window.MessageProcessor.toggleOpenAI();
+    addMessage(response, false);
   });
   inputWrapper.appendChild(paeButton);
   
@@ -197,13 +192,8 @@ async function handleSendMessage() {
   
   await addMessage(userMessage, true);
   
-  try {
-    const response = await window.MessageProcessor.processMessage(userMessage);
-    await addMessage(response, false);
-  } catch (error) {
-    console.error('Error processing message:', error);
-    await addMessage("Извините, произошла ошибка при обработке сообщения.", false);
-  }
+  const response = window.MessageProcessor.processMessage(userMessage);
+  await addMessage(response, false);
 }
 
 // Обработка голосового ввода
