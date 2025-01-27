@@ -4,23 +4,18 @@
   padding: 0;
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   background: #000000;
   color: #ffffff;
   min-height: 100vh;
-  min-height: -webkit-fill-available; /* Для iOS */
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
-  height: 100%;
+  overflow-x: hidden;
 }
 
-html {
-  height: -webkit-fill-available; /* Для iOS */
-  overflow: hidden;
+#root {
+  min-height: 100vh;
+  position: relative;
 }
 
 /* Снежинки */
@@ -74,45 +69,19 @@ html {
   50% { transform: translateX(-50%) translateY(-10px); }
 }
 
-/* Основной контейнер */
-.app-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  height: -webkit-fill-available; /* Для iOS */
-  overflow: hidden;
-  /* Предотвращаем резиновый скролл на iOS */
-  overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
-}
-
 /* Чат */
 .chat-container {
-  flex: 1;
-  position: relative;
+  padding: 80px 20px 100px;
+  height: 100vh;
   overflow-y: auto;
-  overflow-x: hidden;
-  padding-top: 80px;
-  /* Добавляем отступ для iOS */
-  padding-bottom: calc(80px + env(safe-area-inset-bottom));
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  /* Предотвращаем резиновый скролл */
-  overscroll-behavior: contain;
+  position: relative;
+  z-index: 2;
 }
 
 .messages-wrapper {
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
-  padding: 0 20px;
-  display: flex;
-  flex-direction: column;
 }
 
 .message {
@@ -120,26 +89,18 @@ html {
   padding: 12px 16px;
   border-radius: 16px;
   max-width: 80%;
+  animation: fadeIn 0.3s ease-in-out;
   position: relative;
   line-height: 1.5;
   word-wrap: break-word;
-  animation: slideUp 0.3s ease-out forwards;
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-@keyframes slideUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  background: rgba(45, 45, 45, 0.5);
+  backdrop-filter: blur(10px);
 }
 
 .user-message {
   background: rgba(46, 166, 255, 0.8);
   margin-left: auto;
   border-bottom-right-radius: 4px;
-  backdrop-filter: blur(10px);
 }
 
 .bot-message {
@@ -147,7 +108,6 @@ html {
   margin-right: auto;
   border-bottom-left-radius: 4px;
   padding-left: 45px;
-  backdrop-filter: blur(10px);
 }
 
 .message-icon {
@@ -169,45 +129,36 @@ html {
   filter: drop-shadow(0 0 3px #2ea6ff);
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Поле ввода */
 .input-container {
   position: fixed;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: transparent;
-  /* Учитываем отступ для iPhone X и новее */
-  padding-bottom: env(safe-area-inset-bottom);
-  z-index: 1000;
-}
-
-.input-wrapper {
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
   display: flex;
   gap: 12px;
-  padding: 15px;
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  z-index: 1000;
 }
 
 .input-field {
   flex: 1;
-  padding: 14px 18px;
+  padding: 12px 16px;
   border: none;
-  border-radius: 24px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.1);
   color: white;
   font-size: 16px;
   transition: all 0.3s ease;
-  height: 48px;
-  backdrop-filter: blur(10px);
-}
-
-.input-field::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .input-field:focus {
@@ -217,43 +168,36 @@ html {
 
 .buttons-container {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .send-button,
 .mic-button {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: 50%;
-  background: rgba(46, 166, 255, 0.8);
-  backdrop-filter: blur(10px);
+  background: #2ea6ff;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  box-shadow: 0 0 15px rgba(46, 166, 255, 0.3);
+  box-shadow: 0 0 15px #2ea6ff;
 }
 
 .send-button:hover,
 .mic-button:hover {
-  background: rgba(82, 181, 255, 0.8);
+  background: #52b5ff;
   transform: scale(1.05);
-}
-
-.send-button:active,
-.mic-button:active {
-  transform: scale(0.95);
 }
 
 .send-button svg,
 .mic-button svg {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   fill: white;
-  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
 }
 
 .send-button svg {
@@ -261,15 +205,15 @@ html {
 }
 
 .mic-button.recording {
-  background: rgba(255, 68, 68, 0.8);
+  background: #ff4444;
+  box-shadow: 0 0 15px #ff4444;
   animation: pulse 1.5s ease-in-out infinite;
-  box-shadow: 0 0 15px rgba(255, 68, 68, 0.3);
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
 }
 
 /* Скроллбар */
@@ -289,67 +233,25 @@ html {
 /* Адаптивность */
 @media (max-width: 600px) {
   .chat-container {
-    padding-top: 70px;
-    /* Увеличиваем отступ снизу на мобильных устройствах */
-    padding-bottom: calc(70px + env(safe-area-inset-bottom) + 40px);
+    padding: 80px 10px 90px;
   }
 
-  .input-wrapper {
+  .message {
+    max-width: 85%;
+    font-size: 15px;
+  }
+
+  .input-container {
     padding: 10px;
   }
 
   .input-field {
-    height: 44px;
-    padding: 12px 16px;
-    font-size: 16px;
-    /* Предотвращаем масштабирование на iOS при фокусе */
-    font-size: 16px !important;
-  }
-
-  .buttons-container {
-    gap: 10px;
+    font-size: 14px;
   }
 
   .send-button,
   .mic-button {
-    width: 44px;
-    height: 44px;
-  }
-
-  .send-button svg,
-  .mic-button svg {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-/* Планшеты */
-@media (min-width: 601px) and (max-width: 1024px) {
-  .input-wrapper {
-    max-width: 600px;
-  }
-}
-
-/* Десктопы */
-@media (min-width: 1025px) {
-  .input-wrapper {
-    max-width: 800px;
-  }
-}
-
-/* Исправление для iOS */
-@supports (-webkit-touch-callout: none) {
-  .app-container,
-  body,
-  html {
-    height: -webkit-fill-available;
-  }
-  
-  .input-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding-bottom: env(safe-area-inset-bottom);
+    width: 40px;
+    height: 40px;
   }
 }
