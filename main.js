@@ -1,5 +1,3 @@
-import { MessageProcessor } from './src/utils/messageProcessor.ts';
-
 // Основные элементы интерфейса
 let chatContainer;
 let messagesWrapper;
@@ -191,7 +189,6 @@ async function addMessage(text, isUser) {
     isTyping = false;
   }
 
-  // Прокручиваем к новому сообщению
   if (shouldAutoScroll) {
     scrollToBottom();
   }
@@ -209,7 +206,7 @@ async function handleSendMessage() {
   await addMessage(userMessage, true);
   
   setTimeout(() => {
-    const response = MessageProcessor.processMessage(userMessage);
+    const response = MessageProcessor.processUserMessage(userMessage);
     addMessage(response, false);
   }, 500);
 }
