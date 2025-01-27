@@ -19,6 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function createInterface() {
   const root = document.getElementById('root');
   
+  // Создаем основной контейнер
+  const appContainer = document.createElement('div');
+  appContainer.className = 'app-container';
+  
   // Создаем робота
   const robot = document.createElement('div');
   robot.className = 'robot';
@@ -40,6 +44,9 @@ function createInterface() {
   // Создаем поле ввода
   const inputContainer = document.createElement('div');
   inputContainer.className = 'input-container';
+  
+  const inputWrapper = document.createElement('div');
+  inputWrapper.className = 'input-wrapper';
   
   inputField = document.createElement('input');
   inputField.type = 'text';
@@ -73,12 +80,15 @@ function createInterface() {
   buttonsContainer.appendChild(micButton);
   buttonsContainer.appendChild(sendButton);
   
-  inputContainer.appendChild(inputField);
-  inputContainer.appendChild(buttonsContainer);
+  inputWrapper.appendChild(inputField);
+  inputWrapper.appendChild(buttonsContainer);
+  inputContainer.appendChild(inputWrapper);
   
-  root.appendChild(robot);
-  root.appendChild(chatContainer);
-  root.appendChild(inputContainer);
+  appContainer.appendChild(robot);
+  appContainer.appendChild(chatContainer);
+  appContainer.appendChild(inputContainer);
+  
+  root.appendChild(appContainer);
 }
 
 // Инициализация снежинок
@@ -115,11 +125,28 @@ function showWelcomeMessage() {
   }, 500);
 }
 
+// Плавная прокрутка к последнему сообщению
+function scrollToBottom(instant = false) {
+  if (chatContainer) {
+    const scrollOptions = {
+      top: chatContainer.scrollHeight,
+      behavior: instant ? 'instant' : 'smooth'
+    };
+    chatContainer.scrollTo(scrollOptions);
+  }
+}
+
+// Проверка, находится ли скролл внизу
+function isScrolledToBottom() {
+  if (!chatContainer) return true;
+  const threshold = 50; // пикселей от нижней границы
+  return (chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight) <= threshold;
+}
+
 // Обработка скролла
 function handleScroll() {
   if (chatContainer) {
-    const { scrollTop, scrollHeight, clientHeight } = chatContainer;
-    shouldAutoScroll = Math.abs(scrollHeight - clientHeight - scrollTop) < 50;
+    shouldAutoScroll = isScrolledToBottom();
   }
 }
 
@@ -140,28 +167,34 @@ async function addMessage(text, isUser) {
   }
 
   const content = document.createElement('span');
+  content.textContent = text;
   message.appendChild(content);
-
   messagesWrapper.appendChild(message);
 
   if (!isUser) {
     isTyping = true;
+    content.textContent = '';
     let displayedText = '';
     
     for (let i = 0; i < text.length; i++) {
       displayedText += text[i];
       content.textContent = displayedText;
-      await new Promise(resolve => setTimeout(resolve, 20)); // Уменьшенная задержка
+      await new Promise(resolve => setTimeout(resolve, 20));
+      
+      if (shouldAutoScroll) {
+        scrollToBottom(true);
+      }
     }
     
     isTyping = false;
-  } else {
-    content.textContent = text;
   }
 
+  // Прокручиваем к новому сообщению
   if (shouldAutoScroll) {
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    scrollToBottom();
   }
+
+  return message;
 }
 
 // Обработка отправки сообщения
@@ -174,7 +207,7 @@ async function handleSendMessage() {
   await addMessage(userMessage, true);
   
   setTimeout(() => {
-    const response = processMessage(userMessage);
+    const response = window.processMessage(userMessage);
     addMessage(response, false);
   }, 500);
 }
