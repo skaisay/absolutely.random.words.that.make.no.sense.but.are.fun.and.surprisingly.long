@@ -44,14 +44,19 @@ function createInterface() {
   
   const inputWrapper = document.createElement('div');
   inputWrapper.className = 'input-wrapper';
-
+  
   // Создаем кнопку PAE
   paeButton = document.createElement('button');
   paeButton.className = 'pae-button';
   paeButton.textContent = 'PAE';
   paeButton.addEventListener('click', async () => {
-    const response = await window.MessageProcessor.toggleOpenAI();
-    addMessage(response, false);
+    try {
+      const response = await window.MessageProcessor.toggleOpenAI();
+      await addMessage(response, false);
+    } catch (error) {
+      console.error('Error toggling OpenAI:', error);
+      await addMessage(error.message, false);
+    }
   });
   inputWrapper.appendChild(paeButton);
   
@@ -61,9 +66,6 @@ function createInterface() {
   inputField.placeholder = 'Введите ваш вопрос...';
   inputField.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') handleSendMessage();
-  });
-  inputField.addEventListener('input', () => {
-    paeButton.style.display = inputField.value ? 'none' : 'flex';
   });
 
   const buttonsContainer = document.createElement('div');
@@ -192,7 +194,6 @@ async function handleSendMessage() {
 
   const userMessage = inputField.value;
   inputField.value = '';
-  paeButton.style.display = 'flex';
   
   await addMessage(userMessage, true);
   
@@ -211,7 +212,7 @@ function handleVoiceInput() {
     const recognition = new webkitSpeechRecognition();
     recognition.lang = 'ru-RU';
     recognition.continuous = false;
-    recognition.interimResults = true;
+    recognition.interimResults = false;
 
     recognition.onstart = () => {
       isRecording = true;
