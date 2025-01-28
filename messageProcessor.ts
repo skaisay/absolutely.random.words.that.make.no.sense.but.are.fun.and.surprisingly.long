@@ -1,21 +1,12 @@
-interface OpenAIResponse {
-  choices: Array<{
-    message: {
-      content: string;
-    };
-  }>;
-}
-
+// Компилированная версия TypeScript файла
 class MessageProcessor {
-  private useOpenAI: boolean = false;
-  private openAIKey: string | null = null;
-
   constructor() {
-    // Инициализация объекта при создании
+    this.useOpenAI = false;
+    this.openAIKey = null;
     console.log('MessageProcessor initialized');
   }
 
-  async initOpenAI(apiKey: string): Promise<boolean> {
+  async initOpenAI(apiKey) {
     if (!apiKey || apiKey.trim() === '') {
       console.error('Empty API key provided');
       return false;
@@ -52,7 +43,7 @@ class MessageProcessor {
     }
   }
 
-  async getOpenAIResponse(userInput: string): Promise<string> {
+  async getOpenAIResponse(userInput) {
     if (!this.openAIKey || !this.useOpenAI) {
       throw new Error('OpenAI не инициализирован');
     }
@@ -76,7 +67,7 @@ class MessageProcessor {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: OpenAIResponse = await response.json();
+      const data = await response.json();
       return data.choices[0].message.content.trim();
     } catch (error) {
       console.error('Error getting OpenAI response:', error);
@@ -84,7 +75,7 @@ class MessageProcessor {
     }
   }
 
-  async toggleOpenAI(): Promise<string> {
+  async toggleOpenAI() {
     console.log('Toggling OpenAI mode. Current state:', this.useOpenAI);
     
     try {
@@ -118,7 +109,7 @@ class MessageProcessor {
     }
   }
 
-  async processMessage(text: string): Promise<string> {
+  async processMessage(text) {
     console.log('Processing message:', text);
     console.log('OpenAI mode:', this.useOpenAI);
     
