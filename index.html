@@ -91,21 +91,12 @@
       overflow-y: auto;
       position: relative;
       z-index: 2;
-      scrollbar-width: thin;
-      scrollbar-color: var(--primary-color) transparent;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
 
     .chat-container::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .chat-container::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .chat-container::-webkit-scrollbar-thumb {
-      background-color: var(--primary-color);
-      border-radius: 4px;
+      display: none;
     }
 
     .messages-wrapper {
@@ -313,7 +304,7 @@
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="app"></div>
   <script src="/js/database.js"></script>
   <script>
     // OpenAI Configuration
@@ -419,13 +410,13 @@
         }
       }
 
-      // Simple response logic (replace with your database implementation)
-      return "Извините, база данных ответов временно недоступна.";
+      const result = findBestMatch(text);
+      return result.response;
     }
 
     // Interface Creation
     function createInterface() {
-      const root = document.getElementById('root');
+      const root = document.getElementById('app');
       if (!root) return;
 
       // Robot
@@ -652,11 +643,6 @@
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         inputField.value = transcript;
-
-        if (event.results[0].isFinal) {
-          recognition.stop();
-          handleSendMessage();
-        }
       };
 
       recognition.onerror = (event) => {
