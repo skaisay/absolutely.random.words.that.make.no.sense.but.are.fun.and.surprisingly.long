@@ -333,17 +333,17 @@
     async function toggleOpenAI() {
       useOpenAI = !useOpenAI;
       if (useOpenAI) {
-        const key = prompt("Пожалуйста, введите ваш ключ OpenAI API:");
+        const key = prompt("Пожалуйста, введите ваш ключ Pae-api:");
         if (key) {
           openAIKey = key;
-          return "Режим OpenAI включен. Теперь я буду использовать API OpenAI для ответов.";
+          return "Режим Pae_ai включен. Теперь я буду использовать API OpenAI для ответов.";
         } else {
           useOpenAI = false;
           return "Ключ API не был предоставлен. Продолжаю работу в обычном режиме.";
         }
       } else {
         openAIKey = null;
-        return "Режим OpenAI выключен. Возвращаюсь к использованию локальной базы данных.";
+        return "Режим Pae_ai выключен. Возвращаюсь к использованию локальной базы данных.";
       }
     }
 
@@ -434,7 +434,7 @@
       // PAE Button
       paeButton = document.createElement('button');
       paeButton.className = 'pae-button';
-      paeButton.textContent = 'PAE';
+      paeButton.textContent = 'Paeai';
       paeButton.addEventListener('click', async () => {
         const response = await toggleOpenAI();
         addMessage(response, false);
