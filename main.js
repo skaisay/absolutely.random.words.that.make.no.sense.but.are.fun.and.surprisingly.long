@@ -42,7 +42,20 @@ function createInterface() {
   paeButton = document.createElement('button');
   paeButton.className = 'pae-button';
   paeButton.textContent = 'PAE';
-  paeButton.onclick = handlePAEClick; // Изменено на новый обработчик
+  paeButton.addEventListener('click', async () => {
+    if (!window.messageProcessor) {
+      console.error('MessageProcessor not initialized');
+      return;
+    }
+    
+    try {
+      const response = await window.messageProcessor.toggleOpenAI();
+      await addMessage(response, false);
+    } catch (error) {
+      console.error('Error toggling OpenAI:', error);
+      await addMessage("Произошла ошибка при переключении режима.", false);
+    }
+  });
   inputWrapper.appendChild(paeButton);
 
   inputField = document.createElement('input');
@@ -90,30 +103,6 @@ function createInterface() {
   root.appendChild(robot);
   root.appendChild(chatContainer);
   root.appendChild(inputContainer);
-}
-
-// Новый обработчик для кнопки PAE
-async function handlePAEClick() {
-  if (!window.messageProcessor) {
-    console.error('MessageProcessor not initialized');
-    await addMessage("Ошибка: MessageProcessor не инициализирован", false);
-    return;
-  }
-
-  if (paeButton.disabled) {
-    return;
-  }
-
-  try {
-    paeButton.disabled = true;
-    const response = await window.messageProcessor.toggleOpenAI();
-    await addMessage(response, false);
-  } catch (error) {
-    console.error('Error in PAE button click:', error);
-    await addMessage("Произошла ошибка при переключении режима.", false);
-  } finally {
-    paeButton.disabled = false;
-  }
 }
 
 // Инициализация снежинок
@@ -269,18 +258,9 @@ function handleVoiceInput() {
   }
 }
 
-// Проверка инициализации MessageProcessor
-function checkMessageProcessor() {
-  if (!window.messageProcessor) {
-    console.error('MessageProcessor not found, retrying...');
-    setTimeout(checkMessageProcessor, 100);
-    return;
-  }
-  console.log('MessageProcessor initialized successfully');
+// Инициализация приложения
+document.addEventListener('DOMContentLoaded', () => {
   createInterface();
   initializeSnowflakes();
   showWelcomeMessage();
-}
-
-// Инициализация приложения
-document.addEventListener('DOMContentLoaded', checkMessageProcessor);
+});
