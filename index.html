@@ -15,6 +15,11 @@
     // Глобальные переменные
     window.messageProcessor = null;
     window.database = database;
+
+    // Проверяем наличие API ключа в окружении
+    if (typeof process !== 'undefined' && process.env && process.env.PAEAEAPI) {
+      window.OPENAI_API_KEY = process.env.PAEAEAPI;
+    }
   </script>
   <script src="messageProcessor.js"></script>
   <script src="main.js"></script>
