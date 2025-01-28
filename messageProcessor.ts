@@ -4,6 +4,12 @@ class MessageProcessor {
     this.useOpenAI = false;
     this.openAIKey = null;
     console.log('MessageProcessor initialized');
+    
+    // Добавляем обработчик ошибок
+    window.onerror = (msg, url, line) => {
+      console.error('Global error:', msg, 'at', url, ':', line);
+      return false;
+    };
   }
 
   async initOpenAI(apiKey) {
@@ -80,7 +86,8 @@ class MessageProcessor {
     
     try {
       if (!this.useOpenAI) {
-        const key = window.prompt('Пожалуйста, введите ваш OpenAI API ключ:');
+        // Изменено имя ключа на PAEEAPI
+        const key = window.prompt('Пожалуйста, введите ваш PAEEAPI ключ:');
         console.log('API key received:', key ? 'Yes' : 'No');
         
         if (!key) {
@@ -110,6 +117,11 @@ class MessageProcessor {
   }
 
   async processMessage(text) {
+    if (!text || typeof text !== 'string') {
+      console.error('Invalid input:', text);
+      return "Извините, произошла ошибка при обработке сообщения.";
+    }
+
     console.log('Processing message:', text);
     console.log('OpenAI mode:', this.useOpenAI);
     
@@ -124,58 +136,63 @@ class MessageProcessor {
       }
     }
 
-    const normalizedText = text.toLowerCase().trim()
-      .replace(/[.,!?]/g, '')
-      .replace(/\s+/g, ' ');
+    try {
+      const normalizedText = text.toLowerCase().trim()
+        .replace(/[.,!?]/g, '')
+        .replace(/\s+/g, ' ');
 
-    console.log('Normalized text:', normalizedText);
+      console.log('Normalized text:', normalizedText);
 
-    // Прямое совпадение
-    if (database[normalizedText]) {
-      console.log('Direct match found');
-      return database[normalizedText];
-    }
+      // Прямое совпадение
+      if (database[normalizedText]) {
+        console.log('Direct match found');
+        return database[normalizedText];
+      }
 
-    // Поиск частичных совпадений
-    const words = normalizedText.split(' ');
-    let bestMatch = {
-      response: '',
-      confidence: 0,
-      matchedKey: ''
-    };
+      // Поиск частичных совпадений
+      const words = normalizedText.split(' ');
+      let bestMatch = {
+        response: '',
+        confidence: 0,
+        matchedKey: ''
+      };
 
-    for (const key of Object.keys(database)) {
-      const keyWords = key.split(' ');
-      let matchCount = 0;
-      let exactMatches = 0;
+      for (const key of Object.keys(database)) {
+        const keyWords = key.split(' ');
+        let matchCount = 0;
+        let exactMatches = 0;
 
-      for (const word of words) {
-        if (keyWords.includes(word)) {
-          matchCount++;
-          if (word.length > 3) { // Учитываем только значимые слова
-            exactMatches++;
+        for (const word of words) {
+          if (keyWords.includes(word)) {
+            matchCount++;
+            if (word.length > 3) { // Учитываем только значимые слова
+              exactMatches++;
+            }
           }
+        }
+
+        // Улучшенный алгоритм подсчета уверенности
+        const confidence = (matchCount / Math.max(words.length, keyWords.length)) +
+                          (exactMatches * 0.2); // Бонус за точные совпадения
+
+        if (confidence > bestMatch.confidence && confidence > 0.3) {
+          bestMatch = {
+            response: database[key],
+            confidence: confidence,
+            matchedKey: key
+          };
         }
       }
 
-      // Улучшенный алгоритм подсчета уверенности
-      const confidence = (matchCount / Math.max(words.length, keyWords.length)) +
-                        (exactMatches * 0.2); // Бонус за точные совпадения
+      console.log('Best match:', bestMatch);
 
-      if (confidence > bestMatch.confidence && confidence > 0.3) {
-        bestMatch = {
-          response: database[key],
-          confidence: confidence,
-          matchedKey: key
-        };
-      }
+      return bestMatch.confidence > 0
+        ? bestMatch.response
+        : "Извините, я не совсем понял ваш вопрос. Можете переформулировать?";
+    } catch (error) {
+      console.error('Error in message processing:', error);
+      return "Извините, произошла ошибка при обработке сообщения.";
     }
-
-    console.log('Best match:', bestMatch);
-
-    return bestMatch.confidence > 0
-      ? bestMatch.response
-      : "Извините, я не совсем понял ваш вопрос. Можете переформулировать?";
   }
 }
 
