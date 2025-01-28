@@ -10,7 +10,17 @@ class MessageProcessor {
   private useOpenAI: boolean = false;
   private openAIKey: string | null = null;
 
+  constructor() {
+    // Инициализация объекта при создании
+    console.log('MessageProcessor initialized');
+  }
+
   async initOpenAI(apiKey: string): Promise<boolean> {
+    if (!apiKey || apiKey.trim() === '') {
+      console.error('Empty API key provided');
+      return false;
+    }
+
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -26,21 +36,24 @@ class MessageProcessor {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error('OpenAI API error:', response.status, response.statusText);
+        return false;
       }
 
       this.openAIKey = apiKey;
+      this.useOpenAI = true;
       console.log('OpenAI initialized successfully');
       return true;
     } catch (error) {
       console.error('Failed to initialize OpenAI:', error);
       this.openAIKey = null;
+      this.useOpenAI = false;
       return false;
     }
   }
 
   async getOpenAIResponse(userInput: string): Promise<string> {
-    if (!this.openAIKey) {
+    if (!this.openAIKey || !this.useOpenAI) {
       throw new Error('OpenAI не инициализирован');
     }
 
@@ -72,22 +85,29 @@ class MessageProcessor {
   }
 
   async toggleOpenAI(): Promise<string> {
+    console.log('Toggling OpenAI mode. Current state:', this.useOpenAI);
+    
     try {
       if (!this.useOpenAI) {
-        const key = prompt('Пожалуйста, введите ваш OpenAI API ключ:');
+        const key = window.prompt('Пожалуйста, введите ваш OpenAI API ключ:');
+        console.log('API key received:', key ? 'Yes' : 'No');
+        
         if (!key) {
           return "Операция отменена. API ключ не был предоставлен.";
         }
 
         const initialized = await this.initOpenAI(key);
+        console.log('OpenAI initialization result:', initialized);
+        
         if (!initialized) {
           return "Не удалось подключиться к OpenAI. Проверьте ваш API ключ и попробуйте снова.";
         }
-        this.useOpenAI = true;
+        
         return "Режим OpenAI включен. Теперь я буду использовать ИИ для ответов.";
       } else {
         this.useOpenAI = false;
         this.openAIKey = null;
+        console.log('OpenAI mode disabled');
         return "Режим OpenAI выключен. Возврат к стандартному режиму.";
       }
     } catch (error) {
@@ -99,6 +119,9 @@ class MessageProcessor {
   }
 
   async processMessage(text: string): Promise<string> {
+    console.log('Processing message:', text);
+    console.log('OpenAI mode:', this.useOpenAI);
+    
     if (this.useOpenAI && this.openAIKey) {
       try {
         return await this.getOpenAIResponse(text);
@@ -114,8 +137,11 @@ class MessageProcessor {
       .replace(/[.,!?]/g, '')
       .replace(/\s+/g, ' ');
 
+    console.log('Normalized text:', normalizedText);
+
     // Прямое совпадение
     if (database[normalizedText]) {
+      console.log('Direct match found');
       return database[normalizedText];
     }
 
@@ -123,7 +149,8 @@ class MessageProcessor {
     const words = normalizedText.split(' ');
     let bestMatch = {
       response: '',
-      confidence: 0
+      confidence: 0,
+      matchedKey: ''
     };
 
     for (const key of Object.keys(database)) {
@@ -147,10 +174,13 @@ class MessageProcessor {
       if (confidence > bestMatch.confidence && confidence > 0.3) {
         bestMatch = {
           response: database[key],
-          confidence: confidence
+          confidence: confidence,
+          matchedKey: key
         };
       }
     }
+
+    console.log('Best match:', bestMatch);
 
     return bestMatch.confidence > 0
       ? bestMatch.response
@@ -158,4 +188,5 @@ class MessageProcessor {
   }
 }
 
-const messageProcessor = new MessageProcessor();
+// Создаем глобальный экземпляр MessageProcessor
+window.messageProcessor = new MessageProcessor();
