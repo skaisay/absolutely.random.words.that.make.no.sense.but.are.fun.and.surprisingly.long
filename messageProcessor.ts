@@ -2,7 +2,30 @@ class MessageProcessor {
   constructor() {
     this.useOpenAI = false;
     this.openAIKey = null;
+    
+    // Пытаемся получить ключ из GitHub Secrets
+    this.tryLoadApiKey();
     console.log('MessageProcessor initialized');
+  }
+
+  async tryLoadApiKey() {
+    try {
+      // Проверяем, находимся ли мы на GitHub Pages
+      const isGitHubPages = window.location.hostname.includes('github.io');
+      
+      if (isGitHubPages) {
+        // Пытаемся получить ключ из переменной окружения
+        const response = await fetch('/.netlify/functions/get-api-key');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.apiKey) {
+            await this.initOpenAI(data.apiKey);
+          }
+        }
+      }
+    } catch (error) {
+      console.log('Running in preview mode or local environment');
+    }
   }
 
   async initOpenAI(apiKey) {
@@ -16,7 +39,8 @@ class MessageProcessor {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Origin': window.location.origin
         },
         body: JSON.stringify({
           model: 'gpt-3.5-turbo',
@@ -53,7 +77,8 @@ class MessageProcessor {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.openAIKey}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Origin': window.location.origin
         },
         body: JSON.stringify({
           model: 'gpt-3.5-turbo',
@@ -84,24 +109,42 @@ class MessageProcessor {
     
     try {
       if (!this.useOpenAI) {
-        // Запрашиваем ключ у пользователя
-        const key = window.prompt('Пожалуйста, введите ваш OpenAI API ключ:');
-        console.log('API key received:', key ? 'Yes' : 'No');
+        let apiKey;
         
-        if (!key) {
+        // Проверяем, находимся ли мы на GitHub Pages
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        
+        if (isGitHubPages) {
+          try {
+            // Пытаемся получить ключ из GitHub Secrets
+            const response = await fetch('/.netlify/functions/get-api-key');
+            if (response.ok) {
+              const data = await response.json();
+              apiKey = data.apiKey;
+            }
+          } catch (error) {
+            console.error('Failed to get API key from GitHub Secrets:', error);
+          }
+        }
+        
+        // Если не удалось получить ключ из GitHub Secrets, запрашиваем у пользователя
+        if (!apiKey) {
+          apiKey = window.prompt('Пожалуйста, введите ваш OpenAI API ключ:');
+        }
+        
+        if (!apiKey) {
           return "Операция отменена. API ключ не был предоставлен.";
         }
 
         // Очищаем ключ от лишних пробелов
-        const cleanKey = key.trim();
+        const cleanKey = apiKey.trim();
         
-        // Проверяем формат ключа (должен начинаться с 'sk-')
+        // Проверяем формат ключа
         if (!cleanKey.startsWith('sk-')) {
           return "Неверный формат API ключа. Ключ должен начинаться с 'sk-'.";
         }
 
         const initialized = await this.initOpenAI(cleanKey);
-        console.log('OpenAI initialization result:', initialized);
         
         if (!initialized) {
           return "Не удалось подключиться к OpenAI. Проверьте ваш API ключ и попробуйте снова.";
@@ -111,7 +154,6 @@ class MessageProcessor {
       } else {
         this.useOpenAI = false;
         this.openAIKey = null;
-        console.log('OpenAI mode disabled');
         return "Режим OpenAI выключен. Возврат к стандартному режиму.";
       }
     } catch (error) {
@@ -123,6 +165,10 @@ class MessageProcessor {
   }
 
   async processMessage(text) {
+    if (!text || typeof text !== 'string') {
+      return "Извините, произошла ошибка при обработке сообщения.";
+    }
+
     console.log('Processing message:', text);
     console.log('OpenAI mode:', this.useOpenAI);
     
@@ -165,15 +211,14 @@ class MessageProcessor {
       for (const word of words) {
         if (keyWords.includes(word)) {
           matchCount++;
-          if (word.length > 3) { // Учитываем только значимые слова
+          if (word.length > 3) {
             exactMatches++;
           }
         }
       }
 
-      // Улучшенный алгоритм подсчета уверенности
       const confidence = (matchCount / Math.max(words.length, keyWords.length)) +
-                        (exactMatches * 0.2); // Бонус за точные совпадения
+                        (exactMatches * 0.2);
 
       if (confidence > bestMatch.confidence && confidence > 0.3) {
         bestMatch = {
