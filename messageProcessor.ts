@@ -11,7 +11,6 @@ class MessageProcessor {
   private openAIKey: string | null = null;
 
   async initOpenAI(apiKey: string): Promise<boolean> {
-    this.openAIKey = apiKey;
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -30,15 +29,21 @@ class MessageProcessor {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      this.openAIKey = apiKey;
       console.log('OpenAI initialized successfully');
       return true;
     } catch (error) {
       console.error('Failed to initialize OpenAI:', error);
+      this.openAIKey = null;
       return false;
     }
   }
 
   async getOpenAIResponse(userInput: string): Promise<string> {
+    if (!this.openAIKey) {
+      throw new Error('OpenAI не инициализирован');
+    }
+
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -69,36 +74,39 @@ class MessageProcessor {
   async toggleOpenAI(): Promise<string> {
     try {
       if (!this.useOpenAI) {
-        if (!this.openAIKey) {
-          const key = prompt('Пожалуйста, введите ваш OpenAI API ключ:');
-          if (!key) {
-            throw new Error('API ключ не предоставлен');
-          }
-
-          const initialized = await this.initOpenAI(key);
-          if (!initialized) {
-            throw new Error('Не удалось инициализировать OpenAI');
-          }
+        const key = prompt('Пожалуйста, введите ваш OpenAI API ключ:');
+        if (!key) {
+          return "Операция отменена. API ключ не был предоставлен.";
         }
-      }
 
-      this.useOpenAI = !this.useOpenAI;
-      return this.useOpenAI 
-        ? "Режим OpenAI включен. Теперь я буду использовать ИИ для ответов."
-        : "Режим OpenAI выключен. Возврат к стандартному режиму.";
+        const initialized = await this.initOpenAI(key);
+        if (!initialized) {
+          return "Не удалось подключиться к OpenAI. Проверьте ваш API ключ и попробуйте снова.";
+        }
+        this.useOpenAI = true;
+        return "Режим OpenAI включен. Теперь я буду использовать ИИ для ответов.";
+      } else {
+        this.useOpenAI = false;
+        this.openAIKey = null;
+        return "Режим OpenAI выключен. Возврат к стандартному режиму.";
+      }
     } catch (error) {
       console.error('Error toggling OpenAI:', error);
-      return `Ошибка: ${error.message}`;
+      this.useOpenAI = false;
+      this.openAIKey = null;
+      return `Ошибка при переключении режима: ${error.message}`;
     }
   }
 
   async processMessage(text: string): Promise<string> {
-    if (this.useOpenAI) {
+    if (this.useOpenAI && this.openAIKey) {
       try {
         return await this.getOpenAIResponse(text);
       } catch (error) {
         console.error('OpenAI error:', error);
-        return "Извините, произошла ошибка при обработке запроса. Попробуйте позже или переключитесь в обычный режим.";
+        this.useOpenAI = false;
+        this.openAIKey = null;
+        return "Произошла ошибка при использовании OpenAI. Переключаюсь в обычный режим...";
       }
     }
 
