@@ -43,8 +43,20 @@ function createInterface() {
   paeButton.className = 'pae-button';
   paeButton.textContent = 'PAE';
   paeButton.addEventListener('click', async () => {
-    const response = await messageProcessor.toggleOpenAI();
-    addMessage(response, false);
+    if (!messageProcessor) {
+      console.error('MessageProcessor not initialized');
+      return;
+    }
+    paeButton.disabled = true;
+    try {
+      const response = await messageProcessor.toggleOpenAI();
+      await addMessage(response, false);
+    } catch (error) {
+      console.error('Error toggling OpenAI:', error);
+      await addMessage("Произошла ошибка при переключении режима.", false);
+    } finally {
+      paeButton.disabled = false;
+    }
   });
   inputWrapper.appendChild(paeButton);
 
@@ -53,7 +65,10 @@ function createInterface() {
   inputField.className = 'input-field';
   inputField.placeholder = 'Введите ваш вопрос...';
   inputField.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') handleSendMessage();
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   });
   inputField.addEventListener('input', () => {
     paeButton.style.display = inputField.value ? 'none' : 'flex';
@@ -226,12 +241,6 @@ function handleVoiceInput() {
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       inputField.value = transcript;
-      
-      // Убираем автоматическую отправку
-      if (event.results[0].isFinal) {
-        recognition.stop();
-        // НЕ вызываем handleSendMessage() автоматически
-      }
     };
 
     recognition.onerror = (event) => {
