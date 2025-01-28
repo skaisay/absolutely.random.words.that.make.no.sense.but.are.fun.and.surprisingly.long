@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" style="overflow-x: hidden;">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="description" content="AI Chat Interface with voice recognition">
   <title>AI Chat Interface</title>
   <style>
@@ -23,11 +23,16 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      position: relative;
+    }
+
     body {
       background: var(--background-color);
       color: var(--text-color);
       min-height: 100vh;
-      overflow-x: hidden;
       line-height: 1.5;
     }
 
@@ -305,8 +310,24 @@
 </head>
 <body>
   <div id="app"></div>
-  <script src="/js/database.js"></script>
   <script>
+    // Загружаем базу данных
+    const databaseScript = document.createElement('script');
+    databaseScript.src = '/js/database.js';
+    databaseScript.onload = () => {
+      console.log('База данных успешно загружена');
+      // Инициализируем приложение только после загрузки базы данных
+      createInterface();
+      initializeSnowflakes();
+      showWelcomeMessage();
+    };
+    databaseScript.onerror = (error) => {
+      console.error('Ошибка загрузки базы данных:', error);
+      // Показываем сообщение об ошибке пользователю
+      alert('Ошибка загрузки базы данных. Пожалуйста, обновите страницу.');
+    };
+    document.head.appendChild(databaseScript);
+
     // OpenAI Configuration
     let useOpenAI = false;
     let openAIKey = null;
@@ -410,8 +431,17 @@
         }
       }
 
-      const result = findBestMatch(text);
-      return result.response;
+      try {
+        // Проверяем, что функция findBestMatch доступна
+        if (typeof findBestMatch !== 'function') {
+          throw new Error('База данных не загружена');
+        }
+        const result = findBestMatch(text);
+        return result.response;
+      } catch (error) {
+        console.error('Ошибка обработки сообщения:', error);
+        return "Извините, произошла ошибка при обработке сообщения. Пожалуйста, попробуйте позже.";
+      }
     }
 
     // Interface Creation
@@ -656,13 +686,6 @@
 
       recognition.start();
     }
-
-    // Initialize App
-    document.addEventListener('DOMContentLoaded', () => {
-      createInterface();
-      initializeSnowflakes();
-      showWelcomeMessage();
-    });
   </script>
 </body>
 </html>
