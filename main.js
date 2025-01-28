@@ -48,12 +48,19 @@ function createInterface() {
       return;
     }
     
+    if (paeButton.disabled) {
+      return;
+    }
+
+    paeButton.disabled = true;
     try {
       const response = await window.messageProcessor.toggleOpenAI();
       await addMessage(response, false);
     } catch (error) {
       console.error('Error toggling OpenAI:', error);
       await addMessage("Произошла ошибка при переключении режима.", false);
+    } finally {
+      paeButton.disabled = false;
     }
   });
   inputWrapper.appendChild(paeButton);
