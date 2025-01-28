@@ -1,15 +1,8 @@
-// Компилированная версия TypeScript файла
 class MessageProcessor {
   constructor() {
     this.useOpenAI = false;
     this.openAIKey = null;
     console.log('MessageProcessor initialized');
-    
-    // Добавляем обработчик ошибок
-    window.onerror = (msg, url, line) => {
-      console.error('Global error:', msg, 'at', url, ':', line);
-      return false;
-    };
   }
 
   async initOpenAI(apiKey) {
@@ -86,7 +79,6 @@ class MessageProcessor {
     
     try {
       if (!this.useOpenAI) {
-        // Изменено имя ключа на PAEEAPI
         const key = window.prompt('Пожалуйста, введите ваш PAEEAPI ключ:');
         console.log('API key received:', key ? 'Yes' : 'No');
         
@@ -165,15 +157,14 @@ class MessageProcessor {
         for (const word of words) {
           if (keyWords.includes(word)) {
             matchCount++;
-            if (word.length > 3) { // Учитываем только значимые слова
+            if (word.length > 3) {
               exactMatches++;
             }
           }
         }
 
-        // Улучшенный алгоритм подсчета уверенности
         const confidence = (matchCount / Math.max(words.length, keyWords.length)) +
-                          (exactMatches * 0.2); // Бонус за точные совпадения
+                         (exactMatches * 0.2);
 
         if (confidence > bestMatch.confidence && confidence > 0.3) {
           bestMatch = {
