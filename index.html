@@ -94,17 +94,13 @@
       overflow-y: auto;
       position: relative;
       z-index: 2;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
       scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch;
     }
 
     .chat-container::-webkit-scrollbar {
       display: none;
-    }
-
-    .chat-container {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
     }
 
     .messages-wrapper {
@@ -168,22 +164,21 @@
     .input-container {
       position: fixed;
       bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
+      left: 0;
+      right: 0;
       padding: 15px;
       background: rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       display: flex;
-      gap: 12px;
+      justify-content: center;
       z-index: 1000;
-      width: 100%;
-      max-width: 800px;
     }
 
     .input-wrapper {
       position: relative;
-      flex: 1;
+      max-width: 800px;
+      width: 100%;
       display: flex;
       gap: 12px;
     }
@@ -208,6 +203,11 @@
       justify-content: center;
       box-shadow: 0 0 15px rgba(46, 166, 255, 0.5);
       z-index: 2;
+    }
+
+    .pae-button.active {
+      background: var(--recording-color);
+      box-shadow: 0 0 15px rgba(255, 68, 68, 0.5);
     }
 
     .pae-button:hover {
@@ -326,19 +326,6 @@
     let isTyping = false;
     let shouldAutoScroll = true;
 
-    // Функция для работы с OpenAI
-    async function toggleOpenAI() {
-      const key = prompt("Пожалуйста, введите ваш ключ API OpenAI:");
-      if (!key) {
-        return "Операция отменена. Продолжаем работу в стандартном режиме.";
-      }
-
-      openAIKey = key;
-      useOpenAI = true;
-      paeButton.style.background = 'var(--recording-color)';
-      return "Переключено на режим OpenAI. Теперь ваши сообщения будут обрабатываться с помощью искусственного интеллекта.";
-    }
-
     // Message Processing
     async function processMessage(text) {
       if (useOpenAI) {
@@ -397,8 +384,13 @@
       paeButton.className = 'pae-button';
       paeButton.textContent = 'PAE';
       paeButton.addEventListener('click', async () => {
-        const response = await toggleOpenAI();
-        addMessage(response, false);
+        const key = prompt('Введите ваш ключ OpenAI API:');
+        if (key) {
+          openAIKey = key;
+          useOpenAI = true;
+          paeButton.classList.add('active');
+          addMessage("Режим OpenAI активирован", false);
+        }
       });
       inputWrapper.appendChild(paeButton);
 
@@ -526,10 +518,7 @@
           await new Promise(resolve => setTimeout(resolve, 20));
 
           if (shouldAutoScroll) {
-            chatContainer.scrollTo({
-              top: chatContainer.scrollHeight,
-              behavior: 'smooth'
-            });
+            chatContainer.scrollTop = chatContainer.scrollHeight;
           }
         }
 
@@ -539,10 +528,7 @@
       }
 
       if (shouldAutoScroll) {
-        chatContainer.scrollTo({
-          top: chatContainer.scrollHeight,
-          behavior: 'smooth'
-        });
+        chatContainer.scrollTop = chatContainer.scrollHeight;
       }
     }
 
@@ -568,14 +554,15 @@
     // Voice Input Handler
     function handleVoiceInput() {
       if (!('webkitSpeechRecognition' in window)) {
-        alert('К сожалению, ваш браузер не поддерживает распознавание речи. Попробуйте использовать Chrome или Edge.');
+        alert('К сожалению, ваш браузер не поддерживает распознавание речи. Попробуйте использовать Chrome.');
         return;
       }
 
       const recognition = new webkitSpeechRecognition();
       recognition.lang = 'ru-RU';
       recognition.continuous = false;
-      recognition.interimResults = true;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
 
       recognition.onstart = () => {
         isRecording = true;
@@ -594,7 +581,10 @@
       };
 
       recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
+        const transcript = Array.from(event.results)
+          .map(result => result[0].transcript)
+          .join('');
+        
         inputField.value = transcript;
       };
 
@@ -603,7 +593,11 @@
         isRecording = false;
         micButton.classList.remove('recording');
         inputField.disabled = false;
-        inputField.value = '';
+        
+        if (event.error === 'no-speech') {
+          inputField.value = '';
+          return; // Просто очищаем поле без показа ошибки
+        }
         
         let errorMessage = 'Ошибка распознавания речи. ';
         switch (event.error) {
@@ -614,21 +608,20 @@
           case 'permission-denied':
             errorMessage += 'Пожалуйста, разрешите доступ к микрофону.';
             break;
-          case 'no-speech':
-            errorMessage += 'Речь не обнаружена. Говорите громче.';
-            break;
           default:
-            errorMessage += 'Пожалуйста, попробуйте еще раз.';
+            return; // Не показываем ошибку для других случаев
         }
         
-        alert(errorMessage);
+        if (errorMessage !== 'Ошибка распознавания речи. ') {
+          alert(errorMessage);
+        }
       };
 
       try {
         recognition.start();
       } catch (error) {
         console.error('Speech recognition start error:', error);
-        alert('Ошибка при запуске распознавания речи. Пожалуйста, попробуйте еще раз.');
+        alert('Пожалуйста, попробуйте еще раз.');
       }
     }
 
