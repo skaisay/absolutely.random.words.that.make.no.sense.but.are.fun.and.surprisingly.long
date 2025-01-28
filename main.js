@@ -43,13 +43,18 @@ function createInterface() {
   paeButton.className = 'pae-button';
   paeButton.textContent = 'PAE';
   paeButton.addEventListener('click', async () => {
-    if (!messageProcessor) {
+    if (!window.messageProcessor) {
       console.error('MessageProcessor not initialized');
       return;
     }
+    
+    if (paeButton.disabled) {
+      return;
+    }
+
     paeButton.disabled = true;
     try {
-      const response = await messageProcessor.toggleOpenAI();
+      const response = await window.messageProcessor.toggleOpenAI();
       await addMessage(response, false);
     } catch (error) {
       console.error('Error toggling OpenAI:', error);
@@ -205,7 +210,10 @@ async function handleSendMessage() {
   await addMessage(userMessage, true);
 
   try {
-    const response = await messageProcessor.processMessage(userMessage);
+    if (!window.messageProcessor) {
+      throw new Error('MessageProcessor not initialized');
+    }
+    const response = await window.messageProcessor.processMessage(userMessage);
     await addMessage(response, false);
   } catch (error) {
     console.error('Error processing message:', error);
