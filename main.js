@@ -9,17 +9,10 @@ let isRecording = false;
 let isTyping = false;
 let shouldAutoScroll = true;
 
-// Инициализация приложения
-document.addEventListener('DOMContentLoaded', () => {
-  createInterface();
-  initializeSnowflakes();
-  showWelcomeMessage();
-});
-
 // Создание интерфейса
 function createInterface() {
   const root = document.getElementById('root');
-  
+
   // Создаем робота
   const robot = document.createElement('div');
   robot.className = 'robot';
@@ -28,33 +21,33 @@ function createInterface() {
       <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" />
     </svg>
   `;
-  
+
   // Создаем контейнер чата
   chatContainer = document.createElement('div');
   chatContainer.className = 'chat-container';
   chatContainer.addEventListener('scroll', handleScroll);
-  
+
   messagesWrapper = document.createElement('div');
   messagesWrapper.className = 'messages-wrapper';
   chatContainer.appendChild(messagesWrapper);
-  
+
   // Создаем поле ввода
   const inputContainer = document.createElement('div');
   inputContainer.className = 'input-container';
-  
+
   const inputWrapper = document.createElement('div');
   inputWrapper.className = 'input-wrapper';
-  
+
   // Создаем кнопку PAE
   paeButton = document.createElement('button');
   paeButton.className = 'pae-button';
   paeButton.textContent = 'PAE';
-  paeButton.addEventListener('click', () => {
-    const response = window.MessageProcessor.toggleOpenAI();
+  paeButton.addEventListener('click', async () => {
+    const response = await messageProcessor.toggleOpenAI();
     addMessage(response, false);
   });
   inputWrapper.appendChild(paeButton);
-  
+
   inputField = document.createElement('input');
   inputField.type = 'text';
   inputField.className = 'input-field';
@@ -62,10 +55,13 @@ function createInterface() {
   inputField.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') handleSendMessage();
   });
+  inputField.addEventListener('input', () => {
+    paeButton.style.display = inputField.value ? 'none' : 'flex';
+  });
 
   const buttonsContainer = document.createElement('div');
   buttonsContainer.className = 'buttons-container';
-  
+
   micButton = document.createElement('button');
   micButton.className = 'mic-button';
   micButton.innerHTML = `
@@ -74,7 +70,7 @@ function createInterface() {
     </svg>
   `;
   micButton.addEventListener('click', handleVoiceInput);
-  
+
   sendButton = document.createElement('button');
   sendButton.className = 'send-button';
   sendButton.innerHTML = `
@@ -83,14 +79,14 @@ function createInterface() {
     </svg>
   `;
   sendButton.addEventListener('click', handleSendMessage);
-  
+
   buttonsContainer.appendChild(micButton);
   buttonsContainer.appendChild(sendButton);
-  
+
   inputWrapper.appendChild(inputField);
   inputWrapper.appendChild(buttonsContainer);
   inputContainer.appendChild(inputWrapper);
-  
+
   root.appendChild(robot);
   root.appendChild(chatContainer);
   root.appendChild(inputContainer);
@@ -142,7 +138,7 @@ function handleScroll() {
 async function addMessage(text, isUser) {
   const message = document.createElement('div');
   message.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-  
+
   if (!isUser) {
     const icon = document.createElement('div');
     icon.className = 'message-icon';
@@ -162,17 +158,17 @@ async function addMessage(text, isUser) {
     isTyping = true;
     content.textContent = '';
     let displayedText = '';
-    
+
     for (let i = 0; i < text.length; i++) {
       displayedText += text[i];
       content.textContent = displayedText;
       await new Promise(resolve => setTimeout(resolve, 20));
-      
+
       if (shouldAutoScroll) {
         chatContainer.scrollTop = chatContainer.scrollHeight;
       }
     }
-    
+
     isTyping = false;
   } else {
     content.textContent = text;
@@ -189,11 +185,17 @@ async function handleSendMessage() {
 
   const userMessage = inputField.value;
   inputField.value = '';
-  
+  paeButton.style.display = 'flex';
+
   await addMessage(userMessage, true);
-  
-  const response = window.MessageProcessor.processMessage(userMessage);
-  await addMessage(response, false);
+
+  try {
+    const response = await messageProcessor.processMessage(userMessage);
+    await addMessage(response, false);
+  } catch (error) {
+    console.error('Error processing message:', error);
+    await addMessage("Извините, произошла ошибка при обработке сообщения.", false);
+  }
 }
 
 // Обработка голосового ввода
@@ -202,7 +204,7 @@ function handleVoiceInput() {
     const recognition = new webkitSpeechRecognition();
     recognition.lang = 'ru-RU';
     recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.interimResults = true;
 
     recognition.onstart = () => {
       isRecording = true;
@@ -225,9 +227,10 @@ function handleVoiceInput() {
       const transcript = event.results[0][0].transcript;
       inputField.value = transcript;
       
+      // Убираем автоматическую отправку
       if (event.results[0].isFinal) {
         recognition.stop();
-        handleSendMessage();
+        // НЕ вызываем handleSendMessage() автоматически
       }
     };
 
@@ -244,3 +247,10 @@ function handleVoiceInput() {
     alert('К сожалению, ваш браузер не поддерживает распознавание речи.');
   }
 }
+
+// Инициализация приложения
+document.addEventListener('DOMContentLoaded', () => {
+  createInterface();
+  initializeSnowflakes();
+  showWelcomeMessage();
+});
