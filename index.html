@@ -222,6 +222,11 @@
       transform: scale(0.95);
     }
 
+    .pae-button.active {
+      background: var(--recording-color);
+      box-shadow: 0 0 15px rgba(255, 68, 68, 0.5);
+    }
+
     .input-field {
       flex: 1;
       padding: 12px 16px;
@@ -331,19 +336,21 @@
 
     // Функция переключения режима OpenAI
     async function toggleOpenAI() {
-      useOpenAI = !useOpenAI;
-      if (useOpenAI) {
-        const key = prompt("Пожалуйста, введите ваш ключ Pae-api:");
+      if (!useOpenAI) {
+        const key = prompt("Пожалуйста, введите ваш ключ PaeAPI:");
         if (key) {
           openAIKey = key;
-          return "Режим Pae_ai включен. Теперь я буду использовать Pae+AI для ответов.";
+          useOpenAI = true;
+          paeButton.classList.add('active');
+          return "Режим Pae+ включен. Теперь я буду использовать Pae+AI для ответов.";
         } else {
-          useOpenAI = false;
           return "Ключ API не был предоставлен. Продолжаю работу в обычном режиме.";
         }
       } else {
+        useOpenAI = false;
         openAIKey = null;
-        return "Режим Pae_ai выключен. Возвращаюсь к использованию локальной базы данных.";
+        paeButton.classList.remove('active');
+        return "Режим Pae+ выключен. Возвращаюсь к использованию локальной базы данных.";
       }
     }
 
