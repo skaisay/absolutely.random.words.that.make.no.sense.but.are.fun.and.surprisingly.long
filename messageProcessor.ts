@@ -26,7 +26,8 @@ class MessageProcessor {
       });
 
       if (!response.ok) {
-        console.error('OpenAI API error:', response.status, response.statusText);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('OpenAI API error:', response.status, errorData.error?.message || response.statusText);
         return false;
       }
 
@@ -56,14 +57,18 @@ class MessageProcessor {
         },
         body: JSON.stringify({
           model: 'gpt-3.5-turbo',
-          messages: [{ role: 'user', content: userInput }],
+          messages: [
+            { role: 'system', content: 'Вы - дружелюбный ассистент, который помогает пользователям.' },
+            { role: 'user', content: userInput }
+          ],
           temperature: 0.7,
           max_tokens: 150
         })
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
@@ -87,19 +92,27 @@ class MessageProcessor {
           return "Операция отменена. API ключ не был предоставлен.";
         }
 
-        const initialized = await this.initOpenAI(key);
+        // Очищаем ключ от лишних пробелов
+        const cleanKey = key.trim();
+        
+        // Проверяем формат ключа (должен начинаться с 'sk-')
+        if (!cleanKey.startsWith('sk-')) {
+          return "Неверный формат API ключа. Ключ должен начинаться с 'sk-'.";
+        }
+
+        const initialized = await this.initOpenAI(cleanKey);
         console.log('OpenAI initialization result:', initialized);
         
         if (!initialized) {
-          return "Не удалось подключиться к Pae_ai. Проверьте ваш API ключ и попробуйте снова.";
+          return "Не удалось подключиться к OpenAI. Проверьте ваш API ключ и попробуйте снова.";
         }
         
-        return "Режим Pae_ai включен. Теперь я буду использовать ИИ для ответов.";
+        return "Режим OpenAI включен. Теперь я буду использовать ИИ для ответов.";
       } else {
         this.useOpenAI = false;
         this.openAIKey = null;
         console.log('OpenAI mode disabled');
-        return "Режим Pae-ai выключен. Возврат к стандартному режиму.";
+        return "Режим OpenAI выключен. Возврат к стандартному режиму.";
       }
     } catch (error) {
       console.error('Error toggling OpenAI:', error);
@@ -120,7 +133,7 @@ class MessageProcessor {
         console.error('OpenAI error:', error);
         this.useOpenAI = false;
         this.openAIKey = null;
-        return "Произошла ошибка при использовании Pae_ai. Переключаюсь в обычный режим...";
+        return "Произошла ошибка при использовании OpenAI. Переключаюсь в обычный режим...";
       }
     }
 
