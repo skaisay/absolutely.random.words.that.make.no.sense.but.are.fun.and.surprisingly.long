@@ -79,7 +79,8 @@ class MessageProcessor {
     
     try {
       if (!this.useOpenAI) {
-        const key = window.prompt('Пожалуйста, введите ваш PAEEAPI ключ:');
+        // Запрашиваем ключ у пользователя
+        const key = window.prompt('Пожалуйста, введите ваш OpenAI API ключ:');
         console.log('API key received:', key ? 'Yes' : 'No');
         
         if (!key) {
@@ -90,15 +91,15 @@ class MessageProcessor {
         console.log('OpenAI initialization result:', initialized);
         
         if (!initialized) {
-          return "Не удалось подключиться к OpenAI. Проверьте ваш API ключ и попробуйте снова.";
+          return "Не удалось подключиться к Pae_ai. Проверьте ваш API ключ и попробуйте снова.";
         }
         
-        return "Режим OpenAI включен. Теперь я буду использовать ИИ для ответов.";
+        return "Режим Pae_ai включен. Теперь я буду использовать ИИ для ответов.";
       } else {
         this.useOpenAI = false;
         this.openAIKey = null;
         console.log('OpenAI mode disabled');
-        return "Режим OpenAI выключен. Возврат к стандартному режиму.";
+        return "Режим Pae-ai выключен. Возврат к стандартному режиму.";
       }
     } catch (error) {
       console.error('Error toggling OpenAI:', error);
@@ -119,7 +120,7 @@ class MessageProcessor {
         console.error('OpenAI error:', error);
         this.useOpenAI = false;
         this.openAIKey = null;
-        return "Произошла ошибка при использовании OpenAI. Переключаюсь в обычный режим...";
+        return "Произошла ошибка при использовании Pae_ai. Переключаюсь в обычный режим...";
       }
     }
 
