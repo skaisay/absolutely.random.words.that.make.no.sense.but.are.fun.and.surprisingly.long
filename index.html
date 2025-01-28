@@ -503,14 +503,13 @@
         if (snowflakeCount >= MAX_SNOWFLAKES) return;
 
         const snowflake = document.createElement('div');
-        snowconst snowflake = document.createElement('div');
         snowflake.classList.add('snowflake');
         snowflake.style.left = `${Math.random() * 100}vw`;
         snowflake.style.animationDuration = `${Math.random() * 5 + 3}s`;
         snowflake.style.opacity = `${Math.random() * 0.2 + 0.1}`;
         document.body.appendChild(snowflake);
 
-        snowflake.style.top = '-10px';
+        snowflake.style.top = '-10snowflake.style.top = '-10px';
         snowflakeCount++;
 
         snowflake.addEventListener('animationend', () => {
