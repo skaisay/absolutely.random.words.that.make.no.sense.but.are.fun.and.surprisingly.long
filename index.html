@@ -311,6 +311,14 @@
       display: none; /* For Chrome, Safari, and Edge */
     }
 
+    .chat-area {
+      overflow-y: auto; /* Позволяет прокрутку содержимого */
+      scrollbar-width: none; /* Для Firefox */
+    }
+    .chat-area::-webkit-scrollbar {
+      display: none; /* Для Chrome, Safari и Edge */
+    }
+
     @media (max-width: 600px) {
       .message {
         max-width: 90%;
@@ -331,6 +339,38 @@
     let useOpenAI = false;
     let openAIKey = null;
 
+    // Функция переключения режима OpenAI
+    async function toggleOpenAI() {
+        const key = prompt('Введите ваш OpenAI ключ:');
+        if (key) {
+            openAIKey = key;
+            useOpenAI = true;
+            alert('Вы подключены к OpenAI!');
+        } else {
+            alert('Ключ не введен.');
+        }
+    }
+
+    // Функция для получения ответа от OpenAI
+    async function getOpenAIResponse(text) {
+        if (!openAIKey) {
+            throw new Error('Ключ OpenAI не установлен.');
+        }
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${openAIKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ model: 'gpt-3.5-turbo', messages: [{ role: 'user', content: text }] })
+        });
+        if (!response.ok) {
+            throw new Error('OpenAI API error');
+        }
+        const data = await response.json();
+        return data.choices[0].message.content;
+    }
+
     // Interface Elements
     let chatContainer;
     let messagesWrapper;
@@ -341,57 +381,6 @@
     let isRecording = false;
     let isTyping = false;
     let shouldAutoScroll = true;
-
-    // Функция переключения режима OpenAI
-    async function toggleOpenAI() {
-      if (!useOpenAI) {
-        const key = prompt("Пожалуйста, введите ваш ключ PaeAPI:");
-        if (key) {
-          openAIKey = key;
-          useOpenAI = true;
-          paeButton.classList.add('active');
-          return "Режим Pae+ включен. Теперь я буду использовать Pae+AI для ответов.";
-        } else {
-          return "Ключ API не был предоставлен. Продолжаю работу в обычном режиме.";
-        }
-      } else {
-        useOpenAI = false;
-        openAIKey = null;
-        paeButton.classList.remove('active');
-        return "Режим Pae+ выключен. Возвращаюсь к использованию локальной базы данных.";
-      }
-    }
-
-    // Функция для получения ответа от OpenAI
-    async function getOpenAIResponse(text) {
-      try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${openAIKey}`
-          },
-          body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [{
-              role: "user",
-              content: text
-            }],
-            temperature: 0.7
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error('OpenAI API error');
-        }
-
-        const data = await response.json();
-        return data.choices[0].message.content;
-      } catch (error) {
-        console.error('OpenAI API error:', error);
-        throw error;
-      }
-    }
 
     // Message Processing
     async function processMessage(text) {
@@ -432,7 +421,7 @@
 
       // Chat Container
       chatContainer = document.createElement('div');
-      chatContainer.className = 'chat-container';
+      chatContainer.className = 'chat-container chat-area';
       chatContainer.addEventListener('scroll', handleScroll);
 
       messagesWrapper = document.createElement('div');
@@ -493,7 +482,7 @@
           <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
         </svg>
       `;
-      sendButton.addEventListener('click', sendMessage);
+      sendButton.addEventListener('click', handleSendMessage);
 
       // Assemble Interface
       buttonsContainer.appendChild(micButton);
@@ -590,22 +579,22 @@
       }
     }
 
-    function sendMessage() {
-      const message = inputField.value.trim();
-      if (!message || isTyping) return;
+    async function handleSendMessage() {
+      const text = inputField.value.trim();
+      if (!text || isTyping) return;
 
       inputField.value = '';
       paeButton.style.display = 'flex';
 
-      addMessage(message, true);
+      await addMessage(text, true);
 
       try {
-        processMessage(message).then(response => {
-          addMessage(response, false);
-        });
+        const response = await processMessage(text);
+        await addMessage(response, false);
+        autoScroll();
       } catch (error) {
         console.error('Error processing message:', error);
-        addMessage("Извините, произошла ошибка при обработке сообщения.", false);
+        await addMessage("Извините, произошла ошибка при обработке сообщения.", false);
       }
     }
 
@@ -639,7 +628,6 @@
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         inputField.value = transcript;
-        sendMessage();
       };
 
       recognition.onerror = (event) => {
@@ -652,6 +640,10 @@
       };
 
       recognition.start();
+    }
+
+    function autoScroll() {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
     // Initialize App
