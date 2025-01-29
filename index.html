@@ -303,6 +303,14 @@
       100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
     }
 
+    .chat-container {
+      overflow: hidden; /* Hide scrollbar */
+      scrollbar-width: none; /* For Firefox */
+    }
+    .chat-container::-webkit-scrollbar {
+      display: none; /* For Chrome, Safari, and Edge */
+    }
+
     @media (max-width: 600px) {
       .message {
         max-width: 90%;
@@ -485,7 +493,7 @@
           <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
         </svg>
       `;
-      sendButton.addEventListener('click', handleSendMessage);
+      sendButton.addEventListener('click', sendMessage);
 
       // Assemble Interface
       buttonsContainer.appendChild(micButton);
@@ -582,21 +590,22 @@
       }
     }
 
-    async function handleSendMessage() {
-      const text = inputField.value.trim();
-      if (!text || isTyping) return;
+    function sendMessage() {
+      const message = inputField.value.trim();
+      if (!message || isTyping) return;
 
       inputField.value = '';
       paeButton.style.display = 'flex';
 
-      await addMessage(text, true);
+      addMessage(message, true);
 
       try {
-        const response = await processMessage(text);
-        await addMessage(response, false);
+        processMessage(message).then(response => {
+          addMessage(response, false);
+        });
       } catch (error) {
         console.error('Error processing message:', error);
-        await addMessage("Извините, произошла ошибка при обработке сообщения.", false);
+        addMessage("Извините, произошла ошибка при обработке сообщения.", false);
       }
     }
 
@@ -630,6 +639,7 @@
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         inputField.value = transcript;
+        sendMessage();
       };
 
       recognition.onerror = (event) => {
