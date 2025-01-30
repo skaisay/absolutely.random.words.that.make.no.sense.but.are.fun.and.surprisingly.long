@@ -6,7 +6,6 @@
   <meta name="description" content="AI Chat Interface with voice recognition">
   <title>AI Chat Interface</title>
   <style>
-    /* Base styles */
     :root {
       --primary-color: #2ea6ff;
       --background-color: #000000;
@@ -94,21 +93,16 @@
       overflow-y: auto;
       position: relative;
       z-index: 2;
-      scrollbar-width: thin;
-      scrollbar-color: var(--primary-color) transparent;
-    }
-
-    .chat-container::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .chat-container::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .chat-container::-webkit-scrollbar-thumb {
-      background-color: var(--primary-color);
-      border-radius: 4px;
+      scroll-behavior: smooth;
+      
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      
+      /* Hide scrollbar for IE, Edge and Firefox */
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
     }
 
     .messages-wrapper {
@@ -248,6 +242,17 @@
       cursor: not-allowed;
     }
 
+    .input-field.recording {
+      background: rgba(255, 68, 68, 0.1);
+      animation: recordingPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes recordingPulse {
+      0% { background: rgba(255, 68, 68, 0.1); }
+      50% { background: rgba(255, 68, 68, 0.2); }
+      100% { background: rgba(255, 68, 68, 0.1); }
+    }
+
     .buttons-container {
       display: flex;
       gap: 8px;
@@ -294,13 +299,6 @@
     .mic-button.recording {
       background: var(--recording-color);
       box-shadow: 0 0 15px var(--recording-color);
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(255, 68, 68, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
     }
 
     @media (max-width: 600px) {
@@ -317,7 +315,6 @@
 <body>
   <div id="root"></div>
 
-  <script src="database.js"></script>
   <script>
     // OpenAI Configuration
     let useOpenAI = false;
@@ -614,17 +611,17 @@
       recognition.onstart = () => {
         isRecording = true;
         micButton.classList.add('recording');
-        inputField.value = 'Говорите...';
+        inputField.classList.add('recording');
+        inputField.placeholder = 'Говорите...';
         inputField.disabled = true;
       };
 
       recognition.onend = () => {
         isRecording = false;
         micButton.classList.remove('recording');
+        inputField.classList.remove('recording');
         inputField.disabled = false;
-        if (inputField.value === 'Говорите...') {
-          inputField.value = '';
-        }
+        inputField.placeholder = 'Введите ваш вопрос...';
       };
 
       recognition.onresult = (event) => {
@@ -636,8 +633,10 @@
         console.error('Speech recognition error:', event.error);
         isRecording = false;
         micButton.classList.remove('recording');
+        inputField.classList.remove('recording');
         inputField.disabled = false;
         inputField.value = '';
+        inputField.placeholder = 'Введите ваш вопрос...';
         alert('Ошибка распознавания речи. Пожалуйста, попробуйте еще раз.');
       };
 
