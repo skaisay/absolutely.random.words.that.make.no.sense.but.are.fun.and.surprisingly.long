@@ -6,6 +6,7 @@
   <meta name="description" content="AI Chat Interface with voice recognition">
   <title>AI Chat Interface</title>
   <style>
+    /* Base styles */
     :root {
       --primary-color: #2ea6ff;
       --background-color: #000000;
@@ -93,25 +94,18 @@
       overflow-y: auto;
       position: relative;
       z-index: 2;
-      scroll-behavior: smooth;
-      
-      /* Hide scrollbar for Chrome, Safari and Opera */
-      &::-webkit-scrollbar {
-        display: none;
-      }
-      
-      /* Hide scrollbar for IE, Edge and Firefox */
-      -ms-overflow-style: none;  /* IE and Edge */
-      scrollbar-width: none;  /* Firefox */
+      scrollbar-width: none; /* Hide scrollbar */
+      -ms-overflow-style: none; /* IE and Edge */
+    }
+
+    .chat-container::-webkit-scrollbar {
+      display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
     }
 
     .messages-wrapper {
       max-width: 800px;
       margin: 0 auto;
       width: 100%;
-      overflow: hidden;
-      max-height: 70vh;
-      overflow-y: auto;
     }
 
     .message {
@@ -126,9 +120,6 @@
       background: var(--message-bg);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      transition: transform 0.3s ease-out;
-      user-select: none;
-      transition: all 0.3s ease;
     }
 
     .user-message {
@@ -163,21 +154,9 @@
       filter: drop-shadow(0 0 3px var(--primary-color));
     }
 
-    .message.selected {
-      transform: scale(1.02) translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      z-index: 101;
-    }
-
     @keyframes fadeIn {
-      from { 
-        opacity: 0; 
-        transform: translateY(20px); 
-      }
-      to { 
-        opacity: 1; 
-        transform: translateY(0); 
-      }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Input area */
@@ -234,11 +213,6 @@
       transform: scale(0.95);
     }
 
-    .pae-button.active {
-      background: var(--recording-color);
-      box-shadow: 0 0 15px rgba(255, 68, 68, 0.5);
-    }
-
     .input-field {
       flex: 1;
       padding: 12px 16px;
@@ -258,17 +232,6 @@
     .input-field:disabled {
       opacity: 0.7;
       cursor: not-allowed;
-    }
-
-    .input-field.recording {
-      background: rgba(255, 68, 68, 0.1);
-      animation: recordingPulse 1.5s ease-in-out infinite;
-    }
-
-    @keyframes recordingPulse {
-      0% { background: rgba(255, 68, 68, 0.1); }
-      50% { background: rgba(255, 68, 68, 0.2); }
-      100% { background: rgba(255, 68, 68, 0.1); }
     }
 
     .buttons-container {
@@ -317,107 +280,13 @@
     .mic-button.recording {
       background: var(--recording-color);
       box-shadow: 0 0 15px var(--recording-color);
+      animation: pulse 1.5s ease-in-out infinite;
     }
 
-    /* Scroll to bottom button */
-    .scroll-bottom-button {
-      position: fixed;
-      right: 20px;
-      bottom: 100px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--primary-color);
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.3s ease;
-      box-shadow: 0 0 15px var(--primary-color);
-      z-index: 1000;
-    }
-
-    .scroll-bottom-button.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .scroll-bottom-button:hover {
-      filter: brightness(1.1);
-      transform: scale(1.05);
-    }
-
-    .scroll-bottom-button:active {
-      transform: scale(0.95);
-    }
-
-    .scroll-bottom-button svg {
-      width: 24px;
-      height: 24px;
-      fill: var(--text-color);
-    }
-
-    /* Backdrop overlay */
-    .backdrop-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-      z-index: 100;
-    }
-
-    .backdrop-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    /* Context menu */
-    .context-menu {
-      position: absolute;
-      background: rgba(45, 45, 45, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 12px;
-      padding: 8px 0;
-      min-width: 180px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      opacity: 0;
-      transform: scale(0.95);
-      transition: all 0.2s ease;
-      z-index: 102;
-    }
-
-    .context-menu.active {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    .context-menu-item {
-      padding: 8px 16px;
-      color: var(--text-color);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: background-color 0.2s ease;
-    }
-
-    .context-menu-item:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .context-menu-item svg {
-      width: 18px;
-      height: 18px;
-      opacity: 0.7;
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
     }
 
     @media (max-width: 600px) {
@@ -428,20 +297,44 @@
       .input-container {
         padding: 10px;
       }
+    }
 
-      .scroll-bottom-button {
-        right: 10px;
-        bottom: 80px;
-      }
+    /* Scroll to bottom button */
+    .scroll-to-bottom {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: var(--primary-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(46, 166, 255, 0.5);
+      transition: opacity 0.3s ease;
+      opacity: 0;
+      visibility: hidden;
+      z-index: 1000;
+    }
+
+    .scroll-to-bottom svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--text-color);
+    }
+
+    .scroll-to-bottom.show {
+      opacity: 1;
+      visibility: visible;
     }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
-  <!-- Database script -->
   <script src="database.js"></script>
-  
   <script>
     // OpenAI Configuration
     let useOpenAI = false;
@@ -454,34 +347,28 @@
     let sendButton;
     let micButton;
     let paeButton;
-    let scrollButton;
     let isRecording = false;
     let isTyping = false;
     let shouldAutoScroll = true;
-    let recognition = null;
-    let selectedMessage = null;
-    let contextMenu = null;
-    let backdropOverlay = null;
-    let longPressTimer = null;
-    const LONG_PRESS_DURATION = 500;
+
+    // Scroll to bottom button
+    let scrollToBottomButton;
 
     // Функция переключения режима OpenAI
     async function toggleOpenAI() {
-      if (!useOpenAI) {
-        const key = prompt("Пожалуйста, введите ваш ключ PaeAPI:");
+      useOpenAI = !useOpenAI;
+      if (useOpenAI) {
+        const key = prompt("Пожалуйста, введите ваш ключ Pae-api:");
         if (key) {
           openAIKey = key;
-          useOpenAI = true;
-          paeButton.classList.add('active');
-          return "Режим Pae+ включен. Теперь я буду использовать Pae+AI для ответов.";
+          return "Режим Pae_ai включен. Теперь я буду использовать Pae+AI для ответов.";
         } else {
+          useOpenAI = false;
           return "Ключ API не был предоставлен. Продолжаю работу в обычном режиме.";
         }
       } else {
-        useOpenAI = false;
         openAIKey = null;
-        paeButton.classList.remove('active');
-        return "Режим Pae+ выключен. Возвращаюсь к использованию локальной базы данных.";
+        return "Режим Pae_ai выключен. Возвращаюсь к использованию локальной базы данных.";
       }
     }
 
@@ -537,119 +424,6 @@
         console.error('Ошибка обработки сообщения:', error);
         return "Извините, произошла ошибка при обработке сообщения. Пожалуйста, попробуйте позже.";
       }
-    }
-
-    // Create backdrop overlay
-    function createBackdrop() {
-      backdropOverlay = document.createElement('div');
-      backdropOverlay.className = 'backdrop-overlay';
-      backdropOverlay.addEventListener('click', clearMessageSelection);
-      document.body.appendChild(backdropOverlay);
-    }
-
-    // Create context menu
-    function createContextMenu() {
-      contextMenu = document.createElement('div');
-      contextMenu.className = 'context-menu';
-      
-      const actions = [
-        {
-          icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg>',
-          text: 'Скопировать',
-          action: copyMessage
-        },
-        {
-          icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/></svg>',
-          text: 'Редактировать',
-          action: editMessage
-        },
-        {
-          icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/></svg>',
-          text: 'Удалить',
-          action: deleteMessage
-        }
-      ];
-
-      actions.forEach(({ icon, text, action }) => {
-        const item = document.createElement('div');
-        item.className = 'context-menu-item';
-        item.innerHTML = `${icon}<span>${text}</span>`;
-        item.addEventListener('click', () => {
-          action();
-          clearMessageSelection();
-        });
-        contextMenu.appendChild(item);
-      });
-
-      document.body.appendChild(contextMenu);
-    }
-
-    function showContextMenu(x, y) {
-      const rect = contextMenu.getBoundingClientRect();
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-
-      // Adjust position to keep menu within viewport
-      let menuX = x;
-      let menuY = y;
-
-      if (x + rect.width > viewportWidth) {
-        menuX = viewportWidth - rect.width - 10;
-      }
-
-      if (y + rect.height > viewportHeight) {
-        menuY = viewportHeight - rect.height - 10;
-      }
-
-      contextMenu.style.left = `${menuX}px`;
-      contextMenu.style.top = `${menuY}px`;
-      contextMenu.classList.add('active');
-    }
-
-    function selectMessage(message, x, y) {
-      if (selectedMessage === message) return;
-      
-      clearMessageSelection();
-      selectedMessage = message;
-      message.classList.add('selected');
-      backdropOverlay.classList.add('active');
-      showContextMenu(x, y);
-    }
-
-    function clearMessageSelection() {
-      if (selectedMessage) {
-        selectedMessage.classList.remove('selected');
-        selectedMessage = null;
-      }
-      if (contextMenu) {
-        contextMenu.classList.remove('active');
-      }
-      if (backdropOverlay) {
-        backdropOverlay.classList.remove('active');
-      }
-    }
-
-    // Message actions
-    function copyMessage() {
-      if (!selectedMessage) return;
-      const text = selectedMessage.textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        // Optional: Show copy success feedback
-      });
-    }
-
-    function editMessage() {
-      if (!selectedMessage) return;
-      const text = selectedMessage.textContent;
-      inputField.value = text;
-      inputField.focus();
-      // Note: Additional logic needed to handle message update
-    }
-
-    function deleteMessage() {
-      if (!selectedMessage) return;
-      selectedMessage.remove();
-      // Note: Additional logic needed to handle message deletion in data
     }
 
     // Interface Creation
@@ -731,18 +505,6 @@
       `;
       sendButton.addEventListener('click', handleSendMessage);
 
-      // Add scroll to bottom button
-      scrollButton = document.createElement('button');
-      scrollButton.className = 'scroll-bottom-button';
-      scrollButton.innerHTML = `
-        <svg viewBox="0 0 24 24">
-          <path d="M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z"/>
-        </svg>
-      `;
-      scrollButton.addEventListener('click', () => {
-        smoothScroll(chatContainer, chatContainer.scrollHeight);
-      });
-
       // Assemble Interface
       buttonsContainer.appendChild(micButton);
       buttonsContainer.appendChild(sendButton);
@@ -753,11 +515,6 @@
       root.appendChild(robot);
       root.appendChild(chatContainer);
       root.appendChild(inputContainer);
-      root.appendChild(scrollButton);
-
-      // Initialize context menu and backdrop
-      createBackdrop();
-      createContextMenu();
     }
 
     function initializeSnowflakes() {
@@ -792,95 +549,36 @@
       }, 500);
     }
 
+    function createScrollToBottomButton() {
+      scrollToBottomButton = document.createElement('div');
+      scrollToBottomButton.className = 'scroll-to-bottom';
+      scrollToBottomButton.innerHTML = `
+        <svg viewBox="0 0 24 24">
+          <path d="M12 16.5l-6-6h12l-6 6z"/>
+        </svg>
+      `;
+      scrollToBottomButton.addEventListener('click', () => {
+        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+      });
+      document.body.appendChild(scrollToBottomButton);
+    }
+
     function handleScroll() {
       if (!chatContainer) return;
       const { scrollTop, scrollHeight, clientHeight } = chatContainer;
-      const isAtBottom = Math.abs(scrollHeight - clientHeight - scrollTop) < 50;
-      shouldAutoScroll = isAtBottom;
+      shouldAutoScroll = Math.abs(scrollHeight - clientHeight - scrollTop) < 50;
 
-      // Show/hide scroll button
-      if (scrollButton) {
-        if (!isAtBottom) {
-          scrollButton.classList.add('visible');
-        } else {
-          scrollButton.classList.remove('visible');
-        }
+      if (scrollTop < scrollHeight - clientHeight - 50) {
+        scrollToBottomButton.classList.add('show');
+      } else {
+        scrollToBottomButton.classList.remove('show');
       }
     }
 
-    function smoothScroll(element, target) {
-      const start = element.scrollTop;
-      const change = target - start;
-      const duration = 300;
-      let startTime = null;
-
-      function animation(currentTime) {
-        if (startTime === null) startTime = currentTime;
-        const timeElapsed = currentTime - startTime;
-        const progress = Math.min(timeElapsed / duration, 1);
-
-        element.scrollTop = start + change * easeInOutQuad(progress);
-
-        if (timeElapsed < duration) {
-          requestAnimationFrame(animation);
-        }
-      }
-
-      function easeInOutQuad(t) {
-        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-      }
-
-      requestAnimationFrame(animation);
-    }
-
-    function createMessageElement(text, isUser) {
+    async function addMessage(text, isUser) {
       const message = document.createElement('div');
       message.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
 
-      let pressTimer = null;
-      let startX = 0;
-      let startY = 0;
-      const moveThreshold = 10;
-
-      message.addEventListener('mousedown', handlePressStart);
-      message.addEventListener('touchstart', handlePressStart, { passive: true });
-      message.addEventListener('mouseup', handlePressEnd);
-      message.addEventListener('touchend', handlePressEnd);
-      message.addEventListener('mousemove', handlePressMove);
-      message.addEventListener('touchmove', handlePressMove);
-      message.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        const rect = message.getBoundingClientRect();
-        selectMessage(message, e.clientX, rect.top);
-      });
-
-      function handlePressStart(e) {
-        startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
-        startY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
-        
-        pressTimer = setTimeout(() => {
-          const rect = message.getBoundingClientRect();
-          selectMessage(message, e.type === 'mousedown' ? e.clientX : e.touches[0].clientX, rect.top);
-        }, LONG_PRESS_DURATION);
-      }
-
-      function handlePressEnd() {
-        clearTimeout(pressTimer);
-      }
-
-      function handlePressMove(e) {
-        if (!pressTimer) return;
-        
-        const currentX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
-        const currentY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
-        
-        if (Math.abs(currentX - startX) > moveThreshold || 
-            Math.abs(currentY - startY) > moveThreshold) {
-          clearTimeout(pressTimer);
-        }
-      }
-
-      // Add message content
       if (!isUser) {
         const icon = document.createElement('div');
         icon.className = 'message-icon';
@@ -893,20 +591,11 @@
       }
 
       const content = document.createElement('span');
-      content.textContent = text;
       message.appendChild(content);
-
-      return message;
-    }
-
-    // Update addMessage function to use createMessageElement
-    async function addMessage(text, isUser) {
-      const message = createMessageElement(text, isUser);
       messagesWrapper.appendChild(message);
 
       if (!isUser) {
         isTyping = true;
-        const content = message.querySelector('span');
         content.textContent = '';
         let displayedText = '';
 
@@ -917,15 +606,17 @@
           await new Promise(resolve => setTimeout(resolve, 20));
 
           if (shouldAutoScroll) {
-            smoothScroll(chatContainer, chatContainer.scrollHeight);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
           }
         }
 
         isTyping = false;
+      } else {
+        content.textContent = text;
       }
 
       if (shouldAutoScroll) {
-        smoothScroll(chatContainer, chatContainer.scrollHeight);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
       }
     }
 
@@ -953,14 +644,7 @@
         return;
       }
 
-      if (isRecording) {
-        if (recognition) {
-          recognition.stop();
-        }
-        return;
-      }
-
-      recognition = new webkitSpeechRecognition();
+      const recognition = new webkitSpeechRecognition();
       recognition.lang = 'ru-RU';
       recognition.continuous = false;
       recognition.interimResults = true;
@@ -968,18 +652,17 @@
       recognition.onstart = () => {
         isRecording = true;
         micButton.classList.add('recording');
-        inputField.classList.add('recording');
-        inputField.placeholder = 'Говорите...';
+        inputField.value = 'Говорите...';
         inputField.disabled = true;
       };
 
       recognition.onend = () => {
         isRecording = false;
         micButton.classList.remove('recording');
-        inputField.classList.remove('recording');
         inputField.disabled = false;
-        inputField.placeholder = 'Введите ваш вопрос...';
-        recognition = null;
+        if (inputField.value === 'Говорите...') {
+          inputField.value = '';
+        }
       };
 
       recognition.onresult = (event) => {
@@ -991,17 +674,9 @@
         console.error('Speech recognition error:', event.error);
         isRecording = false;
         micButton.classList.remove('recording');
-        inputField.classList.remove('recording');
         inputField.disabled = false;
         inputField.value = '';
-        inputField.placeholder = 'Введите ваш вопрос...';
-        recognition = null;
-
-        if (event.error === 'no-speech') {
-          alert('Речь не обнаружена. Пожалуйста, попробуйте еще раз.');
-        } else {
-          alert('Ошибка распознавания речи. Пожалуйста, попробуйте еще раз.');
-        }
+        alert('Ошибка распознавания речи. Пожалуйста, попробуйте еще раз.');
       };
 
       recognition.start();
@@ -1012,8 +687,8 @@
       createInterface();
       initializeSnowflakes();
       showWelcomeMessage();
+      createScrollToBottomButton();
     });
   </script>
 </body>
 </html>
-        
