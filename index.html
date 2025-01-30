@@ -308,6 +308,47 @@
       box-shadow: 0 0 15px var(--recording-color);
     }
 
+    /* Scroll to bottom button */
+    .scroll-bottom-button {
+      position: fixed;
+      right: 20px;
+      bottom: 100px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px var(--primary-color);
+      z-index: 1000;
+    }
+
+    .scroll-bottom-button.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .scroll-bottom-button:hover {
+      filter: brightness(1.1);
+      transform: scale(1.05);
+    }
+
+    .scroll-bottom-button:active {
+      transform: scale(0.95);
+    }
+
+    .scroll-bottom-button svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--text-color);
+    }
+
     @media (max-width: 600px) {
       .message {
         max-width: 90%;
@@ -315,6 +356,11 @@
       
       .input-container {
         padding: 10px;
+      }
+
+      .scroll-bottom-button {
+        right: 10px;
+        bottom: 80px;
       }
     }
   </style>
@@ -337,6 +383,7 @@
     let sendButton;
     let micButton;
     let paeButton;
+    let scrollButton;
     let isRecording = false;
     let isTyping = false;
     let shouldAutoScroll = true;
@@ -495,6 +542,18 @@
       `;
       sendButton.addEventListener('click', handleSendMessage);
 
+      // Add scroll to bottom button
+      scrollButton = document.createElement('button');
+      scrollButton.className = 'scroll-bottom-button';
+      scrollButton.innerHTML = `
+        <svg viewBox="0 0 24 24">
+          <path d="M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z"/>
+        </svg>
+      `;
+      scrollButton.addEventListener('click', () => {
+        smoothScroll(chatContainer, chatContainer.scrollHeight);
+      });
+
       // Assemble Interface
       buttonsContainer.appendChild(micButton);
       buttonsContainer.appendChild(sendButton);
@@ -505,6 +564,7 @@
       root.appendChild(robot);
       root.appendChild(chatContainer);
       root.appendChild(inputContainer);
+      root.appendChild(scrollButton);
     }
 
     function initializeSnowflakes() {
@@ -542,7 +602,17 @@
     function handleScroll() {
       if (!chatContainer) return;
       const { scrollTop, scrollHeight, clientHeight } = chatContainer;
-      shouldAutoScroll = Math.abs(scrollHeight - clientHeight - scrollTop) < 50;
+      const isAtBottom = Math.abs(scrollHeight - clientHeight - scrollTop) < 50;
+      shouldAutoScroll = isAtBottom;
+
+      // Show/hide scroll button
+      if (scrollButton) {
+        if (!isAtBottom) {
+          scrollButton.classList.add('visible');
+        } else {
+          scrollButton.classList.remove('visible');
+        }
+      }
     }
 
     function smoothScroll(element, target) {
