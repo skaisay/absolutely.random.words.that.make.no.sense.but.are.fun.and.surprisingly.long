@@ -123,6 +123,7 @@
       background: var(--message-bg);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      transition: transform 0.3s ease-out;
     }
 
     .user-message {
@@ -158,8 +159,14 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
     }
 
     /* Input area */
@@ -315,6 +322,9 @@
 <body>
   <div id="root"></div>
 
+  <!-- Database script -->
+  <script src="database.js"></script>
+  
   <script>
     // OpenAI Configuration
     let useOpenAI = false;
@@ -330,6 +340,7 @@
     let isRecording = false;
     let isTyping = false;
     let shouldAutoScroll = true;
+    let recognition = null;
 
     // Функция переключения режима OpenAI
     async function toggleOpenAI() {
@@ -534,6 +545,31 @@
       shouldAutoScroll = Math.abs(scrollHeight - clientHeight - scrollTop) < 50;
     }
 
+    function smoothScroll(element, target) {
+      const start = element.scrollTop;
+      const change = target - start;
+      const duration = 300;
+      let startTime = null;
+
+      function animation(currentTime) {
+        if (startTime === null) startTime = currentTime;
+        const timeElapsed = currentTime - startTime;
+        const progress = Math.min(timeElapsed / duration, 1);
+
+        element.scrollTop = start + change * easeInOutQuad(progress);
+
+        if (timeElapsed < duration) {
+          requestAnimationFrame(animation);
+        }
+      }
+
+      function easeInOutQuad(t) {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+      }
+
+      requestAnimationFrame(animation);
+    }
+
     async function addMessage(text, isUser) {
       const message = document.createElement('div');
       message.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
@@ -565,7 +601,7 @@
           await new Promise(resolve => setTimeout(resolve, 20));
 
           if (shouldAutoScroll) {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            smoothScroll(chatContainer, chatContainer.scrollHeight);
           }
         }
 
@@ -575,7 +611,7 @@
       }
 
       if (shouldAutoScroll) {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        smoothScroll(chatContainer, chatContainer.scrollHeight);
       }
     }
 
@@ -597,13 +633,30 @@
       }
     }
 
+    function stopRecording() {
+      if (recognition) {
+        recognition.stop();
+        recognition = null;
+      }
+      isRecording = false;
+      micButton.classList.remove('recording');
+      inputField.classList.remove('recording');
+      inputField.disabled = false;
+      inputField.placeholder = 'Введите ваш вопрос...';
+    }
+
     function handleVoiceInput() {
+      if (isRecording) {
+        stopRecording();
+        return;
+      }
+
       if (!('webkitSpeechRecognition' in window)) {
         alert('К сожалению, ваш браузер не поддерживает распознавание речи.');
         return;
       }
 
-      const recognition = new webkitSpeechRecognition();
+      recognition = new webkitSpeechRecognition();
       recognition.lang = 'ru-RU';
       recognition.continuous = false;
       recognition.interimResults = true;
@@ -617,11 +670,10 @@
       };
 
       recognition.onend = () => {
-        isRecording = false;
-        micButton.classList.remove('recording');
-        inputField.classList.remove('recording');
-        inputField.disabled = false;
-        inputField.placeholder = 'Введите ваш вопрос...';
+        stopRecording();
+        if (inputField.value.trim()) {
+          handleSendMessage();
+        }
       };
 
       recognition.onresult = (event) => {
@@ -631,13 +683,14 @@
 
       recognition.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
-        isRecording = false;
-        micButton.classList.remove('recording');
-        inputField.classList.remove('recording');
-        inputField.disabled = false;
-        inputField.value = '';
-        inputField.placeholder = 'Введите ваш вопрос...';
-        alert('Ошибка распознавания речи. Пожалуйста, попробуйте еще раз.');
+        if (event.error !== 'aborted') {
+          stopRecording();
+          if (event.error === 'no-speech') {
+            inputField.placeholder = 'Речь не обнаружена. Попробуйте еще раз...';
+          } else {
+            inputField.placeholder = 'Ошибка распознавания. Попробуйте еще раз...';
+          }
+        }
       };
 
       recognition.start();
