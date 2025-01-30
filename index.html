@@ -124,6 +124,8 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       transition: transform 0.3s ease-out;
+      user-select: none;
+      transition: all 0.3s ease;
     }
 
     .user-message {
@@ -156,6 +158,12 @@
       height: 24px;
       fill: var(--primary-color);
       filter: drop-shadow(0 0 3px var(--primary-color));
+    }
+
+    .message.selected {
+      transform: scale(1.02) translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      z-index: 101;
     }
 
     @keyframes fadeIn {
@@ -349,6 +357,66 @@
       fill: var(--text-color);
     }
 
+    /* Backdrop overlay */
+    .backdrop-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .backdrop-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Context menu */
+    .context-menu {
+      position: absolute;
+      background: rgba(45, 45, 45, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 8px 0;
+      min-width: 180px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transform: scale(0.95);
+      transition: all 0.2s ease;
+      z-index: 102;
+    }
+
+    .context-menu.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .context-menu-item {
+      padding: 8px 16px;
+      color: var(--text-color);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.2s ease;
+    }
+
+    .context-menu-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .context-menu-item svg {
+      width: 18px;
+      height: 18px;
+      opacity: 0.7;
+    }
+
     @media (max-width: 600px) {
       .message {
         max-width: 90%;
@@ -388,6 +456,11 @@
     let isTyping = false;
     let shouldAutoScroll = true;
     let recognition = null;
+    let selectedMessage = null;
+    let contextMenu = null;
+    let backdropOverlay = null;
+    let longPressTimer = null;
+    const LONG_PRESS_DURATION = 500;
 
     // Функция переключения режима OpenAI
     async function toggleOpenAI() {
@@ -461,6 +534,119 @@
         console.error('Ошибка обработки сообщения:', error);
         return "Извините, произошла ошибка при обработке сообщения. Пожалуйста, попробуйте позже.";
       }
+    }
+
+    // Create backdrop overlay
+    function createBackdrop() {
+      backdropOverlay = document.createElement('div');
+      backdropOverlay.className = 'backdrop-overlay';
+      backdropOverlay.addEventListener('click', clearMessageSelection);
+      document.body.appendChild(backdropOverlay);
+    }
+
+    // Create context menu
+    function createContextMenu() {
+      contextMenu = document.createElement('div');
+      contextMenu.className = 'context-menu';
+      
+      const actions = [
+        {
+          icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg>',
+          text: 'Скопировать',
+          action: copyMessage
+        },
+        {
+          icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/></svg>',
+          text: 'Редактировать',
+          action: editMessage
+        },
+        {
+          icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/></svg>',
+          text: 'Удалить',
+          action: deleteMessage
+        }
+      ];
+
+      actions.forEach(({ icon, text, action }) => {
+        const item = document.createElement('div');
+        item.className = 'context-menu-item';
+        item.innerHTML = `${icon}<span>${text}</span>`;
+        item.addEventListener('click', () => {
+          action();
+          clearMessageSelection();
+        });
+        contextMenu.appendChild(item);
+      });
+
+      document.body.appendChild(contextMenu);
+    }
+
+    function showContextMenu(x, y) {
+      const rect = contextMenu.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // Adjust position to keep menu within viewport
+      let menuX = x;
+      let menuY = y;
+
+      if (x + rect.width > viewportWidth) {
+        menuX = viewportWidth - rect.width - 10;
+      }
+
+      if (y + rect.height > viewportHeight) {
+        menuY = viewportHeight - rect.height - 10;
+      }
+
+      contextMenu.style.left = `${menuX}px`;
+      contextMenu.style.top = `${menuY}px`;
+      contextMenu.classList.add('active');
+    }
+
+    function selectMessage(message, x, y) {
+      if (selectedMessage === message) return;
+      
+      clearMessageSelection();
+      selectedMessage = message;
+      message.classList.add('selected');
+      backdropOverlay.classList.add('active');
+      showContextMenu(x, y);
+    }
+
+    function clearMessageSelection() {
+      if (selectedMessage) {
+        selectedMessage.classList.remove('selected');
+        selectedMessage = null;
+      }
+      if (contextMenu) {
+        contextMenu.classList.remove('active');
+      }
+      if (backdropOverlay) {
+        backdropOverlay.classList.remove('active');
+      }
+    }
+
+    // Message actions
+    function copyMessage() {
+      if (!selectedMessage) return;
+      const text = selectedMessage.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        // Optional: Show copy success feedback
+      });
+    }
+
+    function editMessage() {
+      if (!selectedMessage) return;
+      const text = selectedMessage.textContent;
+      inputField.value = text;
+      inputField.focus();
+      // Note: Additional logic needed to handle message update
+    }
+
+    function deleteMessage() {
+      if (!selectedMessage) return;
+      selectedMessage.remove();
+      // Note: Additional logic needed to handle message deletion in data
     }
 
     // Interface Creation
@@ -565,6 +751,10 @@
       root.appendChild(chatContainer);
       root.appendChild(inputContainer);
       root.appendChild(scrollButton);
+
+      // Initialize context menu and backdrop
+      createBackdrop();
+      createContextMenu();
     }
 
     function initializeSnowflakes() {
@@ -640,10 +830,54 @@
       requestAnimationFrame(animation);
     }
 
-    async function addMessage(text, isUser) {
+    function createMessageElement(text, isUser) {
       const message = document.createElement('div');
       message.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
 
+      let pressTimer = null;
+      let startX = 0;
+      let startY = 0;
+      const moveThreshold = 10;
+
+      message.addEventListener('mousedown', handlePressStart);
+      message.addEventListener('touchstart', handlePressStart, { passive: true });
+      message.addEventListener('mouseup', handlePressEnd);
+      message.addEventListener('touchend', handlePressEnd);
+      message.addEventListener('mousemove', handlePressMove);
+      message.addEventListener('touchmove', handlePressMove);
+      message.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        const rect = message.getBoundingClientRect();
+        selectMessage(message, e.clientX, rect.top);
+      });
+
+      function handlePressStart(e) {
+        startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+        startY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
+        
+        pressTimer = setTimeout(() => {
+          const rect = message.getBoundingClientRect();
+          selectMessage(message, e.type === 'mousedown' ? e.clientX : e.touches[0].clientX, rect.top);
+        }, LONG_PRESS_DURATION);
+      }
+
+      function handlePressEnd() {
+        clearTimeout(pressTimer);
+      }
+
+      function handlePressMove(e) {
+        if (!pressTimer) return;
+        
+        const currentX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+        const currentY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
+        
+        if (Math.abs(currentX - startX) > moveThreshold || 
+            Math.abs(currentY - startY) > moveThreshold) {
+          clearTimeout(pressTimer);
+        }
+      }
+
+      // Add message content
       if (!isUser) {
         const icon = document.createElement('div');
         icon.className = 'message-icon';
@@ -656,11 +890,20 @@
       }
 
       const content = document.createElement('span');
+      content.textContent = text;
       message.appendChild(content);
+
+      return message;
+    }
+
+    // Update addMessage function to use createMessageElement
+    async function addMessage(text, isUser) {
+      const message = createMessageElement(text, isUser);
       messagesWrapper.appendChild(message);
 
       if (!isUser) {
         isTyping = true;
+        const content = message.querySelector('span');
         content.textContent = '';
         let displayedText = '';
 
@@ -676,8 +919,6 @@
         }
 
         isTyping = false;
-      } else {
-        content.textContent = text;
       }
 
       if (shouldAutoScroll) {
@@ -703,26 +944,16 @@
       }
     }
 
-    function stopRecording() {
-      if (recognition) {
-        recognition.stop();
-        recognition = null;
-      }
-      isRecording = false;
-      micButton.classList.remove('recording');
-      inputField.classList.remove('recording');
-      inputField.disabled = false;
-      inputField.placeholder = 'Введите ваш вопрос...';
-    }
-
     function handleVoiceInput() {
-      if (isRecording) {
-        stopRecording();
+      if (!('webkitSpeechRecognition' in window)) {
+        alert('К сожалению, ваш браузер не поддерживает распознавание речи.');
         return;
       }
 
-      if (!('webkitSpeechRecognition' in window)) {
-        alert('К сожалению, ваш браузер не поддерживает распознавание речи.');
+      if (isRecording) {
+        if (recognition) {
+          recognition.stop();
+        }
         return;
       }
 
@@ -740,10 +971,12 @@
       };
 
       recognition.onend = () => {
-        stopRecording();
-        if (inputField.value.trim()) {
-          handleSendMessage();
-        }
+        isRecording = false;
+        micButton.classList.remove('recording');
+        inputField.classList.remove('recording');
+        inputField.disabled = false;
+        inputField.placeholder = 'Введите ваш вопрос...';
+        recognition = null;
       };
 
       recognition.onresult = (event) => {
@@ -753,13 +986,18 @@
 
       recognition.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
-        if (event.error !== 'aborted') {
-          stopRecording();
-          if (event.error === 'no-speech') {
-            inputField.placeholder = 'Речь не обнаружена. Попробуйте еще раз...';
-          } else {
-            inputField.placeholder = 'Ошибка распознавания. Попробуйте еще раз...';
-          }
+        isRecording = false;
+        micButton.classList.remove('recording');
+        inputField.classList.remove('recording');
+        inputField.disabled = false;
+        inputField.value = '';
+        inputField.placeholder = 'Введите ваш вопрос...';
+        recognition = null;
+
+        if (event.error === 'no-speech') {
+          alert('Речь не обнаружена. Пожалуйста, попробуйте еще раз.');
+        } else {
+          alert('Ошибка распознавания речи. Пожалуйста, попробуйте еще раз.');
         }
       };
 
@@ -775,3 +1013,4 @@
   </script>
 </body>
 </html>
+        
