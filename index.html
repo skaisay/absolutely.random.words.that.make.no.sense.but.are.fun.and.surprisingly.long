@@ -213,6 +213,11 @@
       z-index: 2;
     }
 
+    .pae-button.active {
+      background: var(--recording-color);
+      box-shadow: 0 0 15px var(--recording-color);
+    }
+
     .pae-button:hover {
       transform: scale(1.05);
       filter: brightness(1.1);
@@ -307,6 +312,37 @@
         padding: 10px;
       }
     }
+
+    /* Scroll to bottom button */
+    .scroll-to-bottom {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: var(--primary-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(46, 166, 255, 0.5);
+      transition: opacity 0.3s ease;
+      opacity: 0;
+      visibility: hidden;
+      z-index: 1000;
+    }
+
+    .scroll-to-bottom svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--text-color);
+    }
+
+    .scroll-to-bottom.show {
+      opacity: 1;
+      visibility: visible;
+    }
   </style>
 </head>
 <body>
@@ -329,9 +365,13 @@
     let isTyping = false;
     let shouldAutoScroll = true;
 
+    // Scroll to bottom button
+    let scrollToBottomButton;
+
     // Функция переключения режима OpenAI
     async function toggleOpenAI() {
       useOpenAI = !useOpenAI;
+      paeButton.classList.toggle('active', useOpenAI);
       if (useOpenAI) {
         const key = prompt("Пожалуйста, введите ваш ключ Pae-api:");
         if (key) {
@@ -339,6 +379,7 @@
           return "Режим Pae_ai включен. Теперь я буду использовать Pae+AI для ответов.";
         } else {
           useOpenAI = false;
+          paeButton.classList.remove('active');
           return "Ключ API не был предоставлен. Продолжаю работу в обычном режиме.";
         }
       } else {
@@ -524,10 +565,30 @@
       }, 500);
     }
 
+    function createScrollToBottomButton() {
+      scrollToBottomButton = document.createElement('div');
+      scrollToBottomButton.className = 'scroll-to-bottom';
+      scrollToBottomButton.innerHTML = `
+        <svg viewBox="0 0 24 24">
+          <path d="M12 16.5l-6-6h12l-6 6z"/>
+        </svg>
+      `;
+      scrollToBottomButton.addEventListener('click', () => {
+        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+      });
+      document.body.appendChild(scrollToBottomButton);
+    }
+
     function handleScroll() {
       if (!chatContainer) return;
       const { scrollTop, scrollHeight, clientHeight } = chatContainer;
       shouldAutoScroll = Math.abs(scrollHeight - clientHeight - scrollTop) < 50;
+
+      if (scrollTop < scrollHeight - clientHeight - 50) {
+        scrollToBottomButton.classList.add('show');
+      } else {
+        scrollToBottomButton.classList.remove('show');
+      }
     }
 
     async function addMessage(text, isUser) {
@@ -642,6 +703,7 @@
       createInterface();
       initializeSnowflakes();
       showWelcomeMessage();
+      createScrollToBottomButton();
     });
   </script>
 </body>
