@@ -1,31 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Telegram Mini App</title>
-  
-  <!-- React and ReactDOM -->
-  <script crossorigin src="https://unpkg.com/react@18.3.0/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18.3.0/umd/react-dom.production.min.js"></script>
-  
-  <!-- Babel for JSX -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <!-- Tailwind CSS -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  
+  <script src="https://unpkg.com/lucide-react@latest"></script>
   <style>
     @keyframes float {
-      0%, 100% {
-        transform: translateY(0) rotate(0deg);
-      }
-      50% {
-        transform: translateY(-20px) rotate(180deg);
-      }
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
     }
 
     @keyframes fade-in {
@@ -61,169 +47,29 @@
     .animate-float-3 { animation: float 9s infinite ease-in-out; }
     .animate-float-4 { animation: float 10s infinite ease-in-out; }
 
-    .animate-fade-in {
-      animation: fade-in 1s ease-out;
-    }
-
-    .animate-slide-up {
-      animation: slide-up 0.6s ease-out;
-    }
-
-    .animate-slide-up-delay {
-      animation: slide-up 0.6s ease-out 0.2s both;
-    }
-
-    .animate-profile-appear {
-      animation: profile-appear 0.8s ease-out;
-    }
-
-    .hover\:scale-102:hover {
-      transform: scale(1.02);
-    }
+    .animate-fade-in { animation: fade-in 1s ease-out; }
+    .animate-slide-up { animation: slide-up 0.6s ease-out; }
+    .animate-slide-up-delay { animation: slide-up 0.6s ease-out 0.2s both; }
+    .animate-profile-appear { animation: profile-appear 0.8s ease-out; }
   </style>
 </head>
 <body>
   <div id="root"></div>
-
   <script type="text/babel">
-    // Import icons from Lucide
-    const {
-      Cherry, Sparkles, User, BookOpen, Gamepad2: GamepadIcon, Heart,
-      Settings: SettingsIcon, Info, ArrowLeft, Target, Trophy,
-      Brain, Dice1: Dice, Moon, Sun, Volume2, VolumeX, Globe,
-      Phone, Mail, Github
+    const { useState, useEffect } = React;
+    const { 
+      Cherry, Sparkles, User, BookOpen, GamepadIcon, Heart, Settings: SettingsIcon,
+      Info, ArrowLeft, Target, Trophy, Brain, Dice1: Dice, Moon, Sun,
+      Volume2, VolumeX, Globe, Phone, Mail, Github
     } = lucide;
 
-    // Types
-    const Screen = {
-      HOME: 'home',
-      PROFILE: 'profile',
-      GAMES: 'games',
-      SETTINGS: 'settings',
-      ABOUT: 'about',
-      ARTICLES: 'articles'
-    };
-
-    const Language = {
-      EN: 'en',
-      RU: 'ru',
-      NO: 'no',
-      ZH: 'zh'
-    };
-
-    // Translations
-    const translations = {
-      en: {
-        common: {
-          back: 'Back',
-          loading: 'Loading...',
-          save: 'Save',
-          cancel: 'Cancel',
-        },
-        nav: {
-          profile: 'Profile',
-          games: 'Games',
-          articles: 'Articles',
-          settings: 'Settings',
-          about: 'About',
-        },
-        welcome: {
-          phrases: [
-            'Welcome back!',
-            'Have a wonderful day!',
-            'Happy to see you again!',
-            'Welcome!',
-          ],
-        },
-        games: {
-          title: 'Choose a Game',
-          clicker: {
-            name: 'Sakura Clicker',
-            score: 'Score',
-            highScore: 'High Score',
-          },
-          memory: {
-            name: 'Memory Match',
-            description: 'Match pairs of cards',
-          },
-          quiz: {
-            name: 'Anime Quiz',
-            complete: 'Quiz Complete!',
-            finalScore: 'Final Score',
-            playAgain: 'Play Again',
-          },
-        },
-        settings: {
-          language: 'Language',
-          darkMode: 'Dark Mode',
-          sound: 'Sound Effects',
-          languages: {
-            en: 'English',
-            ru: 'Русский',
-            no: 'Norsk',
-            zh: '中文',
-          },
-        },
-      },
-      ru: {
-        common: {
-          back: 'Назад',
-          loading: 'Загрузка...',
-          save: 'Сохранить',
-          cancel: 'Отмена',
-        },
-        nav: {
-          profile: 'Профиль',
-          games: 'Игры',
-          articles: 'Статьи',
-          settings: 'Настройки',
-          about: 'О приложении',
-        },
-        welcome: {
-          phrases: [
-            'С возвращением!',
-            'Хорошего дня!',
-            'Рады видеть вас снова!',
-            'Добро пожаловать!',
-          ],
-        },
-        games: {
-          title: 'Выберите игру',
-          clicker: {
-            name: 'Сакура Кликер',
-            score: 'Очки',
-            highScore: 'Рекорд',
-          },
-          memory: {
-            name: 'Найди пару',
-            description: 'Найдите пары карточек',
-          },
-          quiz: {
-            name: 'Аниме Викторина',
-            complete: 'Викторина завершена!',
-            finalScore: 'Итоговый счет',
-            playAgain: 'Играть снова',
-          },
-        },
-        settings: {
-          language: 'Язык',
-          darkMode: 'Темная тема',
-          sound: 'Звуковые эффекты',
-          languages: {
-            en: 'English',
-            ru: 'Русский',
-            no: 'Norsk',
-            zh: '中文',
-          },
-        },
-      },
-      no: {
-        // Norwegian translations...
-      },
-      zh: {
-        // Chinese translations...
-      },
-    };
+    // Welcome phrases
+    const welcomePhrases = [
+      "お帰りなさい (Welcome back)!",
+      "素敵な一日を (Have a wonderful day)!",
+      "また会えて嬉しいです (Happy to see you again)!",
+      "ようこそ (Welcome)!",
+    ];
 
     // Articles data
     const articles = [
@@ -247,20 +93,6 @@
         description: "What does the future hold for social applications? We explore the trends and innovations that will shape the next generation of social interaction.",
         imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=60",
         date: "2024-03-13"
-      },
-      {
-        id: 4,
-        title: "The Rise of Mini Games",
-        description: "Mini games are becoming increasingly popular in messaging platforms. We look at why these bite-sized entertainment options are capturing users' attention.",
-        imageUrl: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&auto=format&fit=crop&q=60",
-        date: "2024-03-12"
-      },
-      {
-        id: 5,
-        title: "Building Community Through Apps",
-        description: "How mini applications are creating new ways for communities to connect and interact. From shared experiences to collaborative features.",
-        imageUrl: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=60",
-        date: "2024-03-11"
       }
     ];
 
@@ -283,59 +115,10 @@
       }
     ];
 
-    // Welcoming phrases
-    const welcomePhrases = [
-      "お帰りなさい (Welcome back)!",
-      "素敵な一日を (Have a wonderful day)!",
-      "また会えて嬉しいです (Happy to see you again)!",
-      "ようこそ (Welcome)!",
-    ];
-
-    // Language hook
-    function useLanguage() {
-      const [language, setLanguage] = React.useState(() => {
-        const savedLang = localStorage.getItem('language');
-        if (savedLang && translations[savedLang]) {
-          return savedLang;
-        }
-        
-        if (window.Telegram?.WebApp) {
-          const userLang = window.Telegram.WebApp.initDataUnsafe?.user?.language_code;
-          if (userLang && translations[userLang]) {
-            return userLang;
-          }
-        }
-        
-        return 'en';
-      });
-
-      const t = (key) => {
-        const keys = key.split('.');
-        let value = translations[language];
-        
-        for (const k of keys) {
-          if (value && value[k]) {
-            value = value[k];
-          } else {
-            return key;
-          }
-        }
-        
-        return value;
-      };
-
-      const changeLanguage = (newLang) => {
-        setLanguage(newLang);
-        localStorage.setItem('language', newLang);
-      };
-
-      return { language, t, changeLanguage };
-    }
-
     // Components
     function Profile({ userData }) {
-      const [isEditing, setIsEditing] = React.useState(false);
-      const [formData, setFormData] = React.useState({
+      const [isEditing, setIsEditing] = useState(false);
+      const [formData, setFormData] = useState({
         name: userData.name,
         phone: userData.phone,
       });
@@ -422,19 +205,19 @@
     }
 
     function Games() {
-      const [currentGame, setCurrentGame] = React.useState(null);
-      const [score, setScore] = React.useState(0);
-      const [highScore, setHighScore] = React.useState(0);
-      const [memoryCards, setMemoryCards] = React.useState([]);
-      const [flippedCards, setFlippedCards] = React.useState([]);
-      const [matchedPairs, setMatchedPairs] = React.useState([]);
-      const [quizQuestion, setQuizQuestion] = React.useState(0);
-      const [guessNumber, setGuessNumber] = React.useState(null);
-      const [userGuess, setUserGuess] = React.useState('');
-      const [guessMessage, setGuessMessage] = React.useState('');
-      const [reactionState, setReactionState] = React.useState('waiting');
-      const [reactionStartTime, setReactionStartTime] = React.useState(0);
-      const [reactionTime, setReactionTime] = React.useState(0);
+      const [currentGame, setCurrentGame] = useState(null);
+      const [score, setScore] = useState(0);
+      const [highScore, setHighScore] = useState(0);
+      const [memoryCards, setMemoryCards] = useState([]);
+      const [flippedCards, setFlippedCards] = useState([]);
+      const [matchedPairs, setMatchedPairs] = useState([]);
+      const [quizQuestion, setQuizQuestion] = useState(0);
+      const [guessNumber, setGuessNumber] = useState(null);
+      const [userGuess, setUserGuess] = useState('');
+      const [guessMessage, setGuessMessage] = useState('');
+      const [reactionState, setReactionState] = useState('waiting');
+      const [reactionStartTime, setReactionStartTime] = useState(0);
+      const [reactionTime, setReactionTime] = useState(0);
 
       const initializeMemoryGame = () => {
         const pairs = [1, 1, 2, 2, 3, 3, 4, 4];
@@ -785,44 +568,37 @@
     }
 
     function Settings() {
-      const { language, t, changeLanguage } = useLanguage();
-      const [isDarkMode, setIsDarkMode] = React.useState(false);
-      const [isSoundEnabled, setIsSoundEnabled] = React.useState(true);
+      const [isDarkMode, setIsDarkMode] = useState(false);
+      const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+      const [language, setLanguage] = useState('en');
 
-      const languages = [
-        { code: 'en', name: t('settings.languages.en') },
-        { code: 'ru', name: t('settings.languages.ru') },
-        { code: 'no', name: t('settings.languages.no') },
-        { code: 'zh', name: t('settings.languages.zh') },
-      ];
+      const t = (key) => key; // Simple translation function
 
       return (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">{t('nav.settings')}</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Settings</h2>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Globe size={20} />
-                <span>{t('settings.language')}</span>
+                <span>Language</span>
               </div>
               <select
                 value={language}
-                onChange={(e) => changeLanguage(e.target.value)}
+                onChange={(e) => setLanguage(e.target.value)}
                 className="rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring focus:ring-pink-200"
               >
-                {languages.map((lang) => (
-                  <option key={lang.code} value={lang.code}>
-                    {lang.name}
-                  </option>
-                ))}
+                <option value="en">English</option>
+                <option value="ru">Русский</option>
+                <option value="no">Norsk</option>
+                <option value="zh">中文</option>
               </select>
             </div>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
-                <span>{t('settings.darkMode')}</span>
+                {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}<span>{t('settings.darkMode')}</span>
               </div>
               <button
                 onClick={() => setIsDarkMode(!isDarkMode)}
