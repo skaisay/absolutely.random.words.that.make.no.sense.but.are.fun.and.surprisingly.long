@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Telegram Mini App</title>
+  
+  <!-- React and ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18.3.0/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18.3.0/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-20px) rotate(180deg);
+      }
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slide-up {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes profile-appear {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .animate-float-0 { animation: float 6s infinite ease-in-out; }
+    .animate-float-1 { animation: float 7s infinite ease-in-out; }
+    .animate-float-2 { animation: float 8s infinite ease-in-out; }
+    .animate-float-3 { animation: float 9s infinite ease-in-out; }
+    .animate-float-4 { animation: float 10s infinite ease-in-out; }
+
+    .animate-fade-in {
+      animation: fade-in 1s ease-out;
+    }
+
+    .animate-slide-up {
+      animation: slide-up 0.6s ease-out;
+    }
+
+    .animate-slide-up-delay {
+      animation: slide-up 0.6s ease-out 0.2s both;
+    }
+
+    .animate-profile-appear {
+      animation: profile-appear 0.8s ease-out;
+    }
+
+    .hover\:scale-102:hover {
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    // Import icons from Lucide
+    const {
+      Cherry, Sparkles, User, BookOpen, Gamepad2: GamepadIcon, Heart,
+      Settings: SettingsIcon, Info, ArrowLeft, Target, Trophy,
+      Brain, Dice1: Dice, Moon, Sun, Volume2, VolumeX, Globe,
+      Phone, Mail, Github
+    } = lucide;
+
+    // Types
+    const Screen = {
+      HOME: 'home',
+      PROFILE: 'profile',
+      GAMES: 'games',
+      SETTINGS: 'settings',
+      ABOUT: 'about',
+      ARTICLES: 'articles'
+    };
+
+    const Language = {
+      EN: 'en',
+      RU: 'ru',
+      NO: 'no',
+      ZH: 'zh'
+    };
+
+    // Translations
+    const translations = {
+      en: {
+        common: {
+          back: 'Back',
+          loading: 'Loading...',
+          save: 'Save',
+          cancel: 'Cancel',
+        },
+        nav: {
+          profile: 'Profile',
+          games: 'Games',
+          articles: 'Articles',
+          settings: 'Settings',
+          about: 'About',
+        },
+        welcome: {
+          phrases: [
+            'Welcome back!',
+            'Have a wonderful day!',
+            'Happy to see you again!',
+            'Welcome!',
+          ],
+        },
+        games: {
+          title: 'Choose a Game',
+          clicker: {
+            name: 'Sakura Clicker',
+            score: 'Score',
+            highScore: 'High Score',
+          },
+          memory: {
+            name: 'Memory Match',
+            description: 'Match pairs of cards',
+          },
+          quiz: {
+            name: 'Anime Quiz',
+            complete: 'Quiz Complete!',
+            finalScore: 'Final Score',
+            playAgain: 'Play Again',
+          },
+        },
+        settings: {
+          language: 'Language',
+          darkMode: 'Dark Mode',
+          sound: 'Sound Effects',
+          languages: {
+            en: 'English',
+            ru: 'Русский',
+            no: 'Norsk',
+            zh: '中文',
+          },
+        },
+      },
+      ru: {
+        common: {
+          back: 'Назад',
+          loading: 'Загрузка...',
+          save: 'Сохранить',
+          cancel: 'Отмена',
+        },
+        nav: {
+          profile: 'Профиль',
+          games: 'Игры',
+          articles: 'Статьи',
+          settings: 'Настройки',
+          about: 'О приложении',
+        },
+        welcome: {
+          phrases: [
+            'С возвращением!',
+            'Хорошего дня!',
+            'Рады видеть вас снова!',
+            'Добро пожаловать!',
+          ],
+        },
+        games: {
+          title: 'Выберите игру',
+          clicker: {
+            name: 'Сакура Кликер',
+            score: 'Очки',
+            highScore: 'Рекорд',
+          },
+          memory: {
+            name: 'Найди пару',
+            description: 'Найдите пары карточек',
+          },
+          quiz: {
+            name: 'Аниме Викторина',
+            complete: 'Викторина завершена!',
+            finalScore: 'Итоговый счет',
+            playAgain: 'Играть снова',
+          },
+        },
+        settings: {
+          language: 'Язык',
+          darkMode: 'Темная тема',
+          sound: 'Звуковые эффекты',
+          languages: {
+            en: 'English',
+            ru: 'Русский',
+            no: 'Norsk',
+            zh: '中文',
+          },
+        },
+      },
+      no: {
+        // Norwegian translations...
+      },
+      zh: {
+        // Chinese translations...
+      },
+    };
+
+    // Articles data
+    const articles = [
+      {
+        id: 1,
+        title: "The Art of Mini Apps",
+        description: "Discover how Telegram Mini Apps are revolutionizing the way we interact with messaging platforms. From games to utilities, these apps are changing the landscape of mobile interactions.",
+        imageUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&auto=format&fit=crop&q=60",
+        date: "2024-03-15"
+      },
+      {
+        id: 2,
+        title: "Gaming in Telegram",
+        description: "Explore the exciting world of in-app gaming on Telegram. Learn about the latest trends and how developers are creating engaging experiences within the messenger.",
+        imageUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&auto=format&fit=crop&q=60",
+        date: "2024-03-14"
+      },
+      {
+        id: 3,
+        title: "Future of Social Apps",
+        description: "What does the future hold for social applications? We explore the trends and innovations that will shape the next generation of social interaction.",
+        imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=60",
+        date: "2024-03-13"
+      },
+      {
+        id: 4,
+        title: "The Rise of Mini Games",
+        description: "Mini games are becoming increasingly popular in messaging platforms. We look at why these bite-sized entertainment options are capturing users' attention.",
+        imageUrl: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&auto=format&fit=crop&q=60",
+        date: "2024-03-12"
+      },
+      {
+        id: 5,
+        title: "Building Community Through Apps",
+        description: "How mini applications are creating new ways for communities to connect and interact. From shared experiences to collaborative features.",
+        imageUrl: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=60",
+        date: "2024-03-11"
+      }
+    ];
+
+    // Quiz questions
+    const questions = [
+      {
+        question: "What is the capital of Japan?",
+        options: ["Seoul", "Beijing", "Tokyo", "Bangkok"],
+        correct: 2
+      },
+      {
+        question: "Which anime features a boy who can stretch like rubber?",
+        options: ["Naruto", "One Piece", "Dragon Ball", "Bleach"],
+        correct: 1
+      },
+      {
+        question: "What is the name of the famous Japanese animation studio that created 'Spirited Away'?",
+        options: ["Studio Ghibli", "Toei Animation", "Madhouse", "Kyoto Animation"],
+        correct: 0
+      }
+    ];
+
+    // Welcoming phrases
+    const welcomePhrases = [
+      "お帰りなさい (Welcome back)!",
+      "素敵な一日を (Have a wonderful day)!",
+      "また会えて嬉しいです (Happy to see you again)!",
+      "ようこそ (Welcome)!",
+    ];
+
+    // Language hook
+    function useLanguage() {
+      const [language, setLanguage] = React.useState(() => {
+        const savedLang = localStorage.getItem('language');
+        if (savedLang && translations[savedLang]) {
+          return savedLang;
+        }
+        
+        if (window.Telegram?.WebApp) {
+          const userLang = window.Telegram.WebApp.initDataUnsafe?.user?.language_code;
+          if (userLang && translations[userLang]) {
+            return userLang;
+          }
+        }
+        
+        return 'en';
+      });
+
+      const t = (key) => {
+        const keys = key.split('.');
+        let value = translations[language];
+        
+        for (const k of keys) {
+          if (value && value[k]) {
+            value = value[k];
+          } else {
+            return key;
+          }
+        }
+        
+        return value;
+      };
+
+      const changeLanguage = (newLang) => {
+        setLanguage(newLang);
+        localStorage.setItem('language', newLang);
+      };
+
+      return { language, t, changeLanguage };
+    }
+
+    // Components
+    function Profile({ userData }) {
+      const [isEditing, setIsEditing] = React.useState(false);
+      const [formData, setFormData] = React.useState({
+        name: userData.name,
+        phone: userData.phone,
+      });
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        setIsEditing(false);
+      };
+
+      if (isEditing) {
+        return (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Edit Profile</h2>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Name</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring focus:ring-pink-200"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Phone</label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring focus:ring-pink-200"
+              />
+            </div>
+
+            <div className="flex space-x-4">
+              <button
+                type="submit"
+                className="flex-1 bg-pink-500 text-white rounded-lg px-4 py-2 hover:bg-pink-600 transition-colors"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="flex-1 bg-gray-200 text-gray-800 rounded-lg px-4 py-2 hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        );
+      }
+
+      return (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Profile</h2>
+          
+          <div className="flex items-center space-x-4">
+            <img
+              src={userData.photoUrl}
+              alt="Profile"
+              className="w-16 h-16 rounded-full object-cover"
+            />
+            <div>
+              <div className="flex items-center space-x-2">
+                <User size={16} className="text-gray-500" />
+                <span className="text-gray-800">{userData.name}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Phone size={16} className="text-gray-500" />
+                <span className="text-gray-600">{userData.phone}</span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setIsEditing(true)}
+            className="w-full bg-pink-500 text-white rounded-lg px-4 py-2 hover:bg-pink-600 transition-colors"
+          >
+            Edit Profile
+          </button>
+        </div>
+      );
+    }
+
+    function Games() {
+      const [currentGame, setCurrentGame] = React.useState(null);
+      const [score, setScore] = React.useState(0);
+      const [highScore, setHighScore] = React.useState(0);
+      const [memoryCards, setMemoryCards] = React.useState([]);
+      const [flippedCards, setFlippedCards] = React.useState([]);
+      const [matchedPairs, setMatchedPairs] = React.useState([]);
+      const [quizQuestion, setQuizQuestion] = React.useState(0);
+      const [guessNumber, setGuessNumber] = React.useState(null);
+      const [userGuess, setUserGuess] = React.useState('');
+      const [guessMessage, setGuessMessage] = React.useState('');
+      const [reactionState, setReactionState] = React.useState('waiting');
+      const [reactionStartTime, setReactionStartTime] = React.useState(0);
+      const [reactionTime, setReactionTime] = React.useState(0);
+
+      const initializeMemoryGame = () => {
+        const pairs = [1, 1, 2, 2, 3, 3, 4, 4];
+        const shuffled = pairs.sort(() => Math.random() - 0.5);
+        setMemoryCards(shuffled);
+        setFlippedCards([]);
+        setMatchedPairs([]);
+      };
+
+      const initializeGuessGame = () => {
+        setGuessNumber(Math.floor(Math.random() * 100) + 1);
+        setUserGuess('');
+        setGuessMessage('Guess a number between 1 and 100');
+      };
+
+      const startReactionGame = () => {
+        setReactionState('waiting');
+        const delay = 1000 + Math.random() * 4000;
+        setTimeout(() => {
+          setReactionState('ready');
+          setReactionStartTime(Date.now());
+        }, delay);
+      };
+
+      const handleCardClick = (index) => {
+        if (flippedCards.length === 2 || flippedCards.includes(index) || matchedPairs.includes(index)) return;
+
+        const newFlippedCards = [...flippedCards, index];
+        setFlippedCards(newFlippedCards);
+
+        if (newFlippedCards.length === 2) {
+          if (memoryCards[newFlippedCards[0]] === memoryCards[newFlippedCards[1]]) {
+            setMatchedPairs([...matchedPairs, ...newFlippedCards]);
+            setFlippedCards([]);
+            setScore(score + 10);
+          } else {
+            setTimeout(() => setFlippedCards([]), 1000);
+          }
+        }
+      };
+
+      const handleGuessSubmit = () => {
+        if (!guessNumber || !userGuess) return;
+        
+        const guess = parseInt(userGuess);
+        if (guess === guessNumber) {
+          setGuessMessage('Congratulations! You got it!');
+          setScore(score + 20);
+        } else if (guess < guessNumber) {
+          setGuessMessage('Too low! Try again.');
+        } else {
+          setGuessMessage('Too high! Try again.');
+        }
+        setUserGuess('');
+      };
+
+      const handleReactionClick = () => {
+        if (reactionState === 'waiting') {
+          setReactionState('tooSoon');
+          setTimeout(() => startReactionGame(), 1000);
+        } else if (reactionState === 'ready') {
+          const endTime = Date.now();
+          const time = endTime - reactionStartTime;
+          setReactionTime(time);
+          setReactionState('clicked');
+          if (time < highScore || highScore === 0) {
+            setHighScore(time);
+          }
+        }
+      };
+
+      const renderGameSelection = () => (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Choose a Game</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => setCurrentGame('clicker')}
+              className="p-4 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex flex-col items-center gap-2"
+            >
+              <Target size={24} />
+              <span>Clicker</span>
+            </button>
+            <button
+              onClick={() => {
+                setCurrentGame('memory');
+                initializeMemoryGame();
+              }}
+              className="p-4 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex flex-col items-center gap-2"
+            >
+              <Brain size={24} />
+              <span>Memory</span>
+            </button>
+            <button
+              onClick={() => {
+                setCurrentGame('quiz');
+                setQuizQuestion(0);
+                setScore(0);
+              }}
+              className="p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex flex-col items-center gap-2"
+            >
+              <GamepadIcon size={24} />
+              <span>Quiz</span>
+            </button>
+            <button
+              onClick={() => {
+                setCurrentGame('guess');
+                initializeGuessGame();
+              }}
+              className="p-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex flex-col items-center gap-2"
+            >
+              <Dice size={24} />
+              <span>Number Guess</span>
+            </button>
+            <button
+              onClick={() => {
+                setCurrentGame('reaction');
+                startReactionGame();
+              }}
+              className="col-span-2 p-4 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors flex flex-col items-center gap-2"
+            >
+              <Trophy size={24} />
+              <span>Reaction Time</span>
+            </button>
+          </div>
+        </div>
+      );
+
+      const renderGame = () => {
+        switch (currentGame) {
+          case 'clicker':
+            return (
+              <div className="space-y-6 text-center">
+                <h2 className="text-2xl font-bold text-gray-800">Sakura Clicker</h2>
+                <div className="flex justify-around mb-8">
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Score</p>
+                    <p className="text-2xl font-bold text-pink-500">{score}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">High Score</p>
+                    <p className="text-2xl font-bold text-purple-500">{highScore}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    const newScore = score + 1;
+                    setScore(newScore);
+                    if (newScore > highScore) setHighScore(newScore);
+                  }}
+                  className="w-32 h-32 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 hover:from-pink-500 hover:to-purple-600 transform hover:scale-105 transition-all duration-150 shadow-lg flex items-center justify-center"
+                >
+                  <Target size={48} className="text-white" />
+                </button>
+              </div>
+            );
+
+          case 'memory':
+            return (
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Memory Game</h2>
+                <div className="grid grid-cols-4 gap-2">
+                  {memoryCards.map((card, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleCardClick(index)}
+                      className={`w-16 h-16 rounded-lg ${
+                        flippedCards.includes(index) || matchedPairs.includes(index)
+                          ? 'bg-purple-500 text-white'
+                          : 'bg-gray-200'
+                      } transition-colors`}
+                    >
+                      {(flippedCards.includes(index) || matchedPairs.includes(index)) && card}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-center text-lg font-bold text-purple-500">Score: {score}</p>
+              </div>
+            );
+
+          case 'quiz':
+            return (
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Anime Quiz</h2>
+                {quizQuestion < questions.length ? (
+                  <>
+                    <p className="text-lg font-medium">{questions[quizQuestion].question}</p>
+                    <div className="space-y-2">
+                      {questions[quizQuestion].options.map((option, index) => (
+                        <button
+                          key={index}
+                          onClick={() => {
+                            if (index === questions[quizQuestion].correct) {
+                              setScore(score + 10);
+                            }
+                            setQuizQuestion(quizQuestion + 1);
+                          }}
+                          className="w-full p-3 text-left rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center">
+                    <p className="text-xl font-bold mb-4">Quiz Complete!</p>
+                    <p className="text-lg">Final Score: {score}</p>
+                    <button
+                      onClick={() => {
+                        setQuizQuestion(0);
+                        setScore(0);
+                      }}
+                      className="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                    >
+                      Play Again
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+
+          case 'guess':
+            return (
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Number Guess</h2>
+                <p className="text-lg">{guessMessage}</p>
+                <input
+                  type="number"
+                  value={userGuess}
+                  onChange={(e) => setUserGuess(e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                  placeholder="Enter your guess"
+                />
+                <button
+                  onClick={handleGuessSubmit}
+                  className="w-full p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                >
+                  Guess
+                </button>
+                <p className="text-center text-lg font-bold text-green-500">Score: {score}</p>
+              </div>
+            );
+
+          case 'reaction':
+            return (
+              <div className="space-y-4 text-center">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Reaction Time</h2>
+                <div className="flex justify-around mb-8">
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Last Time</p>
+                    <p className="text-2xl font-bold text-pink-500">
+                      {reactionTime ? `${reactionTime}ms` : '-'}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Best Time</p>
+                    <p className="text-2xl font-bold text-purple-500">
+                      {highScore ? `${highScore}ms` : '-'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleReactionClick}
+                  className={`w-full h-48 rounded-lg transition-colors ${
+                    reactionState === 'waiting'
+                      ? 'bg-red-500 cursor-wait'
+                      : reactionState === 'ready'
+                      ? 'bg-green-500 cursor-pointer'
+                      : reactionState === 'tooSoon'
+                      ? 'bg-yellow-500'
+                      : 'bg-blue-500'
+                  }`}
+                >
+                  <p className="text-white text-xl font-bold">
+                    {reactionState === 'waiting'
+                      ? 'Wait for green...'
+                      : reactionState === 'ready'
+                      ? 'Click!'
+                      : reactionState === 'tooSoon'
+                      ? 'Too soon! Try again'
+                      : `Your time: ${reactionTime}ms`}
+                  </p>
+                </button>
+                {reactionState === 'clicked' && (
+                  <button
+                    onClick={() => startReactionGame()}
+                    className="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                  >
+                    Try Again
+                  </button>
+                )}
+              </div>
+            );
+
+          default:
+            return null;
+        }
+      };
+
+      return (
+        <div className="space-y-6">
+          {currentGame ? (
+            <>
+              <button
+                onClick={() => {
+                  setCurrentGame(null);
+                  setScore(0);
+                }}
+                className="text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                ← Back to Games
+              </button>
+              {renderGame()}
+            </>
+          ) : (
+            renderGameSelection()
+          )}
+        </div>
+      );
+    }
+
+    function Articles() {
+      return (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <BookOpen className="text-pink-500" />
+            Articles
+          </h2>
+
+          <div className="space-y-6">
+            {articles.map((article) => (
+              <article key={article.id} className="bg-white rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-102">
+                <img
+                  src={article.imageUrl}
+                  alt={article.title}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">{article.title}</h3>
+                  <p className="text-gray-600 text-sm mb-3">{article.description}</p>
+                  <time className="text-sm text-gray-500">{article.date}</time>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function Settings() {
+      const { language, t, changeLanguage } = useLanguage();
+      const [isDarkMode, setIsDarkMode] = React.useState(false);
+      const [isSoundEnabled, setIsSoundEnabled] = React.useState(true);
+
+      const languages = [
+        { code: 'en', name: t('settings.languages.en') },
+        { code: 'ru', name: t('settings.languages.ru') },
+        { code: 'no', name: t('settings.languages.no') },
+        { code: 'zh', name: t('settings.languages.zh') },
+      ];
+
+      return (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">{t('nav.settings')}</h2>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Globe size={20} />
+                <span>{t('settings.language')}</span>
+              </div>
+              <select
+                value={language}
+                onChange={(e) => changeLanguage(e.target.value)}
+                className="rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring focus:ring-pink-200"
+              >
+                {languages.map((lang) => (
+                  <option key={lang.code} value={lang.code}>
+                    {lang.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
+                <span>{t('settings.darkMode')}</span>
+              </div>
+              <button
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className={`w-12 h-6 rounded-full transition-colors ${
+                  isDarkMode ? 'bg-purple-500' : 'bg-gray-300'
+                } relative`}
+              >
+                <div
+                  className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${
+                    isDarkMode ? 'translate-x-7' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                {isSoundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                <span>{t('settings.sound')}</span>
+              </div>
+              <button
+                onClick={() => setIsSoundEnabled(!isSoundEnabled)}
+                className={`w-12 h-6 rounded-full transition-colors ${
+                  isSoundEnabled ? 'bg-purple-500' : 'bg-gray-300'
+                } relative`}
+              >
+                <div
+                  className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${
+                    isSoundEnabled ? 'translate-x-7' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-8 p-4 bg-gray-100 rounded-lg">
+            <h3 className="font-semibold mb-2">About Your Data</h3>
+            <p className="text-sm text-gray-600">
+              Your settings are saved locally. No personal data is collected or stored.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    function About() {
+      return (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">About</h2>
+
+          <div className="space-y-4">
+            <div className="bg-gradient-to-r from-pink-100 to-purple-100 p-4 rounded-lg">
+              <h3 className="font-semibold mb-2 flex items-center space-x-2">
+                <Heart size={16} className="text-pink-500" />
+                <span>Version 1.0.0</span>
+              </h3>
+              <p className="text-sm text-gray-600">
+                A beautiful Telegram Mini App with games and personalization features.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="font-semibold">Features</h3>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Profile customization</li>
+                <li>• Mini-games</li>
+                <li>• Beautiful animations</li>
+                <li>• Theme customization</li>
+              </ul>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="font-semibold">Contact</h3>
+              <div className="space-y-2">
+                <a href="#" className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-800">
+                  <Github size={16} />
+                  <span>GitHub</span>
+                </a>
+                <a href="#" className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-800">
+                  <Mail size={16} />
+                  <span>Support</span>
+                </a>
+              </div>
+            </div>
+
+            <div className="text-center text-sm text-gray-500 mt-6">
+              Made with <Heart size={12} className="inline text-pink-500" /> for Telegram
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Main App Component
+    function App() {
+      const [currentScreen, setCurrentScreen] = React.useState('home');
+      const [welcomePhrase, setWelcomePhrase] = React.useState('');
+      const [isLoaded, setIsLoaded] = React.useState(false);
+
+      // Simulate user data (in real app, this would come from Telegram.WebApp)
+      const userData = {
+        name: "Senpai",
+        photoUrl: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&auto=format&fit=crop&q=60",
+        id: "12345",
+        phone: "+1234567890"
+      };
+
+      React.useEffect(() => {
+        // Randomly select a welcome phrase
+        const randomPhrase = welcomePhrases[Math.floor(Math.random() * welcomePhrases.length)];
+        setWelcomePhrase(randomPhrase);
+        setIsLoaded(true);
+
+        // Hide Telegram header
+        if (window.Telegram?.WebApp) {
+          window.Telegram.WebApp.setHeaderColor('secondary_bg_color');
+          window.Telegram.WebApp.expand();
+          window.Telegram.WebApp.enableClosingConfirmation();
+        }
+      }, []);
+
+      const renderScreen = () => {
+        switch (currentScreen) {
+          case 'profile':
+            return <Profile userData={userData} />;
+          case 'games':
+            return <Games />;
+          case 'settings':
+            return <Settings />;
+          case 'about':
+            return <About />;
+          case 'articles':
+            return <Articles />;
+          default:
+            return (
+              <div className="flex flex-col items-center space-y-4">
+                <div className="relative">
+                  <img
+                    src={userData.photoUrl}
+                    alt="Profile"
+                    className="w-24 h-24 rounded-full object-cover border-4 border-pink-200 animate-profile-appear"
+                  />
+                  <Sparkles className="absolute -top-2 -right-2 text-yellow-400 animate-pulse" />
+                </div>
+                
+                <h1 className="text-2xl font-bold text-gray-800 animate-slide-up">
+                  {welcomePhrase}
+                </h1>
+                <p className="text-lg text-gray-600 animate-slide-up-delay">
+                  {userData.name}-san
+                </p>
+                
+                {/* Navigation Buttons */}
+                <div className="grid grid-cols-2 gap-4 w-full mt-6">
+                  <button 
+                    onClick={() => setCurrentScreen('profile')}
+                    className="flex items-center justify-center space-x-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg px-4 py-2 transition-all transform hover:scale-105"
+                  >
+                    <User size={20} />
+                    <span>Profile</span>
+                  </button>
+                  <button 
+                    onClick={() => setCurrentScreen('games')}
+                    className="flex items-center justify-center space-x-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg px-4 py-2 transition-all transform hover:scale-105"
+                  >
+                    <GamepadIcon size={20} />
+                    <span>Games</span>
+                  </button>
+                  <button 
+                    onClick={() => setCurrentScreen('articles')}
+                    className="flex items-center justify-center space-x-2 bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 transition-all transform hover:scale-105"
+                  >
+                    <BookOpen size={20} />
+                    <span>Articles</span>
+                  </button>
+                  <button 
+                    onClick={() => setCurrentScreen('settings')}
+                    className="flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 transition-all transform hover:scale-105"
+                  >
+                    <SettingsIcon size={20} />
+                    <span>Settings</span>
+                  </button>
+                  <button 
+                    onClick={() => setCurrentScreen('about')}
+                    className="col-span-2 flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white rounded-lg px-4 py-2 transition-all transform hover:scale-105"
+                  >
+                    <Info size={20} />
+                    <span>About</span>
+                  </button>
+                </div>
+              </div>
+            );
+        }
+      };
+
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-pink-100 to-purple-100 relative overflow-hidden">
+          {/* Floating Cherry Blossoms Animation */}
+          <div className="absolute inset-0 pointer-events-none">
+            {[...Array(20)].map((_, i) => (
+              <Cherry
+                key={i}
+                className={`absolute text-pink-300 opacity-50 animate-float-${i % 5}`}
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animation: `float ${5 + Math.random() * 5}s infinite linear`
+                }}
+                size={16 + Math.random() * 16}
+              />
+            ))}
+          </div>
+
+          {/* Main Content */}
+          <div className={`relative z-10 flex flex-col min-h-screen p-6 transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+            {/* Back Button (when not on home screen) */}
+            {currentScreen !== 'home' && (
+              <button
+                onClick={() => setCurrentScreen('home')}
+                className="absolute top-4 left-4 text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                <ArrowLeft size={24} />
+              </button>
+            )}
+
+            {/* Content Container */}
+            <div className="flex-1 flex items-center justify-center">
+              <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl max-w-md w-full animate-fade-in">
+                {renderScreen()}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Render the app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+  </script>
+</body>
+</html>
