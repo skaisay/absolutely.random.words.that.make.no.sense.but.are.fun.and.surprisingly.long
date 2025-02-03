@@ -11,14 +11,15 @@
             padding: 0;
             height: 100%;
             overflow: hidden;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
         }
         #app {
             height: 100%;
-            background-color: #f0f0f0;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: Arial, sans-serif;
+            text-align: center;
         }
     </style>
 </head>
@@ -27,14 +28,21 @@
         <h1>Привет, это полноэкранный Web App!</h1>
     </div>
     <script>
-        // Инициализация Telegram WebApp
-        const tg = window.Telegram.WebApp;
+        // Проверяем, загружен ли Telegram WebApp API
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
 
-        // Растягиваем Web App на весь экран
-        tg.expand();
+            // Растягиваем Web App на весь экран
+            tg.expand();
 
-        // Дополнительные действия при загрузке
-        tg.ready();
+            // Уведомляем Telegram, что Web App готов
+            tg.ready();
+
+            // Логируем событие для отладки
+            console.log("Telegram WebApp API загружен, полноэкранный режим активирован.");
+        } else {
+            console.error("Telegram WebApp API не загружен!");
+        }
     </script>
 </body>
 </html>
