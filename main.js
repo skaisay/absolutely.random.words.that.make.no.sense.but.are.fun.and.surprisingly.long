@@ -4,21 +4,15 @@ let messagesWrapper;
 let inputField;
 let sendButton;
 let micButton;
+let paeButton;
 let isRecording = false;
 let isTyping = false;
 let shouldAutoScroll = true;
 
-// Инициализация приложения
-document.addEventListener('DOMContentLoaded', () => {
-  createInterface();
-  initializeSnowflakes();
-  showWelcomeMessage();
-});
-
 // Создание интерфейса
 function createInterface() {
   const root = document.getElementById('root');
-  
+
   // Создаем робота
   const robot = document.createElement('div');
   robot.className = 'robot';
@@ -27,20 +21,67 @@ function createInterface() {
       <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" />
     </svg>
   `;
-  
+
   // Создаем контейнер чата
   chatContainer = document.createElement('div');
   chatContainer.className = 'chat-container';
   chatContainer.addEventListener('scroll', handleScroll);
-  
+
   messagesWrapper = document.createElement('div');
   messagesWrapper.className = 'messages-wrapper';
   chatContainer.appendChild(messagesWrapper);
-  
+
   // Создаем поле ввода
   const inputContainer = document.createElement('div');
   inputContainer.className = 'input-container';
-  
+
+  const inputWrapper = document.createElement('div');
+  inputWrapper.className = 'input-wrapper';
+
+  // Создаем кнопку PAE
+  paeButton = document.createElement('button');
+  paeButton.className = 'pae-button';
+  paeButton.textContent = 'PAE';
+  paeButton.addEventListener('click', async () => {
+    if (!window.messageProcessor) {
+      console.error('MessageProcessor not initialized');
+      return;
+    }
+    
+    if (paeButton.disabled) {
+      return;
+    }
+
+    paeButton.disabled = true;
+    try {
+      const response = await window.messageProcessor.toggleOpenAI();
+      await addMessage(response, false);
+    } catch (error) {
+      console.error('Error toggling OpenAI:', error);
+      await addMessage("Произошла ошибка при переключении режима.", false);
+    } finally {
+      paeButton.disabled = false;
+    }
+  });
+  inputWrapper.appendChild(paeButton);
+
+  inputField = document.createElement('input');
+  inputField.type = 'text';
+  inputField.className = 'input-field';
+  inputField.placeholder = 'Введите ваш вопрос...';
+  inputField.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  });
+  inputField.addEventListener('input', () => {
+    paeButton.style.display = inputField.value ? 'none' : 'flex';
+  });
+
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.className = 'buttons-container';
+
   micButton = document.createElement('button');
   micButton.className = 'mic-button';
   micButton.innerHTML = `
@@ -49,15 +90,7 @@ function createInterface() {
     </svg>
   `;
   micButton.addEventListener('click', handleVoiceInput);
-  
-  inputField = document.createElement('input');
-  inputField.type = 'text';
-  inputField.className = 'input-field';
-  inputField.placeholder = 'Введите ваш вопрос...';
-  inputField.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') handleSendMessage();
-  });
-  
+
   sendButton = document.createElement('button');
   sendButton.className = 'send-button';
   sendButton.innerHTML = `
@@ -66,11 +99,14 @@ function createInterface() {
     </svg>
   `;
   sendButton.addEventListener('click', handleSendMessage);
-  
-  inputContainer.appendChild(micButton);
-  inputContainer.appendChild(inputField);
-  inputContainer.appendChild(sendButton);
-  
+
+  buttonsContainer.appendChild(micButton);
+  buttonsContainer.appendChild(sendButton);
+
+  inputWrapper.appendChild(inputField);
+  inputWrapper.appendChild(buttonsContainer);
+  inputContainer.appendChild(inputWrapper);
+
   root.appendChild(robot);
   root.appendChild(chatContainer);
   root.appendChild(inputContainer);
@@ -106,4 +142,132 @@ function initializeSnowflakes() {
 // Показ приветственного сообщения
 function showWelcomeMessage() {
   setTimeout(() => {
-    addMessage
+    addMessage("Привет! Задайте мне вопрос голосом или текстом, и я постараюсь на него ответить.", false);
+  }, 500);
+}
+
+// Обработка скролла
+function handleScroll() {
+  if (chatContainer) {
+    const { scrollTop, scrollHeight, clientHeight } = chatContainer;
+    shouldAutoScroll = Math.abs(scrollHeight - clientHeight - scrollTop) < 50;
+  }
+}
+
+// Добавление сообщения
+async function addMessage(text, isUser) {
+  const message = document.createElement('div');
+  message.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+
+  if (!isUser) {
+    const icon = document.createElement('div');
+    icon.className = 'message-icon';
+    icon.innerHTML = `
+      <svg viewBox="0 0 24 24">
+        <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" />
+      </svg>
+    `;
+    message.appendChild(icon);
+  }
+
+  const content = document.createElement('span');
+  message.appendChild(content);
+  messagesWrapper.appendChild(message);
+
+  if (!isUser) {
+    isTyping = true;
+    content.textContent = '';
+    let displayedText = '';
+
+    for (let i = 0; i < text.length; i++) {
+      displayedText += text[i];
+      content.textContent = displayedText;
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      if (shouldAutoScroll) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    }
+
+    isTyping = false;
+  } else {
+    content.textContent = text;
+  }
+
+  if (shouldAutoScroll) {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+}
+
+// Обработка отправки сообщения
+async function handleSendMessage() {
+  if (!inputField.value.trim() || isTyping) return;
+
+  const userMessage = inputField.value;
+  inputField.value = '';
+  paeButton.style.display = 'flex';
+
+  await addMessage(userMessage, true);
+
+  try {
+    if (!window.messageProcessor) {
+      throw new Error('MessageProcessor not initialized');
+    }
+    const response = await window.messageProcessor.processMessage(userMessage);
+    await addMessage(response, false);
+  } catch (error) {
+    console.error('Error processing message:', error);
+    await addMessage("Извините, произошла ошибка при обработке сообщения.", false);
+  }
+}
+
+// Обработка голосового ввода
+function handleVoiceInput() {
+  if ('webkitSpeechRecognition' in window) {
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = 'ru-RU';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      isRecording = true;
+      micButton.classList.add('recording');
+      inputField.value = 'Говорите...';
+      inputField.disabled = true;
+    };
+
+    recognition.onend = () => {
+      isRecording = false;
+      micButton.classList.remove('recording');
+      inputField.disabled = false;
+      if (inputField.value === 'Говорите...') {
+        inputField.value = '';
+      }
+      inputField.focus();
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      inputField.value = transcript;
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Ошибка распознавания:', event.error);
+      isRecording = false;
+      micButton.classList.remove('recording');
+      inputField.disabled = false;
+      inputField.value = '';
+    };
+
+    recognition.start();
+  } else {
+    alert('К сожалению, ваш браузер не поддерживает распознавание речи.');
+  }
+}
+
+// Инициализация приложения
+document.addEventListener('DOMContentLoaded', () => {
+  createInterface();
+  initializeSnowflakes();
+  showWelcomeMessage();
+});

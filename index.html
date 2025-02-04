@@ -1,0 +1,122 @@
+<<<<<<< HEAD
+=======
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram WebApp Demo</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // Немедленно вызываем expand() как только загрузится скрипт Telegram WebApp
+        window.onload = function() {
+            window.Telegram.WebApp.expand();
+            window.Telegram.WebApp.ready();
+        }
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .navigation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .button {
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            color: var(--tg-theme-button-color, #2481cc);
+            font-size: 14px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .content {
+            padding-top: 64px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Принудительно вызываем expand() сразу при загрузке body
+        try {
+            window.Telegram.WebApp.expand();
+        } catch (e) {
+            console.error('Failed to expand WebApp:', e);
+        }
+    </script>
+
+    <div class="navigation">
+        <button class="button" id="closeButton">Закрыть</button>
+        <div style="flex-grow: 1"></div>
+        <button class="button" id="menuButton">⋮</button>
+    </div>
+
+    <div class="content">
+        <h1>Web App активно</h1>
+        <p>Приложение работает в полноэкранном режиме</p>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+
+        // Дополнительная попытка расширения через небольшую задержку
+        setTimeout(() => {
+            tg.expand();
+        }, 50);
+
+        document.getElementById('closeButton').addEventListener('click', () => {
+            tg.close();
+        });
+
+        document.getElementById('menuButton').addEventListener('click', () => {
+            tg.showPopup({
+                title: 'Меню',
+                message: 'Выберите действие',
+                buttons: [
+                    {id: 'about', type: 'default', text: 'О приложении'},
+                    {id: 'settings', type: 'default', text: 'Настройки'},
+                    {id: 'cancel', type: 'cancel', text: 'Закрыть'}
+                ]
+            }, function(buttonId) {
+                if (buttonId === 'about') {
+                    tg.showAlert('Демо WebApp для Telegram');
+                } else if (buttonId === 'settings') {
+                    tg.showAlert('Настройки временно недоступны');
+                }
+            });
+        });
+
+        // Включаем поддержку haptic feedback
+        tg.enableClosingConfirmation();
+
+        // Явно указываем, что приложение готово
+        tg.ready();
+
+        // Добавляем обработчик для viewport
+        window.addEventListener('resize', () => {
+            tg.expand();
+        });
+    </script>
+</body>
+</html>
+>>>>>>> 1dd01430d70379a776a0467976be8c2e4130f1c1
