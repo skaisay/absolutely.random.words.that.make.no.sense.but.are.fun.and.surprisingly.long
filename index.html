@@ -3,27 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime Style Web App</title>
+    <title>Pixel Art Creator</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #1a1a2e;
+            --secondary-color: #16213e;
+            --text-color: #ffffff;
+            --accent-color: #4a90e2;
+            --background-opacity: 0.8;
+        }
+
+        [data-theme="light"] {
+            --primary-color: #f0f2f5;
+            --secondary-color: #ffffff;
+            --text-color: #1a1a1a;
+            --accent-color: #4a90e2;
+            --background-opacity: 0.9;
+        }
+
+        [data-color="blue"] { --accent-color: #4a90e2; }
+        [data-color="purple"] { --accent-color: #9c27b0; }
+        [data-color="green"] { --accent-color: #4caf50; }
+        [data-color="orange"] { --accent-color: #ff9800; }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        @font-face {
-            font-family: 'Anime Font';
-            src: url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+            transition: background-color 0.3s, color 0.3s;
         }
 
         body {
-            font-family: 'Anime Font', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--text-color);
             min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
             position: relative;
+        }
+
+        .screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .screen.active {
+            display: block;
         }
 
         /* Анимированный фон */
@@ -33,171 +66,21 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iMiIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjEiLz48L3N2Zz4=');
             pointer-events: none;
-            animation: starTwinkle 3s infinite;
-        }
-
-        @keyframes starTwinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.6; }
-        }
-
-        .screen {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.5s ease;
-            padding: 20px;
-            z-index: 1;
-        }
-
-        .screen.active {
-            display: flex;
-        }
-
-        /* Приветственный экран */
-        .welcome-screen {
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-        }
-
-        .welcome-text {
-            font-size: 2.5em;
-            color: #fff;
-            text-align: center;
-            margin-bottom: 1em;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            animation: glowText 2s infinite;
-        }
-
-        @keyframes glowText {
-            0%, 100% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
-            50% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8); }
-        }
-
-        .main-button {
-            padding: 15px 40px;
-            font-size: 1.2em;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .main-button::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: rotate(45deg);
-            animation: buttonGlow 2s infinite;
-        }
-
-        @keyframes buttonGlow {
-            0% { transform: translateX(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) rotate(45deg); }
-        }
-
-        .main-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-        }
-
-        /* Профиль и меню */
-        .profile-screen {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-        }
-
-        .profile-container {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
-        }
-
-        .profile-photo {
-            width: 120px;
-            height: 120px;
-            border-radius: 60px;
-            margin-bottom: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-        }
-
-        .menu-buttons {
-            display: grid;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .menu-button {
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .menu-button i {
-            font-size: 1.2em;
-        }
-
-        .menu-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        /* Кнопка возврата */
-        .back-button {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        .back-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.1);
+            z-index: -1;
+            opacity: 0.5;
         }
 
         /* Снежинки */
         .snowflake {
             position: fixed;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
+            top: -10px;
+            color: white;
+            font-size: 20px;
+            user-select: none;
             pointer-events: none;
-            animation: fall linear infinite;
+            animation: fall linear forwards;
+            z-index: 1;
         }
 
         @keyframes fall {
@@ -205,189 +88,415 @@
                 transform: translateY(100vh);
             }
         }
-      /* Стили для редактора изображений */
-        .editor-screen {
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-        }
 
-        .editor-container {
-            width: 90%;
-            max-width: 600px;
+        /* Кнопки навигации */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
             background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 100;
+            transition: background-color 0.3s;
         }
 
-        .image-preview {
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Контейнеры */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin-top: 60px;
+        }
+
+        /* Профиль */
+        .profile-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .profile-photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            object-fit: cover;
+            border: 3px solid var(--accent-color);
+        }
+
+        .profile-photo.small {
+            width: 50px;
+            height: 50px;
+        }
+
+        /* Меню кнопки */
+        .menu-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-color);
+            padding: 15px 30px;
+            border-radius: 25px;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-button:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        /* Настройки */
+        .settings-container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+        }
+
+        .settings-section h3 {
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+
+        /* Переключатели */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--text-color);
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+      /* Цветовые кнопки */
+        .color-options {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .color-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .color-button:hover {
+            transform: scale(1.1);
+        }
+
+        /* Выбор языка */
+        .language-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .language-option {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .language-option:hover {
+            background: var(--accent-color);
+        }
+
+        .language-option.active {
+            background: var(--accent-color);
+        }
+
+        /* Редактор изображений */
+        .editor-container {
+            text-align: center;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .editor-preview {
             width: 100%;
+            max-width: 500px;
             height: 300px;
-            background: rgba(0, 0, 0, 0.3);
-            margin-bottom: 20px;
+            margin: 20px auto;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
-        .image-preview img {
+        .editor-preview img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
         }
 
-        /* Стили для новостей */
-        .news-screen {
-            background: rgba(0, 0, 0, 0.8);
-            padding-top: 70px;
+        .pixel-slider-container {
+            margin: 20px 0;
+            text-align: center;
         }
 
+        .pixel-slider {
+            width: 80%;
+            max-width: 300px;
+            margin: 10px auto;
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+
+        .pixel-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .pixel-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        /* Новости и статьи */
         .news-container {
-            width: 100%;
-            max-width: 800px;
             padding: 20px;
-            overflow-y: auto;
-            max-height: calc(100vh - 120px);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .news-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .news-tab {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 20px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .news-tab.active {
+            background: var(--accent-color);
         }
 
         .news-article {
             background: rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-            padding: 20px;
             border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .news-article:hover {
-            transform: translateY(-5px);
+            padding: 20px;
+            margin-bottom: 20px;
         }
 
         .news-article img {
             width: 100%;
-            height: 200px;
-            object-fit: cover;
             border-radius: 10px;
             margin: 10px 0;
         }
 
         .news-article h3 {
-            color: #fff;
+            color: var(--accent-color);
             margin-bottom: 10px;
-            font-size: 1.4em;
         }
 
-        /* Стили для раздела "О приложении" */
-        .about-screen {
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-        }
-
+        /* О приложении */
         .about-container {
-            width: 90%;
+            padding: 20px;
             max-width: 600px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .about-title {
-            font-size: 2em;
-            margin-bottom: 20px;
+            margin: 0 auto;
             text-align: center;
-            color: #fff;
         }
 
         .about-content {
-            line-height: 1.6;
-            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
         }
 
         .feature-list {
+            text-align: left;
+            list-style-position: inside;
             margin: 20px 0;
-            padding-left: 20px;
         }
 
         .feature-list li {
-            margin-bottom: 10px;
-            position: relative;
+            margin: 10px 0;
             padding-left: 20px;
+            position: relative;
         }
 
-        .feature-list li::before {
-            content: '★';
+        .feature-list li:before {
+            content: "•";
+            color: var(--accent-color);
             position: absolute;
             left: 0;
-            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        /* Адаптивный дизайн */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            .menu-button {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .editor-preview {
+                height: 200px;
+            }
+
+            .news-article {
+                margin: 10px 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-photo {
+                width: 80px;
+                height: 80px;
+            }
+
+            .settings-container {
+                padding: 10px;
+            }
+
+            .color-options {
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
-<body>
+  <body>
     <div class="anime-bg"></div>
 
     <!-- Экран приветствия -->
     <div class="screen welcome-screen active" id="welcomeScreen">
-        <h1 class="welcome-text">ようこそ<br>Welcome to PixelArt</h1>
-        <button class="main-button" onclick="showScreen('profileScreen')">始めましょう<br>Let's Begin</button>
+        <div class="welcome-container">
+            <h1 class="fade-in">Welcome to PixelArt</h1>
+            <p class="slide-in">Create amazing pixel art from your photos</p>
+            <button class="menu-button slide-in" onclick="showScreen('profileScreen')">
+                <i class="fas fa-arrow-right"></i> Next
+            </button>
+        </div>
     </div>
 
-    <!-- Экран профиля и меню -->
+    <!-- Экран профиля -->
     <div class="screen profile-screen" id="profileScreen">
         <div class="profile-container">
-            <img class="profile-photo" src="" alt="Profile Photo">
-            <div class="profile-name"></div>
-            <div class="profile-id"></div>
-            
+            <img id="profilePhoto" src="" alt="Profile Photo" class="profile-photo fade-in">
+            <h2 id="userName" class="slide-in">User Name</h2>
             <div class="menu-buttons">
-                <button class="menu-button" onclick="showScreen('editorScreen')">
+                <button class="menu-button slide-in" onclick="showScreen('editorScreen')">
                     <i class="fas fa-image"></i> Create Pixel Art
                 </button>
-                <button class="menu-button" onclick="showScreen('newsScreen')">
-                    <i class="fas fa-newspaper"></i> Articles
+                <button class="menu-button slide-in" onclick="showScreen('newsScreen')">
+                    <i class="fas fa-newspaper"></i> Read Articles
                 </button>
-                <button class="menu-button" onclick="showScreen('settingsScreen')">
+                <button class="menu-button slide-in" onclick="showScreen('settingsScreen')">
                     <i class="fas fa-cog"></i> Settings
                 </button>
-                <button class="menu-button" onclick="showScreen('aboutScreen')">
+                <button class="menu-button slide-in" onclick="showScreen('aboutScreen')">
                     <i class="fas fa-info-circle"></i> About App
                 </button>
             </div>
-        </div>
-    </div>
-
-    <!-- Экран редактора -->
-    <div class="screen editor-screen" id="editorScreen">
-        <button class="back-button" onclick="showScreen('profileScreen')">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        <div class="editor-container">
-            <div class="image-preview">
-                <img id="uploadedImage" src="" alt="Upload Image">
-            </div>
-            <input type="file" id="imageInput" accept="image/*">
-            <label for="imageInput" class="menu-button">
-                <i class="fas fa-upload"></i> Upload Image
-            </label>
-            
-            <div class="pixel-controls">
-                <button class="menu-button" data-effect="light">Light Pixel</button>
-                <button class="menu-button" data-effect="medium">Medium Pixel</button>
-                <button class="menu-button" data-effect="heavy">Heavy Pixel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Экран новостей -->
-    <div class="screen news-screen" id="newsScreen">
-        <button class="back-button" onclick="showScreen('profileScreen')">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        <div class="news-container" id="newsContainer">
-            <!-- Новости будут добавляться динамически -->
         </div>
     </div>
 
@@ -397,7 +506,92 @@
             <i class="fas fa-arrow-left"></i>
         </button>
         <div class="settings-container">
-            <!-- Настройки будут добавлены позже -->
+            <h2>Settings</h2>
+            
+            <div class="user-avatar">
+                <img id="settingsAvatar" src="" alt="User Avatar" class="profile-photo small">
+            </div>
+
+            <div class="settings-section">
+                <h3>Theme</h3>
+                <div class="theme-options">
+                    <button class="theme-button" data-theme="light">Light</button>
+                    <button class="theme-button" data-theme="dark">Dark</button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Accent Color</h3>
+                <div class="color-options">
+                    <button class="color-button" data-color="blue" style="background-color: #4a90e2;"></button>
+                    <button class="color-button" data-color="purple" style="background-color: #9c27b0;"></button>
+                    <button class="color-button" data-color="green" style="background-color: #4caf50;"></button>
+                    <button class="color-button" data-color="orange" style="background-color: #ff9800;"></button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Snow Effect</h3>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggleSnow" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="settings-section">
+                <h3>Language</h3>
+                <div class="language-selector">
+                    <div class="language-option" data-lang="en">English</div>
+                    <div class="language-option" data-lang="ru">Русский</div>
+                    <div class="language-option" data-lang="no">Norsk</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран редактора изображений -->
+    <div class="screen editor-screen" id="editorScreen">
+        <button class="back-button" onclick="showScreen('profileScreen')">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="editor-container">
+            <h2>Image Editor</h2>
+            <div class="editor-preview">
+                <img id="uploadedImage" src="" alt="Upload Image">
+            </div>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+            <label for="imageInput" class="menu-button">
+                <i class="fas fa-upload"></i> Upload Image
+            </label>
+
+            <div class="pixel-slider-container">
+                <label for="pixelSlider">Pixelation Level</label>
+                <input type="range" id="pixelSlider" class="pixel-slider" min="1" max="20" value="10">
+            </div>
+
+            <button class="menu-button" id="downloadButton">
+                <i class="fas fa-download"></i> Download Image
+            </button>
+        </div>
+    </div>
+
+    <!-- Экран новостей -->
+    <div class="screen news-screen" id="newsScreen">
+        <button class="back-button" onclick="showScreen('profileScreen')">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="news-container">
+            <h2>Articles</h2>
+            <div class="news-tabs">
+                <button class="news-tab active" data-tab="articles">Articles</button>
+                <button class="news-tab" data-tab="news">News</button>
+            </div>
+            <div class="news-content" id="articlesContent">
+                <!-- Статьи будут добавлены через JavaScript -->
+            </div>
+            <div class="news-content" id="newsContent" style="display: none;">
+                <!-- Новости будут добавлены через JavaScript -->
+            </div>
         </div>
     </div>
 
@@ -407,252 +601,262 @@
             <i class="fas fa-arrow-left"></i>
         </button>
         <div class="about-container">
-            <h2 class="about-title">About PixelArt</h2>
+            <h2>About PixelArt</h2>
             <div class="about-content">
-                <p>Version: 1.0.0</p>
-                <p>Created: February 2024</p>
-                <h3>Features:</h3>
+                <p>Version: 1.1.0</p>
+                <p>Created: February 2025</p>
+                <p>This application allows you to:</p>
                 <ul class="feature-list">
                     <li>Create unique pixel art from your images</li>
-                    <li>Multiple pixelation levels</li>
-                    <li>Latest news about crypto and programming</li>
-                    <li>Telegram integration</li>
-                    <li>User-friendly interface</li>
+                    <li>Customize themes and colors</li>
+                    <li>Read the latest news and articles</li>
+                    <li>Switch between multiple languages</li>
+                    <li>Enjoy a user-friendly interface with Telegram integration</li>
                 </ul>
-                <p>Made with ❤️ for Telegram users</p>
+                <p>Made with ❤️ for Telegram users.</p>
             </div>
         </div>
     </div>
-  <!-- Подключаем Font Awesome для иконок -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-        // Создание анимированных снежинок
-        function createSnowflake() {
-            const snowflake = document.createElement('div');
-            snowflake.classList.add('snowflake');
-            snowflake.style.width = Math.random() * 4 + 2 + 'px';
-            snowflake.style.height = snowflake.style.width;
-            snowflake.style.left = Math.random() * window.innerWidth + 'px';
-            snowflake.style.opacity = Math.random();
-            snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
-            document.body.appendChild(snowflake);
-
-            // Удаляем снежинку после падения
-            setTimeout(() => {
-                snowflake.remove();
-            }, 5000);
+    // Объект с переводами
+    const translations = {
+        en: {
+            settings: "Settings",
+            theme: "Theme",
+            light: "Light",
+            dark: "Dark",
+            accentColor: "Accent Color",
+            snowEffect: "Snow Effect",
+            language: "Language",
+            uploadImage: "Upload Image",
+            downloadImage: "Download Image",
+            pixelationLevel: "Pixelation Level",
+            articles: "Articles",
+            news: "News",
+            about: "About",
+            createPixelArt: "Create Pixel Art",
+            readArticles: "Read Articles",
+            settings: "Settings",
+            aboutApp: "About App",
+            welcome: "Welcome to PixelArt",
+            createAmazing: "Create amazing pixel art from your photos"
+        },
+        ru: {
+            settings: "Настройки",
+            theme: "Тема",
+            light: "Светлая",
+            dark: "Тёмная",
+            accentColor: "Цветовой акцент",
+            snowEffect: "Эффект снега",
+            language: "Язык",
+            uploadImage: "Загрузить изображение",
+            downloadImage: "Скачать изображение",
+            pixelationLevel: "Уровень пикселизации",
+            articles: "Статьи",
+            news: "Новости",
+            about: "О приложении",
+            createPixelArt: "Создать пиксель-арт",
+            readArticles: "Читать статьи",
+            settings: "Настройки",
+            aboutApp: "О приложении",
+            welcome: "Добро пожаловать в PixelArt",
+            createAmazing: "Создавайте удивительные пиксельные изображения из ваших фото"
         }
+    };
 
-        // Генерация снежинок
-        setInterval(createSnowflake, 100);
+    let currentScreen = 'welcomeScreen';
+    let currentLanguage = 'en';
+    let snowEnabled = true;
 
-        // Управление экранами
-        function showScreen(screenId) {
-            const screens = document.querySelectorAll('.screen');
-            screens.forEach(screen => {
-                screen.classList.remove('active');
-                screen.style.transform = 'translateX(100%)';
-                screen.style.opacity = '0';
-            });
-
-            const targetScreen = document.getElementById(screenId);
-            targetScreen.classList.add('active');
-            
-            // Анимация перехода
-            setTimeout(() => {
-                targetScreen.style.transform = 'translateX(0)';
-                targetScreen.style.opacity = '1';
-            }, 50);
-
-            if (screenId === 'profileScreen') {
-                loadProfileData();
-            } else if (screenId === 'newsScreen') {
-                loadNews();
-            }
-        }
-
-        // Загрузка данных профиля
-        function loadProfileData() {
-            const user = tg.initDataUnsafe.user;
-            if (user) {
-                const profileName = document.querySelector('.profile-name');
-                const profileId = document.querySelector('.profile-id');
-                const profilePhoto = document.querySelector('.profile-photo');
-
-                profileName.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-                profileId.textContent = 'ID: ' + user.id;
-                
-                if (user.photo_url) {
-                    profilePhoto.src = user.photo_url;
-                } else {
-                    profilePhoto.src = 'https://via.placeholder.com/120?text=User';
-                }
-
-                // Анимация появления данных
-                [profileName, profileId, profilePhoto].forEach(element => {
-                    element.style.animation = 'fadeIn 0.5s ease forwards';
-                });
-            }
-        }
-
-        // Обработка загрузки изображения
-        const imageInput = document.getElementById('imageInput');
-        imageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById('uploadedImage');
-                    img.src = e.target.result;
-                    img.onload = function() {
-                        window.originalImage = img;
-                        showMessage('Image uploaded successfully!');
-                    }
-                }
-                reader.readAsDataURL(file);
-            }
+    // Функция для показа экрана
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
         });
+        document.getElementById(screenId).classList.add('active');
+        currentScreen = screenId;
 
-        // Функция пикселизации изображения
-        function pixelateImage(img, pixelSize) {
+        if (screenId === 'profileScreen') {
+            loadUserProfile();
+        } else if (screenId === 'newsScreen') {
+            loadLatestNews();
+        }
+    }
+
+    // Функция загрузки профиля пользователя
+    function loadUserProfile() {
+        const user = tg.initDataUnsafe.user;
+        if (user) {
+            const profilePhoto = document.getElementById('profilePhoto');
+            const userName = document.getElementById('userName');
+            const settingsAvatar = document.getElementById('settingsAvatar');
+
+            if (user.photo_url) {
+                profilePhoto.src = user.photo_url;
+                settingsAvatar.src = user.photo_url;
+            } else {
+                profilePhoto.src = 'https://via.placeholder.com/100?text=User';
+                settingsAvatar.src = 'https://via.placeholder.com/50?text=User';
+            }
+
+            userName.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+        }
+    }
+
+    // Функция пикселизации изображения
+    function pixelateImage(img, pixelSize) {
+        return new Promise((resolve) => {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             
-            canvas.width = img.width;
-            canvas.height = img.height;
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
             
-            // Рисуем оригинальное изображение
-            ctx.drawImage(img, 0, 0, img.width, img.height);
+            ctx.drawImage(img, 0, 0);
             
-            // Уменьшаем размер
             const smallCanvas = document.createElement('canvas');
             const smallCtx = smallCanvas.getContext('2d');
             
-            smallCanvas.width = img.width / pixelSize;
-            smallCanvas.height = img.height / pixelSize;
+            smallCanvas.width = canvas.width / pixelSize;
+            smallCanvas.height = canvas.height / pixelSize;
             
             smallCtx.drawImage(canvas, 0, 0, smallCanvas.width, smallCanvas.height);
             
-            // Увеличиваем размер с пикселизацией
             ctx.imageSmoothingEnabled = false;
-            ctx.drawImage(smallCanvas, 0, 0, img.width, img.height);
+            ctx.drawImage(smallCanvas, 0, 0, canvas.width, canvas.height);
             
-            return canvas.toDataURL();
-        }
-
-        // Обработчики эффектов пикселизации
-        document.querySelectorAll('[data-effect]').forEach(button => {
-            button.addEventListener('click', function() {
-                if (!window.originalImage) {
-                    showMessage('Please upload an image first!');
-                    return;
-                }
-                
-                const effect = this.dataset.effect;
-                let pixelSize;
-                
-                switch(effect) {
-                    case 'light': pixelSize = 5; break;
-                    case 'medium': pixelSize = 10; break;
-                    case 'heavy': pixelSize = 20; break;
-                }
-                
-                const pixelatedDataUrl = pixelateImage(window.originalImage, pixelSize);
-                document.getElementById('uploadedImage').src = pixelatedDataUrl;
-                showMessage('Effect applied!');
-            });
+            resolve(canvas.toDataURL());
         });
+    }
 
-        // Загрузка новостей
-        function loadNews() {
-            const newsContainer = document.getElementById('newsContainer');
-            newsContainer.innerHTML = '';
-
-            // Демо-данные новостей с реальными изображениями
-            const newsData = [
-                {
-                    title: 'Bitcoin Reaches New Heights',
-                    image: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d',
-                    text: 'Bitcoin continues its remarkable journey as it reaches new price levels in 2024.'
-                },
-                {
-                    title: 'AI Development Breakthrough',
-                    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995',
-                    text: 'New developments in AI technology show promising results for future applications.'
-                },
-                {
-                    title: 'Web3 Revolution',
-                    image: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0',
-                    text: 'The Web3 ecosystem continues to grow with new innovative projects.'
+    // Обработчик загрузки изображения
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    window.originalImage = img;
+                    document.getElementById('uploadedImage').src = e.target.result;
                 }
-            ];
-
-            newsData.forEach(article => {
-                const articleElement = createArticleElement(article);
-                newsContainer.appendChild(articleElement);
-            });
-        }
-
-        function createArticleElement(article) {
-            const div = document.createElement('div');
-            div.className = 'news-article';
-            div.innerHTML = `
-                <h3>${article.title}</h3>
-                <img src="${article.image}" alt="${article.title}" loading="lazy">
-                <p>${article.text}</p>
-            `;
-            return div;
-        }
-
-        // Показ сообщений пользователю
-        function showMessage(text) {
-            const message = document.createElement('div');
-            message.className = 'message';
-            message.textContent = text;
-            message.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0, 0, 0, 0.8);
-                color: white;
-                padding: 10px 20px;
-                border-radius: 20px;
-                z-index: 1000;
-                animation: fadeInOut 2s ease forwards;
-            `;
-            document.body.appendChild(message);
-            setTimeout(() => message.remove(), 2000);
-        }
-
-        // Анимация для сообщений
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeInOut {
-                0% { opacity: 0; transform: translate(-50%, 20px); }
-                15% { opacity: 1; transform: translate(-50%, 0); }
-                85% { opacity: 1; transform: translate(-50%, 0); }
-                100% { opacity: 0; transform: translate(-50%, -20px); }
+                img.src = e.target.result;
             }
-        `;
-        document.head.appendChild(style);
+            reader.readAsDataURL(file);
+        }
+    });
 
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', function() {
-            tg.ready();
-            // Добавляем анимацию для приветственного текста
-            const welcomeText = document.querySelector('.welcome-text');
-            welcomeText.style.opacity = '0';
-            setTimeout(() => {
-                welcomeText.style.transition = 'opacity 1s ease';
-                welcomeText.style.opacity = '1';
-            }, 500);
+    // Обработчик слайдера пикселизации
+    const pixelSlider = document.getElementById('pixelSlider');
+    let pixelizeTimeout;
+    
+    pixelSlider.addEventListener('input', function() {
+        clearTimeout(pixelizeTimeout);
+        pixelizeTimeout = setTimeout(() => {
+            if (window.originalImage) {
+                pixelateImage(window.originalImage, this.value).then(dataUrl => {
+                    document.getElementById('uploadedImage').src = dataUrl;
+                });
+            }
+        }, 100);
+    });
+
+    // Обработчик скачивания изображения
+    document.getElementById('downloadButton').addEventListener('click', function() {
+        const img = document.getElementById('uploadedImage');
+        if (img.src) {
+            const a = document.createElement('a');
+            a.href = img.src;
+            a.download = 'pixelated-image.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    });
+
+    // Функция создания снежинок
+    function createSnowflake() {
+        if (!snowEnabled) return;
+        
+        const snowflake = document.createElement('div');
+        snowflake.classList.add('snowflake');
+        snowflake.innerHTML = '❄';
+        snowflake.style.left = Math.random() * window.innerWidth + 'px';
+        snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+        snowflake.style.opacity = Math.random();
+        snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+        
+        document.body.appendChild(snowflake);
+
+        setTimeout(() => {
+            snowflake.remove();
+        }, 5000);
+    }
+
+    // Функция изменения языка
+    function changeLanguage(lang) {
+        currentLanguage = lang;
+        document.querySelectorAll('[data-translate]').forEach(element => {
+            const key = element.dataset.translate;
+            element.textContent = translations[lang][key];
         });
-    </script>
+        
+        document.querySelectorAll('.language-option').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+
+        localStorage.setItem('preferred-language', lang);
+    }
+
+    // Инициализация приложения
+    function initializeApp() {
+        tg.ready();
+        
+        // Загрузка сохраненных настроек
+        const savedLanguage = localStorage.getItem('preferred-language');
+        if (savedLanguage) {
+            changeLanguage(savedLanguage);
+        }
+
+        const savedTheme = localStorage.getItem('preferred-theme');
+        if (savedTheme) {
+            document.body.setAttribute('data-theme', savedTheme);
+        }
+
+        // Запуск снега
+        if (snowEnabled) {
+            setInterval(createSnowflake, 100);
+        }
+
+        // Обработчики настроек
+        document.querySelectorAll('.theme-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.body.setAttribute('data-theme', btn.dataset.theme);
+                localStorage.setItem('preferred-theme', btn.dataset.theme);
+            });
+        });
+
+        document.querySelectorAll('.color-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.body.setAttribute('data-color', btn.dataset.color);
+                localStorage.setItem('preferred-color', btn.dataset.color);
+            });
+        });
+
+        document.getElementById('toggleSnow').addEventListener('change', function() {
+            snowEnabled = this.checked;
+            localStorage.setItem('snow-enabled', snowEnabled);
+        });
+
+        // Загрузка профиля при старте
+        loadUserProfile();
+    }
+
+    // Запуск приложения при загрузке страницы
+    document.addEventListener('DOMContentLoaded', initializeApp);
+</script>
 </body>
 </html>
-  
