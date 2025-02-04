@@ -1,119 +1,194 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram WebApp Demo</title>
+    <title>Welcome App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script>
-        // Немедленно вызываем expand() как только загрузится скрипт Telegram WebApp
-        window.onload = function() {
-            window.Telegram.WebApp.expand();
-            window.Telegram.WebApp.ready();
-        }
-    </script>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
             min-height: 100vh;
-            position: relative;
+            overflow: hidden;
         }
 
-        .navigation {
+        .welcome-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 48px;
-            background-color: var(--tg-theme-bg-color, #ffffff);
+            width: 100%;
+            height: 100%;
             display: flex;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 0 16px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
+            z-index: 1;
         }
 
-        .button {
-            background: none;
-            border: none;
-            padding: 8px 12px;
-            color: var(--tg-theme-button-color, #2481cc);
-            font-size: 14px;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .content {
-            padding-top: 64px;
+        .welcome-text {
+            font-size: 2em;
+            color: rgba(255, 255, 255, 0.8);
             text-align: center;
+            margin-bottom: 2em;
+            animation: fadeIn 2s ease;
+        }
+
+        .next-button {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .next-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-50%) scale(1.05);
+        }
+
+        .snowflake {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .profile-screen {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2;
+        }
+
+        .profile-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-name {
+            font-size: 1.5em;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
+        }
+
+        .profile-id {
+            font-size: 1em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
 <body>
-    <script>
-        // Принудительно вызываем expand() сразу при загрузке body
-        try {
-            window.Telegram.WebApp.expand();
-        } catch (e) {
-            console.error('Failed to expand WebApp:', e);
-        }
-    </script>
-
-    <div class="navigation">
-        <button class="button" id="closeButton">Закрыть</button>
-        <div style="flex-grow: 1"></div>
-        <button class="button" id="menuButton">⋮</button>
+    <div class="welcome-screen">
+        <h1 class="welcome-text">Welcome to the App</h1>
+        <button class="next-button">Next</button>
     </div>
 
-    <div class="content">
-        <h1>Web App активно</h1>
-        <p>Приложение работает в полноэкранном режиме</p>
+    <div class="profile-screen">
+        <img class="profile-photo" src="" alt="Profile Photo">
+        <div class="profile-name"></div>
+        <div class="profile-id"></div>
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-        // Дополнительная попытка расширения через небольшую задержку
-        setTimeout(() => {
-            tg.expand();
-        }, 50);
+        // Создание снежинок
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            snowflake.style.width = Math.random() * 4 + 2 + 'px';
+            snowflake.style.height = snowflake.style.width;
+            snowflake.style.left = Math.random() * window.innerWidth + 'px';
+            snowflake.style.opacity = Math.random();
+            snowflake.style.animation = `fall ${Math.random() * 3 + 2}s linear infinite`;
+            document.body.appendChild(snowflake);
 
-        document.getElementById('closeButton').addEventListener('click', () => {
-            tg.close();
-        });
-
-        document.getElementById('menuButton').addEventListener('click', () => {
-            tg.showPopup({
-                title: 'Меню',
-                message: 'Выберите действие',
-                buttons: [
-                    {id: 'about', type: 'default', text: 'О приложении'},
-                    {id: 'settings', type: 'default', text: 'Настройки'},
-                    {id: 'cancel', type: 'cancel', text: 'Закрыть'}
-                ]
-            }, function(buttonId) {
-                if (buttonId === 'about') {
-                    tg.showAlert('Демо WebApp для Telegram');
-                } else if (buttonId === 'settings') {
-                    tg.showAlert('Настройки временно недоступны');
+            let posY = -10;
+            function fall() {
+                if (posY >= window.innerHeight) {
+                    document.body.removeChild(snowflake);
+                    return;
                 }
-            });
+                posY += 1;
+                snowflake.style.top = posY + 'px';
+                requestAnimationFrame(fall);
+            }
+            fall();
+        }
+
+        // Генерация снежинок
+        setInterval(createSnowflake, 100);
+
+        // Обработка нажатия кнопки Next
+        document.querySelector('.next-button').addEventListener('click', () => {
+            const profileScreen = document.querySelector('.profile-screen');
+            const welcomeScreen = document.querySelector('.welcome-screen');
+
+            // Получаем данные пользователя
+            const user = tg.initDataUnsafe.user;
+            if (user) {
+                document.querySelector('.profile-name').textContent = user.first_name + 
+                    (user.last_name ? ' ' + user.last_name : '');
+                document.querySelector('.profile-id').textContent = 'ID: ' + user.id;
+                
+                // Если есть фото профиля
+                if (user.photo_url) {
+                    document.querySelector('.profile-photo').src = user.photo_url;
+                } else {
+                    document.querySelector('.profile-photo').src = 'https://via.placeholder.com/120';
+                }
+            }
+
+            welcomeScreen.style.display = 'none';
+            profileScreen.style.display = 'flex';
+            profileScreen.classList.add('slide-in');
         });
 
-        // Включаем поддержку haptic feedback
-        tg.enableClosingConfirmation();
-
-        // Явно указываем, что приложение готово
+        // Сообщаем Telegram, что приложение готово
         tg.ready();
-
-        // Добавляем обработчик для viewport
-        window.addEventListener('resize', () => {
-            tg.expand();
-        });
     </script>
 </body>
 </html>
