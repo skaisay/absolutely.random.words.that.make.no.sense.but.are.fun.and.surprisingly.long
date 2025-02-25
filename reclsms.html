@@ -5,102 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verification Code Generator</title>
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #f5f6fa;
+            --container-bg: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .snowflake {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: white;
-            border-radius: 50%;
-            filter: blur(1px);
-            animation: snowfall linear infinite;
-        }
-
-        @keyframes snowfall {
-            0% {
-                transform: translateY(-100vh) translateX(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) translateX(100px);
-                opacity: 0.3;
-            }
+            min-height: 100vh;
+            background: var(--background-color);
+            padding: 20px;
         }
 
         .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.9);
+            background: var(--container-bg);
             padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            position: relative;
-            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
             max-width: 400px;
-            width: 90%;
-        }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: -20px;
-            left: 0;
-            right: 0;
-            height: 40px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
         }
 
         h2 {
-            color: #2c3e50;
+            color: var(--primary-color);
             margin-bottom: 30px;
             font-size: 24px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            font-weight: 600;
         }
 
-        button {
-            padding: 12px 25px;
+        .generate-btn {
+            width: 100%;
+            padding: 12px;
             font-size: 16px;
-            background: linear-gradient(45deg, #6b8cff, #5d3fd3);
+            background: var(--secondary-color);
             color: white;
             border: none;
-            border-radius: 25px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        .generate-btn:hover {
+            background: #2980b9;
         }
 
-        button:disabled {
-            background: linear-gradient(45deg, #cccccc, #999999);
+        .generate-btn:disabled {
+            background: #bdc3c7;
             cursor: not-allowed;
-            transform: none;
         }
 
         .loader {
             display: none;
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid #5d3fd3;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--secondary-color);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             animation: spin 1s linear infinite;
             margin: 20px auto;
         }
@@ -110,52 +82,106 @@
             100% { transform: rotate(360deg); }
         }
 
-        #code {
+        .code-container {
             margin-top: 20px;
-            font-size: 20px;
-            font-family: 'Courier New', monospace;
-            color: #2c3e50;
+            display: none;
+            background: #f8f9fa;
             padding: 15px;
-            background: rgba(255,255,255,0.8);
-            border-radius: 10px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            position: relative;
         }
 
-        .kawaii-character {
+        .code-text {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            color: var(--primary-color);
+            word-break: break-all;
+            margin-right: 40px;
+        }
+
+        .copy-btn {
             position: absolute;
-            bottom: -50px;
-            right: -40px;
-            width: 100px;
-            height: 100px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23FFB6C1"/><circle cx="35" cy="40" r="5" fill="%23000"/><circle cx="65" cy="40" r="5" fill="%23000"/><path d="M 35 60 Q 50 70 65 60" stroke="%23000" stroke-width="3" fill="none"/></svg>') no-repeat;
-            opacity: 0.8;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #2980b9;
+        }
+
+        .copy-feedback {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            .code-text {
+                font-size: 16px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="kawaii-character"></div>
-        <h2>✨ Verification Code Generator ✨</h2>
-        <button id="generateBtn" onclick="generateCode()">Generate Code</button>
+        <h2>Verification Code Generator</h2>
+        <button class="generate-btn" id="generateBtn" onclick="generateCode()">Generate Code</button>
         <div id="loader" class="loader"></div>
-        <div id="code"></div>
+        <div id="codeContainer" class="code-container">
+            <div id="code" class="code-text"></div>
+            <button class="copy-btn" id="copyBtn" onclick="copyCode()">
+                Copy
+            </button>
+        </div>
     </div>
+    <div id="copyFeedback" class="copy-feedback">Code copied!</div>
 
     <script>
-        // Create snowflakes
-        function createSnowflakes() {
-            for (let i = 0; i < 50; i++) {
-                const snowflake = document.createElement('div');
-                snowflake.className = 'snowflake';
-                snowflake.style.left = Math.random() * 100 + 'vw';
-                snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                snowflake.style.opacity = Math.random();
-                snowflake.style.width = snowflake.style.height = (Math.random() * 5 + 5) + 'px';
-                document.body.appendChild(snowflake);
-            }
-        }
+        const verificationCodes = [
+            "A1B2C3D4E5F61111",
+            "B2C3D4E5F6A72222",
+            "C3D4E5F6A7B83333",
+            "D4E5F6A7B8C94444",
+            "E5F6A7B8C9D05555",
+            "F6A7B8C9D0E16666",
+            "1111222233334444",
+            "5555666677778888",
+            "9999AAAABBBBCCCC",
+            "DDDDEEEEFFFF0000",
+            "1A2B3C4D5E6F7890",
+            "2B3C4D5E6F7A8901",
+            "3C4D5E6F7A8B9012",
+            "4D5E6F7A8B9C0123",
+            "5E6F7A8B9C0D1234",
+            "6F7A8B9C0D1E2345",
+            "7A8B9C0D1E2F3456",
+            "8B9C0D1E2F3A4567",
+            "9C0D1E2F3A4B5678",
+            "0D1E2F3A4B5C6789"
+        ];
 
-        // Store generated codes in localStorage
         const generatedCodes = JSON.parse(localStorage.getItem('generatedCodes')) || {};
 
         async function getClientIP() {
@@ -168,54 +194,65 @@
             }
         }
 
-        function generateRandomCode() {
-            const characters = '0123456789ABCDEF';
-            let code = '';
-            for (let i = 0; i < 16; i++) {
-                code += characters.charAt(Math.floor(Math.random() * characters.length));
-            }
-            return code;
+        function getRandomCode() {
+            const randomIndex = Math.floor(Math.random() * verificationCodes.length);
+            return verificationCodes[randomIndex];
         }
 
         async function generateCode() {
             const clientIP = await getClientIP();
-            
+
             if (!clientIP) {
                 alert('Unable to verify your identity. Please try again later.');
                 return;
             }
 
             if (generatedCodes[clientIP]) {
-                document.getElementById('code').textContent = 'You have already generated a code: ' + generatedCodes[clientIP];
+                showCode(generatedCodes[clientIP]);
                 return;
             }
 
             const button = document.getElementById('generateBtn');
             const loader = document.getElementById('loader');
-            const codeDisplay = document.getElementById('code');
 
             button.disabled = true;
             loader.style.display = 'block';
-            codeDisplay.textContent = '';
+            document.getElementById('codeContainer').style.display = 'none';
 
             setTimeout(() => {
-                const newCode = generateRandomCode();
+                const newCode = getRandomCode();
                 generatedCodes[clientIP] = newCode;
                 localStorage.setItem('generatedCodes', JSON.stringify(generatedCodes));
 
                 loader.style.display = 'none';
-                codeDisplay.textContent = 'Your verification code: ' + newCode;
-                button.disabled = false;
+                showCode(newCode);
             }, 10000);
         }
 
-        // Initialize snowflakes and check for existing code on page load
+        function showCode(code) {
+            const codeContainer = document.getElementById('codeContainer');
+            const codeElement = document.getElementById('code');
+
+            codeElement.textContent = code;
+            codeContainer.style.display = 'block';
+            document.getElementById('generateBtn').disabled = true;
+        }
+
+        function copyCode() {
+            const codeText = document.getElementById('code').textContent;
+            navigator.clipboard.writeText(codeText).then(() => {
+                const feedback = document.getElementById('copyFeedback');
+                feedback.style.display = 'block';
+                setTimeout(() => {
+                    feedback.style.display = 'none';
+                }, 2000);
+            });
+        }
+
         window.onload = async function() {
-            createSnowflakes();
             const clientIP = await getClientIP();
             if (clientIP && generatedCodes[clientIP]) {
-                document.getElementById('code').textContent = 'You have already generated a code: ' + generatedCodes[clientIP];
-                document.getElementById('generateBtn').disabled = true;
+                showCode(generatedCodes[clientIP]);
             }
         };
     </script>
