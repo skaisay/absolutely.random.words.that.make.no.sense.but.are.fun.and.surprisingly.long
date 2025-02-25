@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Telegram Mini App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -30,7 +30,7 @@
         <div class="settings-container" style="display: none;">
             <div class="settings-group">
                 <h3 data-translate="language">Язык приложения</h3>
-                <p class="setting-description" data-translate="languageDesc">Выберите предпочитаемый язык интерфейса. Это изменит язык всех надписей в приложении.</p>
+                <p class="setting-description" data-translate="languageDesc">Выберите предпочитаемый язык интерфейса</p>
                 <div class="language-selector">
                     <button class="lang-btn active" data-lang="ru">Русский</button>
                     <button class="lang-btn" data-lang="en">English</button>
@@ -41,7 +41,7 @@
 
             <div class="settings-group">
                 <h3 data-translate="animation">Анимация звёзд</h3>
-                <p class="setting-description" data-translate="animationDesc">Отключение анимации может улучшить производительность приложения и снизить нагрузку на батарею вашего устройства.</p>
+                <p class="setting-description" data-translate="animationDesc">Управление анимацией фона</p>
                 <div class="animation-toggle">
                     <label class="switch">
                         <input type="checkbox" id="starAnimation" checked>
@@ -49,11 +49,6 @@
                     </label>
                     <span class="toggle-label" data-translate="toggleOn">Включено</span>
                 </div>
-            </div>
-
-            <div class="settings-group version-info">
-                <h3 data-translate="version">Версия приложения</h3>
-                <p class="version-number" data-translate="versionNumber">1.0.0 Beta</p>
             </div>
         </div>
 
@@ -88,9 +83,9 @@
         </div>
     </nav>
 
-    <script src="{{ url_for('static', filename='js/starfield.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/matrix.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="starfield.js"></script>
+    <script src="settings.js"></script>
+    <script src="matrix.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
