@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Настройки | Telegram Mini App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <canvas id="starfield"></canvas>
+
+    <div class="container">
+        <div class="settings-container">
+            <div class="settings-group">
+                <h3>Язык приложения</h3>
+                <p class="setting-description">Выберите предпочитаемый язык интерфейса. Это изменит язык всех надписей в приложении.</p>
+                <div class="language-selector">
+                    <button class="lang-btn active" data-lang="ru">Русский</button>
+                    <button class="lang-btn" data-lang="en">English</button>
+                    <button class="lang-btn" data-lang="zh">中文</button>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <h3>Анимация звёзд</h3>
+                <p class="setting-description">Отключение анимации может улучшить производительность приложения и снизить нагрузку на батарею вашего устройства.</p>
+                <div class="animation-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="starAnimation" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="toggle-label">Включено</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Навигация -->
+    <nav class="navigation">
+        <div class="nav-item" data-section="profile">
+            <i class="fas fa-user"></i>
+        </div>
+        <div class="nav-item active" data-section="settings">
+            <i class="fas fa-cog"></i>
+        </div>
+        <div class="nav-item" data-section="menu">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+
+    <script src="{{ url_for('static', filename='js/starfield.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
