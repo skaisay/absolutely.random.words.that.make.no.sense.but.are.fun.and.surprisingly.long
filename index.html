@@ -3,12 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto News Mini App</title>
+    <title>Telegram Mini App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="root"></div>
-    <script type="module" src="main.js"></script>
+    <canvas id="starfield"></canvas>
+
+    <div class="container">
+        <!-- Профиль пользователя -->
+        <div class="user-profile">
+            <div class="profile-image">
+                <img src="" alt="Profile" id="userAvatar">
+            </div>
+            <div class="profile-info">
+                <h2 id="userName">Загрузка...</h2>
+                <p>ID: <span id="userId">Загрузка...</span></p>
+                <p>Язык: <span id="userLanguage">Загрузка...</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Навигация -->
+    <nav class="navigation">
+        <div class="nav-item" data-section="profile">
+            <i class="fas fa-user"></i>
+        </div>
+        <div class="nav-item" data-section="settings">
+            <i class="fas fa-cog"></i>
+        </div>
+        <div class="nav-item" data-section="menu">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+
+    <script src="{{ url_for('static', filename='js/starfield.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
