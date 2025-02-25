@@ -1,40 +1,90 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const canvas = document.getElementById('matrix');
-    const ctx = canvas.getContext('2d');
+// Конфигурация матричного эффекта
+const matrixConfig = {
+    fontSize: 18,          // Увеличили с 14 до 18
+    chars: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+    speed: 50,
+    opacity: 1.0           // Увеличили с 0.8 до 1.0
+};
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+// Класс для управления символом матрицы
+class MatrixSymbol {
+    constructor(x, y, canvas, speed) {
+        this.x = x;
+        this.y = y;
+        this.canvas = canvas;
+        this.speed = speed;
+        this.value = '';
+        this.switchInterval = Math.random() * 2000 + 500;
+        this.lastSwitch = Date.now();
+    }
 
-    const chars = "アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const charArray = chars.split('');
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
+    // Обновление символа
+    update() {
+        this.y += this.speed * 0.5; // Замедлили скорость падения
+        if (this.y > this.canvas.height) {
+            this.y = 0;
+        }
 
-    function draw() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = '#0F0';
-        ctx.font = fontSize + 'px monospace';
-
-        for (let i = 0; i < drops.length; i++) {
-            const text = charArray[Math.floor(Math.random() * charArray.length)];
-            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                drops[i] = 0;
-            }
-            drops[i]++;
+        // Периодически меняем символ
+        if (Date.now() - this.lastSwitch > this.switchInterval) {
+            this.value = matrixConfig.chars[Math.floor(Math.random() * matrixConfig.chars.length)];
+            this.lastSwitch = Date.now();
         }
     }
 
-    window.addEventListener('resize', function() {
+    // Отрисовка символа
+    draw(ctx) {
+        const alpha = (this.canvas.height - this.y) / this.canvas.height;
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha * matrixConfig.opacity})`;
+        ctx.fillText(this.value, this.x, this.y);
+    }
+}
+
+// Инициализация матричного эффекта
+function initMatrix() {
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+
+    // Установка размеров canvas
+    function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        drops.length = Math.floor(canvas.width / fontSize);
-        drops.fill(1);
-    });
+        ctx.font = `${matrixConfig.fontSize}px monospace`;
+    }
 
-    setInterval(draw, 33);
-});
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Создание символов
+    const columns = Math.floor(canvas.width / matrixConfig.fontSize);
+    const symbols = [];
+
+    for (let i = 0; i < columns; i++) {
+        symbols.push(new MatrixSymbol(
+            i * matrixConfig.fontSize,
+            Math.random() * canvas.height,
+            canvas,
+            Math.random() * 1 + 0.5 // Уменьшили скорость падения
+        ));
+        symbols[i].value = matrixConfig.chars[Math.floor(Math.random() * matrixConfig.chars.length)];
+    }
+
+    // Функция анимации
+    function animate() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        symbols.forEach(symbol => {
+            symbol.update();
+            symbol.draw(ctx);
+        });
+
+        requestAnimationFrame(animate);
+    }
+
+    // Запуск анимации
+    animate();
+}
+
+// Запуск после загрузки страницы
+document.addEventListener('DOMContentLoaded', initMatrix);
