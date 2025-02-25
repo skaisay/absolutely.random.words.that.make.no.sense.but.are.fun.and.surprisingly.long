@@ -3,6 +3,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const tg = window.Telegram.WebApp;
     tg.expand(); // Развернуть приложение на весь экран
 
+    // Предотвращаем закрытие приложения свайпами
+    document.body.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+    }, { passive: false });
+
+    document.body.addEventListener('touchstart', function(e) {
+        if (e.touches.length > 1) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // Предотвращаем zoom
+    document.addEventListener('gesturestart', function(e) {
+        e.preventDefault();
+    });
+
     // Получение данных пользователя
     const user = tg.initDataUnsafe.user;
     if (user) {
@@ -27,7 +43,8 @@ document.addEventListener('DOMContentLoaded', function() {
             'profile': document.querySelector('.profile-container'),
             'settings': document.querySelector('.settings-container'),
             'menu': document.querySelector('.menu-container'),
-            'about': document.querySelector('.about-container')
+            'about': document.querySelector('.about-container'),
+            'verification': document.querySelector('.verification-container')
         };
 
         // Скрываем все экраны
@@ -42,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Управляем видимостью навигации
         const navigation = document.querySelector('.navigation');
-        if (section === 'about') {
+        if (section === 'about' || section === 'verification') {
             navigation.style.display = 'none';
         } else {
             navigation.style.display = 'flex';
@@ -52,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.nav-item').forEach(nav => {
             nav.classList.remove('active');
         });
-        if (section !== 'about') {
+        if (section !== 'about' && section !== 'verification') {
             document.querySelector(`.nav-item[data-section="${section}"]`).classList.add('active');
         }
     }
@@ -66,15 +83,58 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Обработчик клика по пункту меню "О приложении"
-    document.querySelector('.menu-item[data-screen="about"]')?.addEventListener('click', function() {
-        switchScreen('about');
+    // Обработчик клика по пунктам меню
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const screen = this.getAttribute('data-screen');
+            switchScreen(screen);
+        });
     });
 
-    // Обработчик клика по кнопке "Назад"
-    document.querySelector('.back-button')?.addEventListener('click', function() {
-        switchScreen('menu');
+    // Обработчик клика по кнопкам "Назад"
+    document.querySelectorAll('.back-button').forEach(button => {
+        button.addEventListener('click', function() {
+            switchScreen('menu');
+        });
     });
+
+    // Обработка верификации
+    const verificationCode = document.getElementById('verificationCode');
+    const submitCode = document.getElementById('submitCode');
+
+    if (submitCode) {
+        submitCode.addEventListener('click', function() {
+            const code = verificationCode.value.trim();
+            if (code.length === 16) {
+                if (isValidVerificationCode(code)) {
+                    tg.showPopup({
+                        title: 'Успешная верификация',
+                        message: 'Поздравляем! Код верификации подтвержден.',
+                        buttons: [{
+                            type: 'ok'
+                        }]
+                    });
+                    switchScreen('menu');
+                } else {
+                    tg.showPopup({
+                        title: 'Ошибка верификации',
+                        message: 'Введенный код не найден в базе. Пожалуйста, проверьте код и попробуйте снова.',
+                        buttons: [{
+                            type: 'ok'
+                        }]
+                    });
+                }
+            } else {
+                tg.showPopup({
+                    title: 'Ошибка ввода',
+                    message: 'Пожалуйста, введите 16-значный код верификации',
+                    buttons: [{
+                        type: 'ok'
+                    }]
+                });
+            }
+        });
+    }
 
     // Показываем профиль по умолчанию
     switchScreen('profile');
