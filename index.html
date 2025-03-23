@@ -1,129 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>Telegram Mini App</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrameIt - Скачать приложение</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f4e8;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        header h1 {
+            font-size: 48px;
+            color: #ffa000;
+            margin: 20px 0 10px;
+        }
+        header p {
+            font-size: 18px;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .download-section {
+            text-align: center;
+            margin: 60px 0;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .download-section h2 {
+            font-size: 36px;
+            color: #ffa000;
+            margin-bottom: 20px;
+        }
+        .download-btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 20px 30px;
+            background-color: #ffa000;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 15px;
+            margin: 20px;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .download-btn:hover {
+            transform: translateY(-5px);
+            background-color: #ff8f00;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            margin-top: 50px;
+        }
+    </style>
 </head>
 <body>
-    <canvas id="starfield"></canvas>
-
     <div class="container">
-        <!-- Профиль пользователя -->
-        <div class="profile-container">
-            <div class="user-profile">
-                <div class="profile-image">
-                    <img src="" alt="Profile" id="userAvatar">
-                </div>
-                <div class="profile-info">
-                    <h2 id="userName" data-translate="loading">Загрузка...</h2>
-                    <p><span data-translate="id">ID</span>: <span id="userId" data-translate="loading">Загрузка...</span></p>
-                    <p><span data-translate="language_code">Язык</span>: <span id="userLanguage" data-translate="loading">Загрузка...</span></p>
-                </div>
-            </div>
+        <header>
+            <h1>FrameIt</h1>
+            <p>Современное приложение для создания, хранения и обмена фотографиями. Работает как онлайн, так и офлайн на всех популярных платформах.</p>
+        </header>
+
+        <div class="download-section">
+            <h2>Скачать FrameIt</h2>
+            <p>Выберите версию для вашей операционной системы:</p>
+            
+            <a href="FrameIt_Setup.exe" class="download-btn">
+                Скачать для Windows
+            </a>
         </div>
 
-        <!-- Настройки -->
-        <div class="settings-container" style="display: none;">
-            <div class="settings-group">
-                <h3 data-translate="language">Язык приложения</h3>
-                <p class="setting-description" data-translate="languageDesc">Выберите предпочитаемый язык интерфейса. Это изменит язык всех надписей в приложении.</p>
-                <div class="language-selector">
-                    <button class="lang-btn active" data-lang="ru">Русский</button>
-                    <button class="lang-btn" data-lang="en">English</button>
-                    <button class="lang-btn" data-lang="zh">中文</button>
-                    <button class="lang-btn" data-lang="no">Norsk</button>
-                </div>
-            </div>
-
-            <div class="settings-group">
-                <h3 data-translate="animation">Анимация звёзд</h3>
-                <p class="setting-description" data-translate="animationDesc">Отключение анимации может улучшить производительность приложения и снизить нагрузку на батарею вашего устройства.</p>
-                <div class="animation-toggle">
-                    <label class="switch">
-                        <input type="checkbox" id="starAnimation" checked>
-                        <span class="slider round"></span>
-                    </label>
-                    <span class="toggle-label" data-translate="toggleOn">Включено</span>
-                </div>
-            </div>
-
-            <div class="settings-group version-info">
-                <h3 data-translate="version">Версия приложения</h3>
-                <p class="version-number" data-translate="versionNumber">1.0.0 Beta</p>
-            </div>
-        </div>
-
-        <!-- Меню -->
-        <div class="menu-container" style="display: none;">
-            <div class="menu-content">
-                <div class="menu-item" data-screen="about">
-                    <i class="fas fa-info-circle"></i>
-                    <span data-translate="aboutApp">О приложении</span>
-                </div>
-                <div class="menu-item" data-screen="verification">
-                    <i class="fas fa-shield-alt"></i>
-                    <span data-translate="verification">Верификация</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- О приложении -->
-        <div class="about-container" style="display: none;">
-            <canvas id="matrix"></canvas>
-            <div class="back-button">
-                <i class="fas fa-arrow-left"></i>
-                <span data-translate="backButton">Назад</span>
-            </div>
-        </div>
-
-        <!-- Верификация -->
-        <div class="verification-container" style="display: none;">
-            <div class="back-button">
-                <i class="fas fa-arrow-left"></i>
-                <span data-translate="backButton">Назад</span>
-            </div>
-            <div class="verification-content">
-                <h3 data-translate="verificationTitle">Верификация</h3>
-                <p data-translate="verificationDesc">Для прохождения верификации необходимо получить 16-значный код.</p>
-                <a href="https://skaisay.github.io/absolutely.random.words.that.make.no.sense.but.are.fun.and.surprisingly.long/reclsms.html" 
-                   class="verification-link" 
-                   target="_blank" 
-                   data-translate="getCode">Получить код</a>
-                <div class="verification-input">
-                    <input type="text" 
-                           id="verificationCode" 
-                           maxlength="16" 
-                           placeholder="Введите 16-значный код" 
-                           data-translate="codePlaceholder">
-                    <button id="submitCode" data-translate="submitCode">Подтвердить</button>
-                </div>
-            </div>
-        </div>
+        <footer>
+            <p>&copy; 2025 FrameIt Team. Все права защищены.</p>
+        </footer>
     </div>
-
-    <!-- Навигация -->
-    <nav class="navigation">
-        <div class="nav-item active" data-section="profile">
-            <i class="fas fa-user"></i>
-        </div>
-        <div class="nav-item" data-section="settings">
-            <i class="fas fa-cog"></i>
-        </div>
-        <div class="nav-item" data-section="menu">
-            <i class="fas fa-bars"></i>
-        </div>
-    </nav>
-
-    <script src="{{ url_for('static', filename='js/starfield.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/matrix.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/verification_codes.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
